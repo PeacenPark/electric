@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>전기 계산기 메인 페이지</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', 'Noto Sans KR', sans-serif;
+      background: #f6f9fc;
+      margin: 0;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    h1 {
+      color: #1a73e8;
+      margin-bottom: 40px;
+    }
+    .btn {
+      display: block;
+      margin: 15px auto;
+      padding: 15px 30px;
+      font-size: 18px;
+      background-color: #1a73e8;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 260px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .btn:hover {
+      background-color: #155ec2;
+    }
+    @media (max-width: 500px) {
+      .btn {
+        width: 90%;
+        font-size: 16px;
+        padding: 12px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>전기 계산기 메인 페이지</h1>
+  <button class="btn" onclick="location.href='cable.html'">전선(차단기) 계산기</button>
+  <button class="btn" onclick="location.href='conduit-size.html'">전선관 계산기</button>
+  <button class="btn" onclick="location.href='voltage-drop.html'">전압강하 계산기</button>
+</body>
+</html>

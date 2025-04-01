@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>케이블 계산기</title>
+  <style>
+    :root {
+      --primary-color: #0056b3;
+      --accent-color: #007bff;
+      --background: #f9fafa;
+      --text: #222;
+      --border: #ccc;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', 'Noto Sans KR', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: var(--background);
+      color: var(--text);
+    }
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 30px 20px;
+    }
+    .calculator {
+      background: #fff;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    }
+    h1 {
+      text-align: center;
+      color: var(--primary-color);
+      margin-bottom: 25px;
+      font-size: 1.8em;
+    }
+    label {
+      font-weight: bold;
+      margin-top: 18px;
+      display: block;
+      font-size: 0.95em;
+    }
+    select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: #fefefe;
+      font-size: 1em;
+    }
+    .result {
+      margin-top: 25px;
+      background: #f0f7ff;
+      border-left: 4px solid var(--accent-color);
+      padding: 15px 20px;
+      border-radius: 8px;
+      font-size: 0.95em;
+      line-height: 1.6em;
+    }
+    .reference {
+      margin-top: 20px;
+      font-size: 0.85em;
+      color: #555;
+      border-top: 1px dashed #bbb;
+      padding-top: 12px;
+    }
+    @media (max-width: 480px) {
+      .container { padding: 20px 15px; }
+      h1 { font-size: 1.5em; }
+    }
+    .home-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: #1a73e8;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      z-index: 1000;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .home-btn:hover { background: #155ec2; }
+  </style>
+</head>
+<body>
+  <button class="home-btn" onclick="goBack()">← 홈으로</button>
+  <div class="container">
+    <div class="calculator">
+      <h1>케이블 계산기</h1>
+      <label for="cableSize">전선 굵기 (㎟)</label>
+      <select id="cableSize"></select>
+
+      <label for="installMethod">설치 방법</label>
+      <select id="installMethod">
+        <option value="공기">공기 중</option>
+        <option value="관">관내 배선</option>
+        <option value="지중">지중 매설(관 없음)</option>
+      </select>
+
+      <label for="voltageType">전원 종류</label>
+      <select id="voltageType">
+        <option value="단상">단상 220V</option>
+        <option value="삼상">삼상 380V</option>
+      </select>
+
+      <label for="coreCount">심 수</label>
+      <select id="coreCount">
+        <option value="1">1심</option>
+        <option value="2">2심</option>
+        <option value="3">3심</option>
+        <option value="4">4심</option>
+      </select>
+
+      <div class="result" id="result">선택 정보를 바탕으로 결과가 표시됩니다.</div>
+    </div>
+  </div>
+
+  <script>
+    function goBack() {
+      window.location.href = 'index.html';
+    }
+
+    const cableData = {
+      "1.5": 18, "2.5": 24, "4": 32, "6": 41, "10": 57, "16": 76, "25": 101,
+      "35": 125, "50": 150, "70": 192, "95": 232, "120": 269, "150": 309,
+      "185": 353, "240": 415, "300": 472, "400": 545, "500": 614, "600": 690
+    };
+
+    const installFactor = {
+      "공기": 1.0, "관": 0.87, "지중": 0.75
+    };
+
+    const coreFactor = {
+      "1": 1.0, "2": 0.94, "3": 0.9, "4": 0.87
+    };
+
+    const breakerSizes = [
+      2, 3, 5, 10, 15, 20, 25, 30, 32, 40, 50, 60, 63,
+      75, 80, 100, 125, 150, 160, 175, 200, 225, 250,
+      300, 315, 350, 400, 450, 500, 550, 600, 630
+    ];
+
+    const groundSizes = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240, 300, 400, 500, 600];
+
+    function getGroundSize(powerSize) {
+      const size = parseFloat(powerSize);
+      let result;
+      if (size <= 6) result = 6;
+      else if (size <= 16) result = size;
+      else if (size <= 35) result = 16;
+      else result = Math.floor(size / 2);
+      return `${groundSizes.find(s => s >= result)} ㎟`;
+    }
+
+    function updateCableOptions() {
+      const select = document.getElementById('cableSize');
+      const sortedSizes = Object.keys(cableData).map(Number).sort((a, b) => a - b);
+      sortedSizes.forEach(size => {
+        const option = document.createElement('option');
+        option.value = size;
+        option.textContent = `${size} ㎟`;
+        select.appendChild(option);
+      });
+    }
+
+    function updateResult() {
+      const size = document.getElementById('cableSize').value;
+      const method = document.getElementById('installMethod').value;
+      const voltage = document.getElementById('voltageType').value;
+      const cores = document.getElementById('coreCount').value;
+
+      if (!size || !method || !cores || !voltage) {
+        document.getElementById('result').textContent = "모든 항목을 선택해주세요.";
+        return;
+      }
+
+      const baseCurrent = cableData[size];
+      const correction = installFactor[method] * coreFactor[cores];
+      const correctedCurrent = Math.floor(baseCurrent * correction);
+
+      const maxBreaker = Math.floor(correctedCurrent / 1.25);
+      const matchedBreaker = [...breakerSizes].reverse().find(a => a <= maxBreaker);
+
+      const voltageVal = voltage === "단상" ? 220 : 380;
+      const contractPower = voltage === "단상"
+        ? Math.round((voltageVal * correctedCurrent) / 1000)
+        : Math.round((Math.sqrt(3) * voltageVal * correctedCurrent) / 1000);
+
+      const groundSize = getGroundSize(size);
+
+      document.getElementById('result').innerHTML = `
+        <strong>전선 정보</strong><br>
+        굵기: ${size} ㎟ (CV)<br>
+        설치 방법: ${method}<br>
+        전원: ${voltage}<br>
+        심 수: ${cores}심<br><br>
+        <strong>최대 허용 전류:</strong> ${baseCurrent} A<br>
+        <strong>보정 후 허용 전류:</strong> 약 ${correctedCurrent} A<br>
+        <strong>추천 차단기:</strong> ${matchedBreaker} A 이하<br>
+        <strong>가능 계약 용량:</strong> 약 ${contractPower} kW<br>
+        <strong>접지선 굵기:</strong> ${groundSize}
+
+        <div class="reference">
+          <strong>[KEC 기준 참고]</strong><br>
+          - 허용 전류: KEC 2021 표 3.2.1 (CV 케이블 기준)<br>
+          - 접지선 굵기: KEC 제1212-3 접지도체 최소 단면적 기준<br>
+          - 차단기 용량: 허용전류의 125% 이하 적용
+        </div>
+      `;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      updateCableOptions();
+      document.querySelectorAll('select').forEach(select => {
+        select.addEventListener('change', updateResult);
+      });
+    });
+  </script>
+</body>
+</html>
