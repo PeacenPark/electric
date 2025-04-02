@@ -66,12 +66,9 @@
     <select id="pipeType" onchange="updateConduitSizes()">
       <option value="">선택</option>
       <option value="ELP">ELP관</option>
-      <option value="CD">CD관</option>
-      <option value="PE">PE관</option>
+      <option value="CD_PE">CD/PE관</option>
       <option value="HI">HI관</option>
-      <option value="G">금속관 G형</option>
-      <option value="C">금속관 C형</option>
-      <option value="GW">금속관 GW형</option>
+      <option value="STEEL">스틸/GW관</option>
       <option value="TRAY">케이블 트레이</option>
     </select>
 
@@ -86,13 +83,14 @@
 
     <div id="result"></div>
   </div>
+
 <script>
 function goBack() {
   window.location.href = 'index.html';
 }
 
 const fillLimit = {
-  'ELP': 40, 'CD': 40, 'PE': 40, 'HI': 45, 'G': 50, 'C': 50, 'GW': 50, 'TRAY': 50
+  'ELP': 40, 'CD_PE': 40, 'HI': 45, 'STEEL': 50, 'TRAY': 50
 };
 
 const trayWidths = [50, 100, 150, 200, 300, 400, 500, 600, 700, 800];
@@ -105,10 +103,10 @@ const elpConduits = [
 ];
 
 const generalConduits = [
-  { name: '16호', area: 200 },
-  { name: '22호', area: 300 }, { name: '28호', area: 500 },
-  { name: '36호', area: 800 }, { name: '42호', area: 1200 },
-  { name: '54호', area: 1500 }, { name: '70호', area: 2500 }
+  { name: '16호', area: 200 }, { name: '22호', area: 300 },
+  { name: '28호', area: 500 }, { name: '36호', area: 800 },
+  { name: '42호', area: 1200 }, { name: '54호', area: 1500 },
+  { name: '70호', area: 2500 }
 ];
 
 const cableDiameters = {
@@ -157,6 +155,19 @@ function updateConduitSizes() {
   }
 }
 
+function updateSizeOptions(index) {
+  const type = document.getElementById(`type${index}`).value;
+  const sizeSelect = document.getElementById(`size${index}`);
+  const coreSelect = document.getElementById(`core${index}`);
+
+  let sizes = Object.keys(cableDiameters[type] || {});
+  sizes.sort((a, b) => parseFloat(a) - parseFloat(b));
+  sizeSelect.innerHTML = `<option value="">직접 입력</option>` + sizes.map(s => `<option value="${s}">${s}㎟</option>`).join('');
+
+  coreSelect.innerHTML = (type === "HFIX") ? `<option value="1">1C</option>` :
+    `<option value="1">1C</option><option value="2">2C</option><option value="3">3C</option><option value="4">4C</option>`;
+}
+
 function addCableGroup() {
   const div = document.createElement('div');
   div.className = 'group';
@@ -164,7 +175,7 @@ function addCableGroup() {
   div.innerHTML = `
     <div class="field-group">
       <div class="field"><label>전선 종류</label>
-        <select id="type${groupIndex}">
+        <select id="type${groupIndex}" onchange="updateSizeOptions(${groupIndex})">
           <option value="CV">CV</option>
           <option value="HFIX">HFIX</option>
         </select>
@@ -172,13 +183,11 @@ function addCableGroup() {
       <div class="field"><label>전선 굵기(㎟)</label>
         <select id="size${groupIndex}">
           <option value="">직접 입력</option>
-          ${Object.keys(cableDiameters.CV).map(Number).sort((a,b)=>a-b).map(s=>`<option value="${s}">${s}㎟</option>`).join('')}
         </select>
       </div>
       <div class="field"><label>Core 수</label>
         <select id="core${groupIndex}">
-          <option value="1">1C</option><option value="2">2C</option>
-          <option value="3">3C</option><option value="4">4C</option>
+          <option value="1">1C</option><option value="2">2C</option><option value="3">3C</option><option value="4">4C</option>
         </select>
       </div>
       <div class="field"><label>회로 수</label>
@@ -193,16 +202,17 @@ function addCableGroup() {
       </div>
     </div>`;
   document.getElementById('cableGroups').appendChild(div);
+  updateSizeOptions(groupIndex);
   groupIndex++;
 }
-
+</script>
+<!-- 계산 함수와 로직은 다음 메시지에서 이어드릴게요 (길이 제한으로 나뉨) -->
+<script>
 function removeCableGroup(index) {
   const group = document.getElementById(`group${index}`);
   if (group) group.remove();
 }
-</script>
-<!-- 계산 로직은 다음 메시지에 이어서 보내드릴게요 -->
-<script>
+
 function getCombinations(arr, len) {
   if (len === 1) return arr.map(v => [v]);
   const res = [];
@@ -233,12 +243,9 @@ function calculate() {
   const pipeType = document.getElementById("pipeType").value;
   const selectedVal = parseFloat(document.getElementById("pipeSize").value);
   const correction = pipeType === 'ELP' ? 0.7 :
-                     pipeType === 'CD' ? 0.6 :
-                     pipeType === 'PE' ? 0.6 :
+                     pipeType === 'CD_PE' ? 0.6 :
                      pipeType === 'HI' ? 0.65 :
-                     pipeType === 'G'  ? 0.8 :
-                     pipeType === 'C'  ? 0.75 :
-                     pipeType === 'GW' ? 0.75 : 1.0;
+                     pipeType === 'STEEL' ? 0.75 : 1.0;
 
   let totalArea = 0, totalWidth = 0, resultText = "";
   document.querySelectorAll(".group").forEach(group => {
@@ -281,6 +288,7 @@ function calculate() {
         resultText += `<span class="red">※ 적합한 트레이 조합이 없습니다.</span>`;
       }
     }
+
   } else {
     const conduitList = pipeType === 'ELP' ? elpConduits : generalConduits;
     const selectedArea = selectedVal || 0;
@@ -321,9 +329,9 @@ function calculate() {
 
   resultText += `<span style="color:blue"><br><br><small><strong>※ KEC 전선관 채움률 기준 안내</strong><br>
   - ELP관: 40% 이하 권장<br>
-  - CD관/PE관: 40% 이하<br>
+  - CD/PE관: 40% 이하<br>
   - HI관: 45% 이하<br>
-  - 금속관(G/C/GW형): 최대 50% 이하<br>
+  - 스틸/GW관: 최대 50% 이하<br>
   - 케이블 트레이: 50% 이하 권장</small>`;
 
   document.getElementById("result").innerHTML = resultText;
