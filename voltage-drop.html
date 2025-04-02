@@ -151,6 +151,7 @@
     </form>
 
     <div id="warnings" class="warning"></div>
+    <div id="summary" class="info-text" style="margin-top:20px; font-size:15px; font-weight:500;"></div>
 
     <div class="table-container">
       <table id="resultTable">
@@ -206,6 +207,8 @@ function updateWireInfo() {
 function populateWireOptions() {
   const wire1 = document.getElementById("wire1_select");
   const wire2 = document.getElementById("wire2_select");
+  wire1.innerHTML = "";
+  wire2.innerHTML = "";
   wireOptions.forEach(opt => {
     const option1 = new Option(opt.label, JSON.stringify(opt));
     const option2 = new Option(opt.label, JSON.stringify(opt));
@@ -231,13 +234,14 @@ function calculate() {
   const table = document.querySelector("#resultTable tbody");
   table.innerHTML = "";
   const warnings = [];
-
   let overDropWarned = false;
 
   if (totalCurrent > wire1.current) warnings.push(`1번 LED까지 전류 (${totalCurrent.toFixed(2)}A)가 허용전류 ${wire1.current}A 초과`);
   if (currentPerLED > wire2.current) warnings.push(`이후 LED당 전류 (${currentPerLED.toFixed(3)}A)가 허용전류 ${wire2.current}A 초과`);
 
   for (let i = 1; i <= count; i++) {
+    if (remainingCurrent <= 0) break;
+
     const isFirst = i === 1;
     const segmentLength = isFirst ? firstDist : spacing;
     const resistance = isFirst ? wire1.resistance : wire2.resistance;
@@ -248,7 +252,6 @@ function calculate() {
     const percentDrop = (cumulativeDrop / smpsV) * 100;
     const overLimit = percentDrop > 3;
 
-    // 전압 강하가 3% 초과된 첫 번째 LED 위치를 경고로 출력
     if (overLimit && !overDropWarned) {
       warnings.push(`LED ${i}번 이후 전압강하 ${percentDrop.toFixed(1)}% 발생 (3% 초과)`);
       overDropWarned = true;
@@ -267,31 +270,19 @@ function calculate() {
     remainingCurrent -= currentPerLED;
   }
 
-  document.getElementById("warnings").innerHTML = warnings.length ? warnings.join("<br>") : "";
+  document.getElementById("warnings").innerHTML = warnings.join("<br>");
 
-  for (let i = 1; i <= count; i++) {
-    const isFirst = i === 1;
-    const segmentLength = isFirst ? firstDist : spacing;
-    const resistance = isFirst ? wire1.resistance : wire2.resistance;
-    const wireLength = segmentLength * 2;
-    const voltageDrop = remainingCurrent * resistance * wireLength;
-    cumulativeDrop += voltageDrop;
-    const ledVoltage = smpsV - cumulativeDrop;
-    const percentDrop = (cumulativeDrop / smpsV) * 100;
-    const overLimit = percentDrop > 3;
+  const totalDistance = firstDist + spacing * (count - 1);
+  const totalCableLength = totalDistance * 2;
+  const percentDrop = (cumulativeDrop / smpsV) * 100;
+  const finalVoltage = smpsV - cumulativeDrop;
 
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${i}</td>
-      <td>${segmentLength.toFixed(2)}</td>
-      <td>${remainingCurrent.toFixed(3)}</td>
-      <td>${remainingCurrent.toFixed(3)} × ${resistance.toExponential(3)} × ${wireLength.toFixed(2)} = ${voltageDrop.toFixed(3)}V</td>
-      <td class="${overLimit ? "high-drop" : ""}">${cumulativeDrop.toFixed(3)}V (${percentDrop.toFixed(1)}%)</td>
-      <td>${smpsV.toFixed(1)} - ${cumulativeDrop.toFixed(3)} = ${ledVoltage.toFixed(3)}V</td>`;
-    table.appendChild(row);
-
-    remainingCurrent -= currentPerLED;
-  }
+  document.getElementById("summary").innerHTML = `
+    총 거리: ${totalDistance.toFixed(2)}m<br>
+    총 전선 길이 (왕복): ${totalCableLength.toFixed(2)}m<br>
+    최종 누적 전압 강하: ${cumulativeDrop.toFixed(3)}V (${percentDrop.toFixed(1)}%)<br>
+    최종 LED 전압: ${finalVoltage.toFixed(3)}V
+  `;
 }
 
 window.addEventListener("DOMContentLoaded", populateWireOptions);
