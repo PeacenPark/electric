@@ -156,7 +156,11 @@ function addCableGroup() {
       <div class="field"><label>전선 굵기(㎟)</label>
         <select id="size${groupIndex}">
           <option value="">직접 입력</option>
-          ${Object.keys(cableDiameters.CV).map(size => `<option value="${size}">${size}㎟</option>`).join('')}
+          ${Object.keys(cableDiameters.CV)
+    .map(Number)
+    .sort((a, b) => a - b)  // 숫자 기준 오름차순 정렬
+    .map(size => `<option value="${size}">${size}㎟</option>`)
+    .join('')}
         </select>
       </div>
       <div class="field"><label>Core 수</label>
