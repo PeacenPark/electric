@@ -71,6 +71,8 @@
     @media (max-width: 480px) {
       .container { padding: 20px 15px; }
       h1 { font-size: 1.5em; }
+      select { font-size: 1.2em; }
+      label { font-size: 1.3em; }
     }
     .home-btn {
       position: fixed;
@@ -94,6 +96,13 @@
   <div class="container">
     <div class="calculator">
       <h1>케이블 계산기</h1>
+
+      <label for="cableType">전선 종류</label>
+      <select id="cableType">
+        <option value="CV">CV</option>
+        <option value="HFIX">HFIX</option>
+      </select>
+
       <label for="cableSize">전선 굵기 (㎟)</label>
       <select id="cableSize"></select>
 
@@ -128,23 +137,25 @@
     }
 
     const cableData = {
-      "1.5": 18, "2.5": 24, "4": 32, "6": 41, "10": 57, "16": 76, "25": 101,
-      "35": 125, "50": 150, "70": 192, "95": 232, "120": 269, "150": 309,
-      "185": 353, "240": 415, "300": 472, "400": 545, "500": 614, "600": 690
+      CV: {
+        "1.5": 18, "2.5": 24, "4": 32, "6": 41, "10": 57, "16": 76, "25": 101,
+        "35": 125, "50": 150, "70": 192, "95": 232, "120": 269, "150": 309,
+        "185": 353, "240": 415, "300": 472, "400": 545, "500": 614, "600": 690
+      },
+      HFIX: {
+        "1.5": 15, "2.5": 21, "4": 28, "6": 36, "10": 50, "16": 68, "25": 89,
+        "35": 112, "50": 138, "70": 174, "95": 210, "120": 245, "150": 285,
+        "185": 325, "240": 380, "300": 440, "400": 505, "500": 570, "600": 635
+      }
     };
 
-    const installFactor = {
-      "공기": 1.0, "관": 0.87, "지중": 0.75
-    };
-
-    const coreFactor = {
-      "1": 1.0, "2": 0.94, "3": 0.9, "4": 0.87
-    };
+    const installFactor = { "공기": 1.0, "관": 0.87, "지중": 0.75 };
+    const coreFactor = { "1": 1.0, "2": 0.94, "3": 0.9, "4": 0.87 };
 
     const breakerSizes = [
-      2, 3, 5, 10, 15, 20, 25, 30, 32, 40, 50, 60, 63,
-      75, 80, 100, 125, 150, 160, 175, 200, 225, 250,
-      300, 315, 350, 400, 450, 500, 550, 600, 630
+      2, 3, 5, 10, 15, 20, 25, 30, 32, 40, 50, 60, 63, 75, 80,
+      100, 125, 150, 160, 175, 200, 225, 250, 300, 315, 350,
+      400, 450, 500, 550, 600, 630
     ];
 
     const groundSizes = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240, 300, 400, 500, 600];
@@ -152,8 +163,7 @@
     function getGroundSize(sizeStr) {
       const size = parseFloat(sizeStr);
       let result;
-      if (size <= 6) result = 6;
-      else if (size <= 16) result = size;
+      if (size <= 16) result = size;
       else if (size <= 35) result = 16;
       else result = size / 2;
       return `${groundSizes.find(s => s >= result)} ㎟`;
@@ -161,32 +171,38 @@
 
     function updateCableOptions() {
       const select = document.getElementById('cableSize');
-      const sortedSizes = Object.keys(cableData).map(Number).sort((a, b) => a - b);
-      sortedSizes.forEach(size => {
+      select.innerHTML = "";
+      const type = document.getElementById('cableType').value;
+      const sizes = Object.keys(cableData[type]).map(Number).sort((a, b) => a - b);
+      sizes.forEach(size => {
         const option = document.createElement('option');
         option.value = size;
         option.textContent = `${size} ㎟`;
         select.appendChild(option);
       });
+      select.selectedIndex = 0;
+      updateResult();
     }
 
     function updateResult() {
+      const type = document.getElementById('cableType').value;
       const size = document.getElementById('cableSize').value;
       const method = document.getElementById('installMethod').value;
       const voltage = document.getElementById('voltageType').value;
       const cores = document.getElementById('coreCount').value;
 
-      if (!size || !method || !cores || !voltage) {
+      if (!size || !method || !cores || !voltage || !type) {
         document.getElementById('result').textContent = "모든 항목을 선택해주세요.";
         return;
       }
 
-      const baseCurrent = cableData[size];
+      const baseCurrent = cableData[type][size];
       const correction = installFactor[method] * coreFactor[cores];
-      const correctedCurrent = Math.floor(baseCurrent * correction);
-
+      const correctedCurrent = Math.round(baseCurrent * correction * 10) / 10;
       const maxBreaker = Math.floor(correctedCurrent * 1.25);
-      const matchedBreaker = breakerSizes.find(a => a >= correctedCurrent && a <= maxBreaker) || "적정 차단기 없음";
+
+      const validBreakers = breakerSizes.filter(a => a >= correctedCurrent && a <= maxBreaker);
+      const matchedBreaker = validBreakers.length > 0 ? Math.min(...validBreakers) : null;
 
       const voltageVal = voltage === "단상" ? 220 : 380;
       const contractPower = voltage === "단상"
@@ -195,23 +211,29 @@
 
       const groundSize = getGroundSize(size);
 
+      const breakerText = matchedBreaker
+        ? `${matchedBreaker} A 이하`
+        : `<span style="color:red">적정 차단기 없음 – 전선 굵기를 상향하세요</span>`;
+
       document.getElementById('result').innerHTML = `
         <strong>전선 정보</strong><br>
-        굵기: ${size} ㎟ (CV)<br>
+        종류: ${type} 케이블<br>
+        굵기: ${size} ㎟<br>
         설치 방법: ${method}<br>
         전원: ${voltage}<br>
         Core 수: ${cores}C<br><br>
+
         <strong>최대 허용 전류:</strong> ${baseCurrent} A<br>
         <strong>보정 후 허용 전류:</strong> 약 ${correctedCurrent} A<br>
-        <span style="color:green"><strong>추천 차단기: ${matchedBreaker} A 이하</strong></span> <br>
-        <span style="color:green"><strong>가능 계약 용량: 약 ${contractPower} kW</strong></span> <br>
-        <span style="color:green"><strong>접지선 굵기: ${groundSize}</strong></span> 
+        <span style="color:green"><strong>추천 차단기: ${breakerText}</strong></span><br>
+        <span style="color:green"><strong>가능 계약 용량: 약 ${contractPower} kW</strong></span><br>
+        <span style="color:green"><strong>접지선 굵기: ${groundSize}</strong></span>
 
         <div class="reference">
           <strong>[KEC 기준 참고]</strong><br>
-          - 허용 전류: KEC 2021 표 3.2.1 (CV 케이블 기준)<br>
-          - 접지선 굵기: KEC 제1212-3 접지도체 최소 단면적 기준<br>
-          - 차단기 용량: 허용전류의 125% 이하 적용
+          - 허용 전류: KEC 2021 표 3.2.1 기준<br>
+          - 접지선 산정: 16㎟ 이하 동일, 16~35㎟는 16㎟, 35㎟ 초과는 1/2<br>
+          - 차단기: 허용전류의 125% 이하
         </div>
       `;
     }
@@ -219,7 +241,13 @@
     document.addEventListener('DOMContentLoaded', () => {
       updateCableOptions();
       document.querySelectorAll('select').forEach(select => {
-        select.addEventListener('change', updateResult);
+        select.addEventListener('change', () => {
+          if (select.id === 'cableType') {
+            updateCableOptions();
+          } else {
+            updateResult();
+          }
+        });
       });
     });
   </script>
