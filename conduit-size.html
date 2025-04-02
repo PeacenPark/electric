@@ -58,7 +58,7 @@
   </style>
 </head>
 <body>
- <button class="home-btn" onclick="goBack()">← 홈으로</button>
+  <button class="home-btn" onclick="goBack()">← 홈으로</button>
   <div class="container">
     <h1>전선관 계산기</h1>
 
@@ -71,6 +71,7 @@
       <option value="HI">HI관</option>
       <option value="G">금속관 G형</option>
       <option value="C">금속관 C형</option>
+      <option value="GW">금속관 GW형</option>
       <option value="TRAY">케이블 트레이</option>
     </select>
 
@@ -86,11 +87,12 @@
     <div id="result"></div>
   </div>
 <script>
-    function goBack() {
-      window.location.href = 'index.html';
-    }
+function goBack() {
+  window.location.href = 'index.html';
+}
+
 const fillLimit = {
-  'ELP': 40, 'CD': 40, 'PE': 40, 'HI': 45, 'G': 50, 'C': 50, 'TRAY': 50
+  'ELP': 40, 'CD': 40, 'PE': 40, 'HI': 45, 'G': 50, 'C': 50, 'GW': 50, 'TRAY': 50
 };
 
 const trayWidths = [50, 100, 150, 200, 300, 400, 500, 600, 700, 800];
@@ -103,6 +105,7 @@ const elpConduits = [
 ];
 
 const generalConduits = [
+  { name: '16호', area: 200 },
   { name: '22호', area: 300 }, { name: '28호', area: 500 },
   { name: '36호', area: 800 }, { name: '42호', area: 1200 },
   { name: '54호', area: 1500 }, { name: '70호', area: 2500 }
@@ -129,6 +132,14 @@ const cableDiameters = {
     '400': { '1': 35.0, '2': 65.0, '3': 75.0, '4': 80.0 },
     '500': { '1': 39.0, '2': 71.0, '3': 82.0, '4': 88.0 },
     '600': { '1': 42.0, '2': 76.0, '3': 88.0, '4': 94.0 }
+  },
+  'HFIX': {
+    '1.5': { '1': 3.0 },
+    '2.5': { '1': 3.4 },
+    '4': { '1': 3.9 },
+    '6': { '1': 4.5 },
+    '10': { '1': 5.5 },
+    '16': { '1': 6.8 }
   }
 };
 
@@ -138,7 +149,6 @@ function updateConduitSizes() {
   const type = document.getElementById("pipeType").value;
   const sizeSelect = document.getElementById("pipeSize");
   sizeSelect.innerHTML = '<option value="">자동 선택</option>';
-
   if (type === 'TRAY') {
     trayWidths.forEach(w => sizeSelect.innerHTML += `<option value="${w}">${w}mm</option>`);
   } else {
@@ -153,14 +163,16 @@ function addCableGroup() {
   div.setAttribute('id', `group${groupIndex}`);
   div.innerHTML = `
     <div class="field-group">
+      <div class="field"><label>전선 종류</label>
+        <select id="type${groupIndex}">
+          <option value="CV">CV</option>
+          <option value="HFIX">HFIX</option>
+        </select>
+      </div>
       <div class="field"><label>전선 굵기(㎟)</label>
         <select id="size${groupIndex}">
           <option value="">직접 입력</option>
-${Object.keys(cableDiameters.CV)
-    .map(Number)
-    .sort((a, b) => a - b)  // 숫자 기준 오름차순 정렬
-    .map(size => `<option value="${size}">${size}㎟</option>`)
-    .join('')}
+          ${Object.keys(cableDiameters.CV).map(Number).sort((a,b)=>a-b).map(s=>`<option value="${s}">${s}㎟</option>`).join('')}
         </select>
       </div>
       <div class="field"><label>Core 수</label>
@@ -189,6 +201,7 @@ function removeCableGroup(index) {
   if (group) group.remove();
 }
 </script>
+<!-- 계산 로직은 다음 메시지에 이어서 보내드릴게요 -->
 <script>
 function getCombinations(arr, len) {
   if (len === 1) return arr.map(v => [v]);
@@ -224,22 +237,24 @@ function calculate() {
                      pipeType === 'PE' ? 0.6 :
                      pipeType === 'HI' ? 0.65 :
                      pipeType === 'G'  ? 0.8 :
-                     pipeType === 'C'  ? 0.75 : 1.0;
+                     pipeType === 'C'  ? 0.75 :
+                     pipeType === 'GW' ? 0.75 : 1.0;
 
   let totalArea = 0, totalWidth = 0, resultText = "";
   document.querySelectorAll(".group").forEach(group => {
     const id = group.id.replace("group", "");
+    const type = document.getElementById(`type${id}`).value;
     const size = document.getElementById(`size${id}`).value;
     const core = document.getElementById(`core${id}`).value;
     const count = parseInt(document.getElementById(`count${id}`).value) || 1;
-    const dia = parseFloat(document.getElementById(`customDia${id}`).value) || (cableDiameters.CV[size]?.[core] || 0);
+    const dia = parseFloat(document.getElementById(`customDia${id}`).value) || (cableDiameters[type]?.[size]?.[core] || 0);
     if (!dia) return;
 
     const area = Math.PI * Math.pow(dia / 2, 2);
     totalArea += area * count;
     totalWidth += dia * count;
 
-    resultText += `● ${size || '사용자 입력'} ${core}C × ${count}회로<br>`;
+    resultText += `● ${type} ${size || '사용자 입력'} ${core}C × ${count}회로<br>`;
     resultText += `&nbsp;&nbsp;- 외경: ${dia}mm / 단면적: ${area.toFixed(2)}㎟ / 총: ${(area * count).toFixed(2)}㎟<br><br>`;
   });
 
@@ -308,7 +323,7 @@ function calculate() {
   - ELP관: 40% 이하 권장<br>
   - CD관/PE관: 40% 이하<br>
   - HI관: 45% 이하<br>
-  - 금속관(G/C형): 최대 50% 이하<br>
+  - 금속관(G/C/GW형): 최대 50% 이하<br>
   - 케이블 트레이: 50% 이하 권장</small>`;
 
   document.getElementById("result").innerHTML = resultText;
