@@ -58,12 +58,12 @@
       border-left: 4px solid var(--accent-color);
       padding: 15px 20px;
       border-radius: 8px;
-      font-size: 0.95em;
+      font-size: 1.5em;
       line-height: 1.6em;
     }
     .reference {
       margin-top: 20px;
-      font-size: 0.85em;
+      font-size: 0.55em;
       color: #555;
       border-top: 1px dashed #bbb;
       padding-top: 12px;
@@ -110,12 +110,12 @@
         <option value="삼상">삼상 380V</option>
       </select>
 
-      <label for="coreCount">심 수</label>
+      <label for="coreCount">Core 수</label>
       <select id="coreCount">
-        <option value="1">1심</option>
-        <option value="2">2심</option>
-        <option value="3">3심</option>
-        <option value="4">4심</option>
+        <option value="1">1C</option>
+        <option value="2">2C</option>
+        <option value="3">3C</option>
+        <option value="4">4C</option>
       </select>
 
       <div class="result" id="result">선택 정보를 바탕으로 결과가 표시됩니다.</div>
@@ -149,13 +149,13 @@
 
     const groundSizes = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240, 300, 400, 500, 600];
 
-    function getGroundSize(powerSize) {
-      const size = parseFloat(powerSize);
+    function getGroundSize(sizeStr) {
+      const size = parseFloat(sizeStr);
       let result;
       if (size <= 6) result = 6;
       else if (size <= 16) result = size;
       else if (size <= 35) result = 16;
-      else result = Math.floor(size / 2);
+      else result = size / 2;
       return `${groundSizes.find(s => s >= result)} ㎟`;
     }
 
@@ -185,8 +185,8 @@
       const correction = installFactor[method] * coreFactor[cores];
       const correctedCurrent = Math.floor(baseCurrent * correction);
 
-      const maxBreaker = Math.floor(correctedCurrent / 1.25);
-      const matchedBreaker = [...breakerSizes].reverse().find(a => a <= maxBreaker);
+      const maxBreaker = Math.floor(correctedCurrent * 1.25);
+      const matchedBreaker = breakerSizes.find(a => a >= correctedCurrent && a <= maxBreaker) || "적정 차단기 없음";
 
       const voltageVal = voltage === "단상" ? 220 : 380;
       const contractPower = voltage === "단상"
