@@ -19,13 +19,13 @@
       display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; align-items: center;
     }
     .field { flex: 1; min-width: 130px; }
-    label { font-weight: bold; display: block; margin-bottom: 5px; }
+    label { font-weight: bold; display: block; margin-bottom: 5px; font-size: 25px;}
     select, input {
-      width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px;
+      width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; font-size: 23px;
     }
     button {
       background: #1a73e8; color: #fff; border: none;
-      padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 15px;
+      padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 20px;
       margin-top: 10px; margin-right: 5px;
     }
     button:hover { background: #155ec2; }
@@ -33,7 +33,7 @@
     .remove-btn:hover { background: #c0392b; }
     #result {
       margin-top: 20px; background: #e8f0fe;
-      padding: 15px; border-radius: 10px; font-weight: bold;
+      padding: 15px; border-radius: 10px; font-weight: bold; font-size: 20px;
     }
     .group {
       background: #fafafa; border: 1px solid #ddd;
@@ -156,7 +156,7 @@ function addCableGroup() {
       <div class="field"><label>전선 굵기(㎟)</label>
         <select id="size${groupIndex}">
           <option value="">직접 입력</option>
-          ${Object.keys(cableDiameters.CV)
+${Object.keys(cableDiameters.CV)
     .map(Number)
     .sort((a, b) => a - b)  // 숫자 기준 오름차순 정렬
     .map(size => `<option value="${size}">${size}㎟</option>`)
@@ -296,8 +296,8 @@ function calculate() {
           const match = conduitList.find(c => c.area === a);
           return match ? match.name : `${a}㎟`;
         });
-        resultText += `<strong>추천 조합:</strong> ${names.join(" + ")} = ${sum}㎟<br>`;
-        resultText += `<strong>채움률:</strong> ${fill2.toFixed(1)}%`;
+        resultText += `<span style="color:green"><strong>추천 조합 ${names.join(" + ")} = ${sum}㎟</strong></span> <br>`;
+        resultText += `<span style="color:green"><strong>채움률: ${fill2.toFixed(1)}% </strong></span>`;
       } else {
         resultText += `<span class="red">※ 적합한 전선관 조합이 없습니다.</span>`;
       }
@@ -305,7 +305,7 @@ function calculate() {
   }
 
   resultText += `<span style="color:blue"><br><br><small><strong>※ KEC 전선관 채움률 기준 안내</strong><br>
-  - ELP관: 40% 권장<br>
+  - ELP관: 40% 이하 권장<br>
   - CD관/PE관: 40% 이하<br>
   - HI관: 45% 이하<br>
   - 금속관(G/C형): 최대 50% 이하<br>
