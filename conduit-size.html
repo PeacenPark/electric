@@ -282,8 +282,8 @@ function calculate() {
       if (combo) {
         const sum = combo.reduce((a,b) => a + b, 0);
         const fill2 = (totalWidth / sum) * 100;
-        resultText += `<strong>추천 조합:</strong> ${combo.join(" + ")}mm = ${sum}mm<br>`;
-        resultText += `<strong>채움률:</strong> ${fill2.toFixed(1)}%`;
+        resultText += `<span style="color:green">추천 조합: ${combo.join(" + ")}mm = ${sum}mm</span> <br>`;
+        resultText += `<span style="color:green">채움률: ${fill2.toFixed(1)}%</span> `;
       } else {
         resultText += `<span class="red">※ 적합한 트레이 조합이 없습니다.</span>`;
       }
