@@ -30,14 +30,15 @@
       flex-direction: column;
       margin-bottom: 15px;
       font-weight: 600;
-      font-size: 15px;
+      font-size: 25px;
     }
     input, select {
       padding: 8px;
-      font-size: 15px;
+      font-size: 25px;
       margin-top: 5px;
       border: 1px solid #ccc;
       border-radius: 6px;
+      color: #1a73e8;
     }
     .info-text {
       font-size: 14px;
@@ -128,16 +129,16 @@
         <input type="number" id="smps_voltage" value="220" />
       </label>
       <label>LED 전력 (W)
-        <input type="number" id="led_power" value="50" />
+        <input type="number" id="led_power" value="1" />
       </label>
       <label>LED 개수
-        <input type="number" id="led_count" value="10" />
+        <input type="number" id="led_count" value="100" />
       </label>
       <label>1번 LED까지 거리 (m)
-        <input type="number" step="20" id="first_distance" value="20" />
+        <input type="number" step="0.1" id="first_distance" value="5" />
       </label>
       <label>LED 간 간격 (m)
-        <input type="number" step="20" id="spacing" value="20" />
+        <input type="number" step="0.1" id="spacing" value="0.1" />
       </label>
       <label>1번 LED까지 전선
         <select id="wire1_select" onchange="updateWireInfo()"></select>
