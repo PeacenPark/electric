@@ -263,8 +263,8 @@ function calculate() {
       <td>${i}</td>
       <td>${segmentLength.toFixed(2)}</td>
       <td>${remainingCurrent.toFixed(3)}</td>
+       <td class="${overLimit ? "high-drop" : ""}">${cumulativeDrop.toFixed(3)}V (${percentDrop.toFixed(1)}%)</td>
       <td>${remainingCurrent.toFixed(3)} × ${resistance.toExponential(3)} × ${wireLength.toFixed(2)} = ${voltageDrop.toFixed(3)}V</td>
-      <td class="${overLimit ? "high-drop" : ""}">${cumulativeDrop.toFixed(3)}V (${percentDrop.toFixed(1)}%)</td>
       <td>${smpsV.toFixed(1)} - ${cumulativeDrop.toFixed(3)} = ${ledVoltage.toFixed(3)}V</td>`;
     table.appendChild(row);
 
