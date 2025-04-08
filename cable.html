@@ -190,6 +190,28 @@
   updateResult();
 }
 
+function updateCoreOptions() {
+    const type = document.getElementById('cableType').value;
+    const coreSelect = document.getElementById('coreCount');
+    coreSelect.innerHTML = "";
+
+    const options = type === "HFIX"
+      ? [{value: "1", label: "1C"}]
+      : [
+          {value: "1", label: "1C"},
+          {value: "2", label: "2C"},
+          {value: "3", label: "3C"},
+          {value: "4", label: "4C"}
+        ];
+
+    options.forEach(opt => {
+      const option = document.createElement('option');
+      option.value = opt.value;
+      option.textContent = opt.label;
+      coreSelect.appendChild(option);
+    });
+  }
+
     function updateResult() {
       const type = document.getElementById('cableType').value;
       const size = document.getElementById('cableSize').value;
@@ -245,17 +267,20 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      updateCableOptions();
-      document.querySelectorAll('select').forEach(select => {
-        select.addEventListener('change', () => {
-          if (select.id === 'cableType') {
-            updateCableOptions();
-          } else {
-            updateResult();
-          }
-        });
-      });
+  updateCableOptions();
+  updateCoreOptions(); // 코어 옵션도 초기화
+
+  document.querySelectorAll('select').forEach(select => {
+    select.addEventListener('change', () => {
+      if (select.id === 'cableType') {
+        updateCableOptions();
+        updateCoreOptions(); // 전선 종류 변경 시 코어 옵션도 재설정
+      } else {
+        updateResult();
+      }
     });
+  });
+});
   </script>
 </body>
 </html>
