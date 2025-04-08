@@ -170,19 +170,25 @@
     }
 
     function updateCableOptions() {
-      const select = document.getElementById('cableSize');
-      select.innerHTML = "";
-      const type = document.getElementById('cableType').value;
-      const sizes = Object.keys(cableData[type]).map(Number).sort((a, b) => a - b);
-      sizes.forEach(size => {
-        const option = document.createElement('option');
-        option.value = size;
-        option.textContent = `${size} ㎟`;
-        select.appendChild(option);
-      });
-      select.selectedIndex = 0;
-      updateResult();
-    }
+  const select = document.getElementById('cableSize');
+  select.innerHTML = "";
+  const type = document.getElementById('cableType').value;
+  let sizes = Object.keys(cableData[type]).map(Number).sort((a, b) => a - b);
+
+  // HFIX는 50㎟까지만 선택 가능하도록 제한
+  if (type === 'HFIX') {
+    sizes = sizes.filter(size => size <= 50);
+  }
+
+  sizes.forEach(size => {
+    const option = document.createElement('option');
+    option.value = size;
+    option.textContent = `${size} ㎟`;
+    select.appendChild(option);
+  });
+  select.selectedIndex = 0;
+  updateResult();
+}
 
     function updateResult() {
       const type = document.getElementById('cableType').value;
