@@ -5,7 +5,12 @@
   <title>전선관 계산기</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    body { font-family: 'Segoe UI', sans-serif; background: #f6f9fc; padding: 20px; margin: 0; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f6f9fc;
+      padding: 20px;
+      margin: 0;
+    }
     .container {
       max-width: 860px;
       margin: auto;
@@ -13,33 +18,85 @@
       padding: 25px;
       border-radius: 12px;
       box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      position: relative;
     }
-    h1 { text-align: center; color: #1a73e8; margin-bottom: 30px; }
+    h1 {
+      text-align: center;
+      color: #1a73e8;
+      margin-bottom: 30px;
+    }
     .field-group {
-      display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 10px;
+      align-items: center;
     }
-    .field { flex: 1; min-width: 130px; }
-    label { font-weight: bold; display: block; margin-bottom: 5px; font-size: 25px;}
+    .field {
+      flex: 1;
+      min-width: 130px;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+      font-size: 22px;
+    }
     select, input {
-      width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; font-size: 23px;
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 20px;
     }
     button {
-      background: #1a73e8; color: #fff; border: none;
-      padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 20px;
-      margin-top: 10px; margin-right: 5px;
+      background: #1a73e8;
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 18px;
+      margin-top: 10px;
+      margin-right: 5px;
     }
-    button:hover { background: #155ec2; }
-    .remove-btn { background: #e74c3c; margin-left: 10px; }
-    .remove-btn:hover { background: #c0392b; }
+    button:hover {
+      background: #155ec2;
+    }
+    .remove-btn {
+      background: #e74c3c;
+      margin-left: 10px;
+    }
+    .remove-btn:hover {
+      background: #c0392b;
+    }
     #result {
-      margin-top: 20px; background: #e8f0fe;
-      padding: 15px; border-radius: 10px; font-weight: bold; font-size: 20px;
+      margin-top: 20px;
+      background: #e8f0fe;
+      padding: 15px;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 18px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
     .group {
-      background: #fafafa; border: 1px solid #ddd;
-      padding: 10px; border-radius: 8px; margin-bottom: 10px;
+      background: #fafafa;
+      border: 1px solid #ddd;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 10px;
     }
-    .red { color: red; font-weight: bold; }
+    .red {
+      color: red;
+      font-weight: bold;
+    }
+    .hint {
+      font-size: 14px;
+      color: #999;
+      margin-top: 3px;
+    }
     .home-btn {
       position: fixed;
       top: 20px;
@@ -54,7 +111,9 @@
       z-index: 1000;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
-    .home-btn:hover { background: #155ec2; }
+    .home-btn:hover {
+      background: #155ec2;
+    }
   </style>
 </head>
 <body>
@@ -66,7 +125,8 @@
     <select id="pipeType" onchange="updateConduitSizes()">
       <option value="">선택</option>
       <option value="ELP">ELP관</option>
-      <option value="CD_PE">CD/PE관</option>
+      <option value="CD">CD관</option>
+      <option value="PE">PE관</option>
       <option value="HI">HI관</option>
       <option value="STEEL">스틸/GW관</option>
       <option value="TRAY">케이블 트레이</option>
@@ -81,16 +141,16 @@
     <button onclick="addCableGroup()">+ 전선 추가</button>
     <button onclick="calculate()">계산하기</button>
 
+    <div id="summary" style="margin-top:15px; font-size:16px; color:#333;"></div>
     <div id="result"></div>
   </div>
-
-<script>
+  <script>
 function goBack() {
   window.location.href = 'index.html';
 }
 
 const fillLimit = {
-  'ELP': 40, 'CD_PE': 40, 'HI': 45, 'STEEL': 50, 'TRAY': 50
+  'ELP': 40, 'CD': 40, 'PE': 40, 'HI': 45, 'STEEL': 50, 'TRAY': 50
 };
 
 const trayWidths = [50, 100, 150, 200, 300, 400, 500, 600, 700, 800];
@@ -99,16 +159,105 @@ const elpConduits = [
   { name: '30mm', area: 600 }, { name: '40mm', area: 1100 },
   { name: '50mm', area: 1700 }, { name: '65mm', area: 2800 },
   { name: '80mm', area: 4200 }, { name: '100mm', area: 6700 },
-  { name: '125mm', area: 10500 }, { name: '150mm', area: 15000 }
+  { name: '125mm', area: 10500 }, { name: '150mm', area: 15000 },
+  { name: '175mm', area: 20000 }, { name: '200mm', area: 25000 }
 ];
-
-const generalConduits = [
-  { name: '16호', area: 200 }, { name: '22호', area: 300 },
+const cdConduits = [
+  { name: '16호', area: 100 }, { name: '22호', area: 200 },
+  { name: '28호', area: 340 }, { name: '36호', area: 530 }
+];
+const peConduits = [
+  { name: '16호', area: 100 }, { name: '22호', area: 200 },
+  { name: '28호', area: 340 }, { name: '36호', area: 530 },
+  { name: '42호', area: 730 }, { name: '54호', area: 1100 },
+  { name: '70호', area: 1600 }, { name: '82호', area: 2100 },
+  { name: '104호', area: 3000 }
+];
+const hiConduits = [
+  { name: '16호', area: 120 }, { name: '22호', area: 230 },
+  { name: '28호', area: 380 }, { name: '36호', area: 600 },
+  { name: '42호', area: 830 }, { name: '54호', area: 1250 },
+  { name: '70호', area: 1800 }, { name: '82호', area: 2400 },
+  { name: '100호', area: 3200 }
+];
+const steelConduits = [
+  { name: '16호', area: 160 }, { name: '22호', area: 300 },
   { name: '28호', area: 500 }, { name: '36호', area: 800 },
   { name: '42호', area: 1200 }, { name: '54호', area: 1500 },
-  { name: '70호', area: 2500 }
+  { name: '70호', area: 2500 }, { name: '82호', area: 3200 },
+  { name: '104호', area: 4000 }
 ];
 
+function updateConduitSizes() {
+  const type = document.getElementById("pipeType").value;
+  const sizeSelect = document.getElementById("pipeSize");
+  sizeSelect.innerHTML = '<option value="">자동 선택</option>';
+
+  let list = [];
+  if (type === 'TRAY') {
+    trayWidths.forEach(w => sizeSelect.innerHTML += `<option value="${w}">${w}mm</option>`);
+    return;
+  }
+  if (type === 'ELP') list = elpConduits;
+  else if (type === 'CD') list = cdConduits;
+  else if (type === 'PE') list = peConduits;
+  else if (type === 'HI') list = hiConduits;
+  else if (type === 'STEEL') list = steelConduits;
+
+  list.forEach(c => {
+    sizeSelect.innerHTML += `<option value="${c.area}">${c.name}</option>`;
+  });
+}
+
+let groupIndex = 0;
+
+function addCableGroup() {
+  const div = document.createElement('div');
+  div.className = 'group';
+  div.setAttribute('id', `group${groupIndex}`);
+  div.innerHTML = `
+    <div class="field-group">
+      <div class="field"><label>전선 종류</label>
+        <select id="type${groupIndex}" onchange="updateSizeOptions(${groupIndex})">
+          <option value="CV">CV</option>
+          <option value="HFIX">HFIX</option>
+        </select>
+      </div>
+      <div class="field"><label>전선 굵기(㎟)</label>
+        <select id="size${groupIndex}">
+          <option value="">직접 입력</option>
+        </select>
+      </div>
+      <div class="field"><label>Core 수</label>
+        <select id="core${groupIndex}">
+          <option value="1">1C</option><option value="2">2C</option><option value="3">3C</option><option value="4">4C</option>
+        </select>
+      </div>
+      <div class="field"><label>회로 수</label>
+        <input type="number" id="count${groupIndex}" value="1" min="1">
+      </div>
+      <div class="field"><label>외경(mm)</label>
+        <input type="number" step="0.1" id="customDia${groupIndex}" placeholder="자동 또는 수동 입력"
+          oninput="document.getElementById('size${groupIndex}').value = ''; this.style.borderColor='orange';">
+        <div class="hint">※ 수동 입력 시 자동 외경 무시</div>
+      </div>
+      <div class="field"><label>&nbsp;</label>
+        <button class="remove-btn" onclick="removeCableGroup(${groupIndex})">삭제</button>
+      </div>
+    </div>`;
+  document.getElementById('cableGroups').appendChild(div);
+  updateSizeOptions(groupIndex);
+  groupIndex++;
+}
+
+function removeCableGroup(index) {
+  if (confirm("정말 삭제하시겠습니까?")) {
+    const group = document.getElementById(`group${index}`);
+    if (group) group.remove();
+  }
+}
+</script>
+<script>
 const cableDiameters = {
   'CV': {
     '1.5': { '1': 6.3, '2': 11.0, '3': 12.1, '4': 13.0 },
@@ -141,20 +290,6 @@ const cableDiameters = {
   }
 };
 
-let groupIndex = 0;
-
-function updateConduitSizes() {
-  const type = document.getElementById("pipeType").value;
-  const sizeSelect = document.getElementById("pipeSize");
-  sizeSelect.innerHTML = '<option value="">자동 선택</option>';
-  if (type === 'TRAY') {
-    trayWidths.forEach(w => sizeSelect.innerHTML += `<option value="${w}">${w}mm</option>`);
-  } else {
-    const list = type === 'ELP' ? elpConduits : generalConduits;
-    list.forEach(c => sizeSelect.innerHTML += `<option value="${c.area}">${c.name}</option>`);
-  }
-}
-
 function updateSizeOptions(index) {
   const type = document.getElementById(`type${index}`).value;
   const sizeSelect = document.getElementById(`size${index}`);
@@ -166,51 +301,6 @@ function updateSizeOptions(index) {
 
   coreSelect.innerHTML = (type === "HFIX") ? `<option value="1">1C</option>` :
     `<option value="1">1C</option><option value="2">2C</option><option value="3">3C</option><option value="4">4C</option>`;
-}
-
-function addCableGroup() {
-  const div = document.createElement('div');
-  div.className = 'group';
-  div.setAttribute('id', `group${groupIndex}`);
-  div.innerHTML = `
-    <div class="field-group">
-      <div class="field"><label>전선 종류</label>
-        <select id="type${groupIndex}" onchange="updateSizeOptions(${groupIndex})">
-          <option value="CV">CV</option>
-          <option value="HFIX">HFIX</option>
-        </select>
-      </div>
-      <div class="field"><label>전선 굵기(㎟)</label>
-        <select id="size${groupIndex}">
-          <option value="">직접 입력</option>
-        </select>
-      </div>
-      <div class="field"><label>Core 수</label>
-        <select id="core${groupIndex}">
-          <option value="1">1C</option><option value="2">2C</option><option value="3">3C</option><option value="4">4C</option>
-        </select>
-      </div>
-      <div class="field"><label>회로 수</label>
-        <input type="number" id="count${groupIndex}" value="1" min="1">
-      </div>
-      <div class="field"><label>외경(mm)</label>
-        <input type="number" step="0.1" id="customDia${groupIndex}" placeholder="자동 또는 수동 입력"
-          oninput="document.getElementById('size${groupIndex}').value = '';">
-      </div>
-      <div class="field"><label>&nbsp;</label>
-        <button class="remove-btn" onclick="removeCableGroup(${groupIndex})">삭제</button>
-      </div>
-    </div>`;
-  document.getElementById('cableGroups').appendChild(div);
-  updateSizeOptions(groupIndex);
-  groupIndex++;
-}
-</script>
-<!-- 계산 함수와 로직은 다음 메시지에서 이어드릴게요 (길이 제한으로 나뉨) -->
-<script>
-function removeCableGroup(index) {
-  const group = document.getElementById(`group${index}`);
-  if (group) group.remove();
 }
 
 function getCombinations(arr, len) {
@@ -243,11 +333,14 @@ function calculate() {
   const pipeType = document.getElementById("pipeType").value;
   const selectedVal = parseFloat(document.getElementById("pipeSize").value);
   const correction = pipeType === 'ELP' ? 0.7 :
-                     pipeType === 'CD_PE' ? 0.6 :
+                     pipeType === 'CD' ? 0.6 :
+                     pipeType === 'PE' ? 0.6 :
                      pipeType === 'HI' ? 0.65 :
                      pipeType === 'STEEL' ? 0.75 : 1.0;
 
-  let totalArea = 0, totalWidth = 0, resultText = "";
+  let totalArea = 0, totalWidth = 0, totalCount = 0;
+  let resultText = "";
+
   document.querySelectorAll(".group").forEach(group => {
     const id = group.id.replace("group", "");
     const type = document.getElementById(`type${id}`).value;
@@ -260,10 +353,13 @@ function calculate() {
     const area = Math.PI * Math.pow(dia / 2, 2);
     totalArea += area * count;
     totalWidth += dia * count;
+    totalCount += count;
 
-    resultText += `● ${type} ${size || '사용자 입력'} ${core}C × ${count}회로<br>`;
+    resultText += `● ${type} ${size || '사용자입력'} ${core}C × ${count}회로<br>`;
     resultText += `&nbsp;&nbsp;- 외경: ${dia}mm / 단면적: ${area.toFixed(2)}㎟ / 총: ${(area * count).toFixed(2)}㎟<br><br>`;
   });
+
+  document.getElementById("summary").innerHTML = `총 전선 수: <strong>${totalCount}</strong> / 총 단면적: <strong>${totalArea.toFixed(2)}㎟</strong>`;
 
   const limit = fillLimit[pipeType];
 
@@ -274,23 +370,26 @@ function calculate() {
     resultText += `<strong>채움률:</strong> <span class="${fill > limit ? 'red' : ''}">${fill.toFixed(1)}%</span><br>`;
 
     if (fill <= limit) {
-      resultText += `<strong>선택한 트레이:</strong> <span style="color:green">적합</span>`;
+      resultText += `<strong style="color:green">선택한 트레이 적합</strong>`;
     } else {
-      resultText += `<span class="red">※ 선택한 트레이로는 부적합합니다.</span><br>`;
+      resultText += `<span class="red">※ 선택한 트레이 부적합</span><br>`;
       const required = totalWidth / (limit / 100);
       const combo = findBalancedCombo(trayWidths, required);
       if (combo) {
         const sum = combo.reduce((a,b) => a + b, 0);
         const fill2 = (totalWidth / sum) * 100;
-        resultText += `<span style="color:green">추천 조합: ${combo.join(" + ")}mm = ${sum}mm</span> <br>`;
-        resultText += `<span style="color:green">채움률: ${fill2.toFixed(1)}%</span> `;
+        resultText += `<span style="color:green">추천 조합: ${combo.join(" + ")}mm = ${sum}mm<br>채움률: ${fill2.toFixed(1)}%</span>`;
       } else {
         resultText += `<span class="red">※ 적합한 트레이 조합이 없습니다.</span>`;
       }
     }
 
   } else {
-    const conduitList = pipeType === 'ELP' ? elpConduits : generalConduits;
+    let conduitList = pipeType === 'ELP' ? elpConduits :
+                      pipeType === 'CD' ? cdConduits :
+                      pipeType === 'PE' ? peConduits :
+                      pipeType === 'HI' ? hiConduits : steelConduits;
+
     const selectedArea = selectedVal || 0;
     const effectiveArea = selectedArea * correction;
     const fill = selectedArea ? (totalArea / effectiveArea) * 100 : 999;
@@ -304,9 +403,9 @@ function calculate() {
       resultText += `<span style="color:green"><strong>적합</strong></span>`;
     } else {
       if (selectedArea) {
-        resultText += `<span class="red">※ 선택한 전선관으로는 부적합합니다.</span><br>`;
+        resultText += `<span class="red">※ 선택한 전선관 부적합</span><br>`;
       } else {
-        resultText += `<span>※ 전선관을 선택하지 않아 자동으로 추천합니다.</span><br>`;
+        resultText += `<span>※ 전선관 미선택 → 자동 추천</span><br>`;
       }
 
       const required = totalArea / (limit / 100 * correction);
@@ -315,14 +414,11 @@ function calculate() {
       if (combo) {
         const sum = combo.reduce((a,b)=>a+b,0);
         const fill2 = (totalArea / (sum * correction)) * 100;
-        const names = combo.map(a => {
-          const match = conduitList.find(c => c.area === a);
-          return match ? match.name : `${a}㎟`;
-        });
+        const names = combo.map(a => conduitList.find(c => c.area === a)?.name || `${a}㎟`);
         resultText += `<span style="color:green"><strong>추천 조합 ${names.join(" + ")} = ${sum}㎟</strong></span> <br>`;
-        resultText += `<span style="color:green"><strong>채움률: ${fill2.toFixed(1)}% </strong></span>`;
+        resultText += `<span style="color:green"><strong>채움률: ${fill2.toFixed(1)}%</strong></span>`;
       } else {
-        resultText += `<span class="red">※ 적합한 전선관 조합이 없습니다.</span>`;
+        resultText += `<span class="red">※ 적합한 전선관 조합 없음</span>`;
       }
     }
   }
