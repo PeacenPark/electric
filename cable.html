@@ -1,3 +1,4 @@
+<!-- 코드가 길어 분할 제공됩니다. 다음 메시지에서 계속 이어집니다. -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -58,7 +59,7 @@
       border-left: 4px solid var(--accent-color);
       padding: 15px 20px;
       border-radius: 8px;
-      font-size: 1.5em;
+      font-size: 1.4em;
       line-height: 1.6em;
     }
     .reference {
@@ -127,7 +128,9 @@
         <option value="4">4C</option>
       </select>
 
-      <div class="result" id="result">선택 정보를 바탕으로 결과가 표시됩니다.</div>
+      <div class="result" id="result" style="color:#777;">
+        선택 정보를 바탕으로 결과가 표시됩니다.
+      </div>
     </div>
   </div>
 
@@ -144,8 +147,7 @@
       },
       HFIX: {
         "1.5": 15, "2.5": 21, "4": 28, "6": 36, "10": 50, "16": 68, "25": 89,
-        "35": 112, "50": 138, "70": 174, "95": 210, "120": 245, "150": 285,
-        "185": 325, "240": 380, "300": 440, "400": 505, "500": 570, "600": 635
+        "35": 112, "50": 138
       }
     };
 
@@ -153,9 +155,7 @@
     const coreFactor = { "1": 1.0, "2": 0.94, "3": 0.9, "4": 0.87 };
 
     const breakerSizes = [
-      2, 3, 5, 10, 15, 20, 25, 30, 32, 40, 50, 60, 63, 75, 80,
-      100, 125, 150, 160, 175, 200, 225, 250, 300, 315, 350,
-      400, 450, 500, 550, 600, 630
+      15, 20, 30, 40, 50, 75, 100, 125, 150, 175, 200, 225, 250, 300
     ];
 
     const groundSizes = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240, 300, 400, 500, 600];
@@ -170,47 +170,43 @@
     }
 
     function updateCableOptions() {
-  const select = document.getElementById('cableSize');
-  select.innerHTML = "";
-  const type = document.getElementById('cableType').value;
-  let sizes = Object.keys(cableData[type]).map(Number).sort((a, b) => a - b);
+      const select = document.getElementById('cableSize');
+      select.innerHTML = "";
+      const type = document.getElementById('cableType').value;
+      let sizes = Object.keys(cableData[type]).map(Number).sort((a, b) => a - b);
+      if (type === 'HFIX') sizes = sizes.filter(size => size <= 50);
 
-  // HFIX는 50㎟까지만 선택 가능하도록 제한
-  if (type === 'HFIX') {
-    sizes = sizes.filter(size => size <= 50);
-  }
+      sizes.forEach(size => {
+        const option = document.createElement('option');
+        option.value = size;
+        option.textContent = `${size} ㎟`;
+        select.appendChild(option);
+      });
+      select.selectedIndex = 0;
+      updateResult();
+    }
 
-  sizes.forEach(size => {
-    const option = document.createElement('option');
-    option.value = size;
-    option.textContent = `${size} ㎟`;
-    select.appendChild(option);
-  });
-  select.selectedIndex = 0;
-  updateResult();
-}
+    function updateCoreOptions() {
+      const type = document.getElementById('cableType').value;
+      const coreSelect = document.getElementById('coreCount');
+      coreSelect.innerHTML = "";
 
-function updateCoreOptions() {
-    const type = document.getElementById('cableType').value;
-    const coreSelect = document.getElementById('coreCount');
-    coreSelect.innerHTML = "";
+      const options = type === "HFIX"
+        ? [{value: "1", label: "1C"}]
+        : [
+            {value: "1", label: "1C"},
+            {value: "2", label: "2C"},
+            {value: "3", label: "3C"},
+            {value: "4", label: "4C"}
+          ];
 
-    const options = type === "HFIX"
-      ? [{value: "1", label: "1C"}]
-      : [
-          {value: "1", label: "1C"},
-          {value: "2", label: "2C"},
-          {value: "3", label: "3C"},
-          {value: "4", label: "4C"}
-        ];
-
-    options.forEach(opt => {
-      const option = document.createElement('option');
-      option.value = opt.value;
-      option.textContent = opt.label;
-      coreSelect.appendChild(option);
-    });
-  }
+      options.forEach(opt => {
+        const option = document.createElement('option');
+        option.value = opt.value;
+        option.textContent = opt.label;
+        coreSelect.appendChild(option);
+      });
+    }
 
     function updateResult() {
       const type = document.getElementById('cableType').value;
@@ -225,12 +221,15 @@ function updateCoreOptions() {
       }
 
       const baseCurrent = cableData[type][size];
-      const correction = installFactor[method] * coreFactor[cores];
-      const correctedCurrent = Math.round(baseCurrent * correction * 10) / 10;
+      const installCoef = installFactor[method];
+      const coreCoef = coreFactor[cores];
+      const correctedCurrent = Math.round(baseCurrent * installCoef * coreCoef * 10) / 10;
       const maxBreaker = Math.floor(correctedCurrent * 1.25);
 
       const validBreakers = breakerSizes.filter(a => a >= correctedCurrent && a <= maxBreaker);
-      const matchedBreaker = validBreakers.length > 0 ? Math.min(...validBreakers) : null;
+      const breakerText = validBreakers.length > 0
+        ? validBreakers.join(" / ") + " A"
+        : `<span style="color:red">적정 차단기 없음 – 전선 굵기를 상향하세요</span>`;
 
       const voltageVal = voltage === "단상" ? 220 : 380;
       const contractPower = voltage === "단상"
@@ -238,10 +237,6 @@ function updateCoreOptions() {
         : Math.round((Math.sqrt(3) * voltageVal * correctedCurrent) / 1000);
 
       const groundSize = getGroundSize(size);
-
-      const breakerText = matchedBreaker
-        ? `${matchedBreaker} A 이하`
-        : `<span style="color:red">적정 차단기 없음 – 전선 굵기를 상향하세요</span>`;
 
       document.getElementById('result').innerHTML = `
         <strong>전선 정보</strong><br>
@@ -251,11 +246,36 @@ function updateCoreOptions() {
         전원: ${voltage}<br>
         Core 수: ${cores}C<br><br>
 
-        <strong>최대 허용 전류:</strong> ${baseCurrent} A<br>
-        <strong>보정 후 허용 전류:</strong> 약 ${correctedCurrent} A<br>
-        <span style="color:green"><strong>추천 차단기: ${breakerText}</strong></span><br>
-        <span style="color:green"><strong>가능 계약 용량: 약 ${contractPower} kW</strong></span><br>
-        <span style="color:green"><strong>접지선 굵기: ${groundSize}</strong></span>
+        <strong>① 최대 허용 전류:</strong> ${baseCurrent} A<br>
+        <div style="font-size:0.9em; color:#555;">
+          - 기준: KEC 2021 표 3.2.1<br>
+          - 예: ${type} ${size}㎟ → ${baseCurrent} A
+        </div><br>
+
+        <strong>② 보정 후 허용 전류:</strong> 약 ${correctedCurrent} A<br>
+        <div style="font-size:0.9em; color:#555;">
+          - 계산식: ${baseCurrent} × ${installCoef}(${method} 보정값) × ${coreCoef}(${cores}C 보정값) = ${correctedCurrent} A
+        </div><br>
+
+        <strong>③ 추천 차단기:</strong> <span style="color:green">${breakerText}</span><br>
+        <div style="font-size:0.9em; color:#555;">
+          - 조건: ${correctedCurrent} A 이상, ${maxBreaker} A 이하 차단기 추천
+        </div><br>
+
+        <strong>④ 가능 계약 용량:</strong> <span style="color:green">${contractPower} kW</span><br>
+        <div style="font-size:0.9em; color:#555;">
+          - 계산식: ${
+            voltage === "단상"
+              ? `220V × ${correctedCurrent}A = ${Math.round(220 * correctedCurrent)}W`
+              : `√3 × 380V × ${correctedCurrent}A = ${Math.round(Math.sqrt(3) * 380 * correctedCurrent)}W`
+          }
+        </div><br>
+
+        <strong>⑤ 접지선 굵기:</strong> <span style="color:green">${groundSize}</span><br>
+        <div style="font-size:0.9em; color:#555;">
+          - 기준: 16㎟ 이하 동일, 16~35㎟는 16㎟, 35㎟ 초과는 1/2<br>
+          - 계산: ${size}㎟ → ${groundSize}
+        </div>
 
         <div class="reference">
           <strong>[KEC 기준 참고]</strong><br>
@@ -267,20 +287,20 @@ function updateCoreOptions() {
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-  updateCableOptions();
-  updateCoreOptions(); // 코어 옵션도 초기화
+      updateCableOptions();
+      updateCoreOptions();
 
-  document.querySelectorAll('select').forEach(select => {
-    select.addEventListener('change', () => {
-      if (select.id === 'cableType') {
-        updateCableOptions();
-        updateCoreOptions(); // 전선 종류 변경 시 코어 옵션도 재설정
-      } else {
-        updateResult();
-      }
+      document.querySelectorAll('select').forEach(select => {
+        select.addEventListener('change', () => {
+          if (select.id === 'cableType') {
+            updateCableOptions();
+            updateCoreOptions();
+          } else {
+            updateResult();
+          }
+        });
+      });
     });
-  });
-});
   </script>
 </body>
 </html>
