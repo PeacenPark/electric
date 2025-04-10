@@ -32,11 +32,33 @@
     .btn:hover {
       background-color: #155ec2;
     }
+    .note {
+      margin-top: 60px;
+      font-size: 16px;
+      color: #1a73e8;
+      line-height: 1.7;
+      max-width: 680px;
+      margin-left: auto;
+      margin-right: auto;
+      font-weight: 500;
+    }
+    .footer {
+      margin-top: 80px;
+      font-size: 13px;
+      color: #999;
+    }
     @media (max-width: 500px) {
       .btn {
         width: 90%;
         font-size: 25px;
         padding: 12px 20px;
+      }
+      .note {
+        font-size: 17px;
+        padding: 0 10px;
+      }
+      .footer {
+        font-size: 14px;
       }
     }
   </style>
@@ -46,5 +68,16 @@
   <button class="btn" onclick="location.href='cable.html'">전선(차단기) 계산기</button>
   <button class="btn" onclick="location.href='conduit-size.html'">전선관 계산기</button>
   <button class="btn" onclick="location.href='voltage-drop.html'">전압강하 계산기</button>
+
+  <div class="note">
+    ※ 본 계산기는 「전기설비기술기준(KEC)」을 기반으로 하여 신중하게 설계되었으며,<br>
+    일반적인 조건을 고려한 보수적 기준으로 산출된 참고 자료입니다.<br>
+    실제 시공 및 설계 시에는 현장 여건과 다양한 변수들을 종합적으로 고려하여<br>
+    전문가의 검토와 판단을 병행하시기 바랍니다.
+  </div>
+
+  <div class="footer">
+    © 2025 Electric Calculator ｜ Developed by Park Pyung Hwan
+  </div>
 </body>
 </html>
