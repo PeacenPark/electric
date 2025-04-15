@@ -399,10 +399,11 @@ function calculate() {
       <td class="bold-text ${fill > limit ? 'red' : ''}">${fill.toFixed(1)}%</td>
     </tr></tbody></table><br>`;
 
-    resultHTML += `<div class="result-highlight${fill > limit ? ' result-error' : ''}">
-    ※ 결과: <strong>${fill <= limit ? '적합' : '부적합'}</strong></div>`;
+    if (fill <= limit) {
+      resultHTML += `<div class="result-highlight">※ 결과: <strong>적합</strong></div>`;
+    } else {
+      resultHTML += `<div class="result-highlight result-error">※ 결과: <strong>부적합</strong></div>`;
 
-    if (fill > limit) {
       const required = totalWidth / (limit / 100);
       const combo = findBalancedCombo(trayWidths, required);
 
@@ -420,10 +421,13 @@ function calculate() {
           <td class="bold-text ${fill2 > limit ? 'red' : ''}">${fill2.toFixed(1)}%</td>
         </tr></tbody></table></div><br>`;
 
-        resultHTML += `<div class="result-highlight${fill2 > limit ? ' result-error' : ''}">
-        ※ 결과: <strong>${fill2 <= limit ? '적합' : '부적합'}</strong></div>`;
+        if (fill2 > limit) {
+          resultHTML += `<div class="result-highlight result-error">※ 결과: <strong>부적합</strong></div>`;
+        }
+        // 적합일 경우 결과 문구 생략
       } else {
         resultHTML += `<span class="red">※ 적합한 트레이 조합이 없습니다.</span>`;
+        resultHTML += `<div class="result-highlight result-error">※ 결과: <strong>부적합</strong></div>`;
       }
     }
 
@@ -441,10 +445,12 @@ function calculate() {
       resultHTML += `<strong>전체 면적:</strong> <span class="bold-text">${fullArea.toLocaleString()}㎟</span><br>`;
       resultHTML += `<strong>유효 면적:</strong> <span class="bold-text">${fullArea} × ${correction} = ${eff.toFixed(1)}㎟</span><br>`;
       resultHTML += `<strong>채움률:</strong> <span class="bold-text">${fill.toFixed(1)}%</span><br>`;
-      resultHTML += `<div class="result-highlight${fill > limit ? ' result-error' : ''}">
-      ※ 결과: <strong>${fill <= limit ? '적합' : '부적합'}</strong></div>`;
 
-      if (fill > limit) {
+      if (fill <= limit) {
+        resultHTML += `<div class="result-highlight">※ 결과: <strong>적합</strong></div>`;
+      } else {
+        resultHTML += `<div class="result-highlight result-error">※ 결과: <strong>부적합</strong></div>`;
+
         const required = totalArea / (limit / 100 * correction);
         const combo = findBalancedCombo(conduitList.map(c => c.area), required);
 
@@ -467,10 +473,13 @@ function calculate() {
           resultHTML += `<strong>총 단면적:</strong> <span class="bold-text">${totalComboArea.toLocaleString()}㎟</span><br>`;
           resultHTML += `<strong>유효 면적:</strong> <span class="bold-text">${totalComboArea} × ${correction} = ${effArea.toFixed(1)}㎟</span><br>`;
           resultHTML += `<strong>채움률:</strong> <span class="bold-text">${fill2.toFixed(1)}%</span><br>`;
-          resultHTML += `<div class="result-highlight${fill2 > limit ? ' result-error' : ''}">
-          ※ 결과: <strong>${fill2 <= limit ? '적합' : '부적합'}</strong></div>`;
+
+          if (fill2 > limit) {
+            resultHTML += `<div class="result-highlight result-error">※ 결과: <strong>부적합</strong></div>`;
+          }
         } else {
           resultHTML += `<span class="red">※ 적합한 전선관 조합이 없습니다.</span>`;
+          resultHTML += `<div class="result-highlight result-error">※ 결과: <strong>부적합</strong></div>`;
         }
       }
 
@@ -497,10 +506,13 @@ function calculate() {
         resultHTML += `<strong>총 단면적:</strong> <span class="bold-text">${totalComboArea.toLocaleString()}㎟</span><br>`;
         resultHTML += `<strong>유효 면적:</strong> <span class="bold-text">${totalComboArea} × ${correction} = ${effArea.toFixed(1)}㎟</span><br>`;
         resultHTML += `<strong>채움률:</strong> <span class="bold-text">${fill2.toFixed(1)}%</span><br>`;
-        resultHTML += `<div class="result-highlight${fill2 > limit ? ' result-error' : ''}">
-        ※ 결과: <strong>${fill2 <= limit ? '적합' : '부적합'}</strong></div>`;
+
+        if (fill2 > limit) {
+          resultHTML += `<div class="result-highlight result-error">※ 결과: <strong>부적합</strong></div>`;
+        }
       } else {
         resultHTML += `<span class="red">※ 적합한 전선관 조합이 없습니다.</span>`;
+        resultHTML += `<div class="result-highlight result-error">※ 결과: <strong>부적합</strong></div>`;
       }
     }
   }
