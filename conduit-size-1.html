@@ -356,7 +356,7 @@ const generalConduits = {
 function updateConduitSizes() {
   const type = document.getElementById("pipeType").value;
   const sizeSelect = document.getElementById("pipeSize");
-  sizeSelect.innerHTML = '<option value="" disabled selected>자동 추천</option>';
+  sizeSelect.innerHTML = '<option value="" selected>자동 추천</option>';  // ← 여기 수정됨
 
   if (type === 'TRAY') {
     trayWidths.forEach(w => {
@@ -369,7 +369,6 @@ function updateConduitSizes() {
     });
   }
 
-  // 자동으로 특정 값이 선택되지 않도록 value 강제 초기화
   sizeSelect.value = "";
 }
 </script>
