@@ -112,9 +112,28 @@
       margin-top: 0;
       color: #1a73e8;
     }
+    .home-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: #1a73e8;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      z-index: 1000;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+.home-btn:hover {
+  background: #0d47a1;
+}
+
   </style>
 </head>
 <body>
+<button class="home-btn" onclick="goBack()">← 홈으로</button>
   <div class="container">
     <h1>전선관 계산기</h1>
 
@@ -184,6 +203,9 @@
   </div>
 
 <script>
+
+
+
 const cableDiameters = {
   'CV': {
     '1.5': { '1': 6.3, '2': 11.0, '3': 12.1, '4': 13.0 },
@@ -247,6 +269,10 @@ window.addEventListener("load", updateSizeOptions);
 </script>
 
 <script>
+function goBack() {
+  window.location.href = 'index.html'; // 필요 시 다른 경로로 수정
+}
+
 function addCable() {
   const type = document.getElementById("type").value;
   const size = document.getElementById("size").value;
