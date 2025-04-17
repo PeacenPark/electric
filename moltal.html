@@ -8,70 +8,100 @@
     body {
       font-family: 'Segoe UI', 'Noto Sans KR', sans-serif;
       margin: 0;
-      background: #f2f2f2;
-      padding: 20px;
-      font-size: 20px;
+      background: #f9f9f9;
+      padding: 16px;
+      font-size: 16px;
     }
     h1 {
-  font-size: 28px;
-  text-align: center;
-  margin-bottom: 10px;
-  color: #1e88e5; /* 블루 계열로 설정 */
-}
-    .home-btn {
+      font-size: 22px;
+      text-align: center;
+      margin-bottom: 20px;
+      color: #1e88e5;
+    }
+.home-btn {
   position: fixed;
-  top: 0px;         /* 제목과 겹치지 않도록 */
-  left: 20px;
-  font-size: 14px;
-  padding: 6px 12px;
-  background-color: #1e88e5; /* 세련된 블루 계열 */
+  top: 10px;
+  left: 10px;
+  font-size: 13px;
+  padding: 2px 6px;               /* 더 얇게 */
+  height: 28px;                   /* 높이 제한 */
+  background-color: #007bff;
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 4px;
   cursor: pointer;
-  width: auto;
-  display: inline-block;
   z-index: 1000;
+  white-space: nowrap;
+  width: auto;
 }
     .card {
       background: white;
-      padding: 25px;
+      padding: 20px;
       border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      max-width: 600px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      max-width: 500px;
       margin: 0 auto 30px;
     }
     label {
       display: block;
-      margin: 15px 0 5px;
+      margin: 14px 0 6px;
       font-weight: bold;
-    }
-    input, select {
-      width: 100%;
-      padding: 12px;
       font-size: 18px;
-      margin-bottom: 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
+    }
+    input:not(.inline-small),
+select {
+  width: 60%;              /* 필드가 중앙까지만 오도록 폭 제한 */
+  padding: 12px;
+  font-size: 18px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-bottom: 12px;
+}
+    .inline-small {
+      width: 50px;
+      font-size: 14px;
+      padding: 3px;
+      height: 20px;
     }
     button {
       width: 100%;
-      font-size: 20px;
-      padding: 15px;
+      font-size: 18px;
+      padding: 16px;
+      height: 56px;
       background-color: #28a745;
       color: white;
       border: none;
       border-radius: 10px;
       cursor: pointer;
-      margin-top: 10px;
+      margin-top: 12px;
     }
     .result-box {
-      background-color: #e9f7ef;
-      border-left: 6px solid #28a745;
-      padding: 20px;
-      border-radius: 10px;
-      font-size: 20px;
-    }
+  background-color: #fffde7;             /* 밝은 노랑 (주의 유도 색상) */
+  border-left: 6px solid #f9a825;        /* 진한 노랑 테두리 */
+  padding: 20px;
+  border-radius: 10px;
+  font-size: 23px;
+  color: #333;
+  margin-top: 20px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.08);  /* 살짝 입체감 */
+}
+
+#material {
+  width: 60%;
+  padding: 12px 40px 12px 12px;
+  font-size: 20px;
+  height: 50px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-bottom: 16px;
+  background-color: #f0f0f0;         /* 밝은 그레이 배경 */
+  color: #007bff;                    /* 파란 글자 */
+  appearance: none;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%23007bff" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 24px;
+}
   </style>
 </head>
 <body>
@@ -86,11 +116,17 @@
       <option value="soil">흙 메움</option>
     </select>
 
-    <label>가로 (m)</label>
-    <input type="number" id="width" placeholder="예: 5" />
-
-    <label>세로 (m)</label>
-    <input type="number" id="length" placeholder="예: 10" />
+    <label>
+      넓이
+      <span style="font-size: 0.9em; font-weight: normal; white-space: nowrap;">
+        (가로 <input type="number" id="width" class="inline-small" oninput="updateAreaFromSize()" /> m,
+         세로 <input type="number" id="length" class="inline-small" oninput="updateAreaFromSize()" /> m)
+      </span>
+    </label>
+    <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 10px;">
+      <input type="number" id="area" oninput="updateSizeFromArea()" />
+      <span style="font-size: 16px;">㎡</span>
+    </div>
 
     <label>두께 (cm)</label>
     <input type="number" id="depth" placeholder="예: 20" />
@@ -98,30 +134,44 @@
     <label>여유율 (%)</label>
     <input type="number" id="margin" value="5" />
 
-    <label>다짐률 (%) <span style="font-weight: normal;">(※ 아스콘 · 흙 메움에만 적용)</span></label>
+    <label>다짐률 (%) <span style="font-weight: normal; font-size: 0.8em;">(※ 아스콘 · 흙 메움)</span></label>
     <input type="number" id="compaction" value="90" />
 
     <button onclick="calculate()">계산하기</button>
-    <div id="result" class="result-box" style="margin-top: 20px; display: none;"></div>
+    <div id="result" class="result-box" style="display: none;"></div>
   </div>
 
   <script>
-    function calculate() {
-      const material = document.getElementById('material').value;
+    function updateAreaFromSize() {
       const width = parseFloat(document.getElementById('width').value);
       const length = parseFloat(document.getElementById('length').value);
+      if (!isNaN(width) && !isNaN(length)) {
+        document.getElementById('area').value = (width * length).toFixed(2);
+      }
+    }
+
+    function updateSizeFromArea() {
+      const area = parseFloat(document.getElementById('area').value);
+      if (!isNaN(area)) {
+        document.getElementById('width').value = '넓이 입력';
+        document.getElementById('length').value = '넓이 입력';
+      }
+    }
+
+    function calculate() {
+      const material = document.getElementById('material').value;
+      const area = parseFloat(document.getElementById('area').value);
       const depth = parseFloat(document.getElementById('depth').value);
       const margin = parseFloat(document.getElementById('margin').value || 0);
       const compaction = parseFloat(document.getElementById('compaction').value || 100);
 
-      if (isNaN(width) || isNaN(length) || isNaN(depth)) {
-        alert('모든 항목을 정확히 입력해주세요.');
+      if (isNaN(area) || isNaN(depth)) {
+        alert('넓이 또는 두께를 정확히 입력해주세요.');
         return;
       }
 
-      const baseVolume = (width * length * depth) / 100; // ㎥
+      const baseVolume = (area * depth) / 100;
       const volumeWithMargin = baseVolume * (1 + margin / 100);
-
       let compactionRate = 1.0;
       if (material === 'ascon' || material === 'soil') {
         compactionRate = compaction / 100;
@@ -129,7 +179,7 @@
 
       const adjustedVolume = volumeWithMargin / compactionRate;
 
-      let density = 2.3; // 기본 콘크리트
+      let density = 2.3;
       let bagWeight = 0;
       let bagUnit = '';
       if (material === 'ascon') {
