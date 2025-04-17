@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>충전재 계산기 (몰탈, 아스콘 등)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: 'Segoe UI', 'Noto Sans KR', sans-serif;
+      margin: 0;
+      background: #f2f2f2;
+      padding: 20px;
+      font-size: 20px;
+    }
+    h1 {
+  font-size: 28px;
+  text-align: center;
+  margin-bottom: 10px;
+  color: #1e88e5; /* 블루 계열로 설정 */
+}
+    .home-btn {
+  position: fixed;
+  top: 0px;         /* 제목과 겹치지 않도록 */
+  left: 20px;
+  font-size: 14px;
+  padding: 6px 12px;
+  background-color: #1e88e5; /* 세련된 블루 계열 */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  width: auto;
+  display: inline-block;
+  z-index: 1000;
+}
+    .card {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 600px;
+      margin: 0 auto 30px;
+    }
+    label {
+      display: block;
+      margin: 15px 0 5px;
+      font-weight: bold;
+    }
+    input, select {
+      width: 100%;
+      padding: 12px;
+      font-size: 18px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      width: 100%;
+      font-size: 20px;
+      padding: 15px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .result-box {
+      background-color: #e9f7ef;
+      border-left: 6px solid #28a745;
+      padding: 20px;
+      border-radius: 10px;
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+  <button class="home-btn" onclick="location.href='index.html'">← 홈으로</button>
+  <h1>충전재 계산기 (몰탈, 아스콘 등)</h1>
+  <div class="card">
+    <label>자재 선택</label>
+    <select id="material">
+      <option value="concrete">콘크리트</option>
+      <option value="ascon">아스콘</option>
+      <option value="mortar">몰탈</option>
+      <option value="soil">흙 메움</option>
+    </select>
+
+    <label>가로 (m)</label>
+    <input type="number" id="width" placeholder="예: 5" />
+
+    <label>세로 (m)</label>
+    <input type="number" id="length" placeholder="예: 10" />
+
+    <label>두께 (cm)</label>
+    <input type="number" id="depth" placeholder="예: 20" />
+
+    <label>여유율 (%)</label>
+    <input type="number" id="margin" value="5" />
+
+    <label>다짐률 (%) <span style="font-weight: normal;">(※ 아스콘 · 흙 메움에만 적용)</span></label>
+    <input type="number" id="compaction" value="90" />
+
+    <button onclick="calculate()">계산하기</button>
+    <div id="result" class="result-box" style="margin-top: 20px; display: none;"></div>
+  </div>
+
+  <script>
+    function calculate() {
+      const material = document.getElementById('material').value;
+      const width = parseFloat(document.getElementById('width').value);
+      const length = parseFloat(document.getElementById('length').value);
+      const depth = parseFloat(document.getElementById('depth').value);
+      const margin = parseFloat(document.getElementById('margin').value || 0);
+      const compaction = parseFloat(document.getElementById('compaction').value || 100);
+
+      if (isNaN(width) || isNaN(length) || isNaN(depth)) {
+        alert('모든 항목을 정확히 입력해주세요.');
+        return;
+      }
+
+      const baseVolume = (width * length * depth) / 100; // ㎥
+      const volumeWithMargin = baseVolume * (1 + margin / 100);
+
+      let compactionRate = 1.0;
+      if (material === 'ascon' || material === 'soil') {
+        compactionRate = compaction / 100;
+      }
+
+      const adjustedVolume = volumeWithMargin / compactionRate;
+
+      let density = 2.3; // 기본 콘크리트
+      let bagWeight = 0;
+      let bagUnit = '';
+      if (material === 'ascon') {
+        density = 2.2;
+        bagWeight = 25;
+        bagUnit = '포대(25kg)';
+      } else if (material === 'mortar') {
+        density = 2.0;
+        bagWeight = 40;
+        bagUnit = '포대(건몰탈 40kg)';
+      } else if (material === 'soil') {
+        density = 1.6;
+      }
+
+      const totalWeightTon = adjustedVolume * density;
+      const totalWeightKg = totalWeightTon * 1000;
+      const bagCount = bagWeight ? Math.ceil(totalWeightKg / bagWeight) : null;
+      const readyMixCount = (material === 'concrete' || material === 'mortar')
+        ? Math.ceil(volumeWithMargin / 6)
+        : null;
+
+      let resultText = `
+        <strong>최종 부피:</strong> ${baseVolume.toFixed(2)} ㎥<br>
+        <strong>여유 포함 부피:</strong> ${volumeWithMargin.toFixed(2)} ㎥<br>
+      `;
+
+      if (material === 'ascon' || material === 'soil') {
+        resultText += `<strong>다짐 전 필요 부피:</strong> ${adjustedVolume.toFixed(2)} ㎥<br>`;
+      }
+
+      resultText += `<strong>예상 중량:</strong> 약 ${totalWeightTon.toFixed(2)} 톤`;
+
+      if (bagCount && material !== 'concrete') {
+        resultText += `<br><strong>필요 수량:</strong> 약 ${bagCount} ${bagUnit}`;
+      }
+
+      if (readyMixCount && readyMixCount > 0) {
+        resultText += `<br><strong>레미콘 차량 수:</strong> 약 ${readyMixCount} 대 (6㎥ 기준)`;
+      }
+
+      document.getElementById('result').innerHTML = resultText;
+      document.getElementById('result').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
