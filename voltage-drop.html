@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -5,6 +6,7 @@
   <title>LED 전압 강하 계산기</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
+    /* 이전과 동일한 CSS 유지 */
     body {
       font-family: 'Segoe UI', sans-serif;
       margin: 0;
@@ -50,10 +52,11 @@
       color: white;
       border: none;
       padding: 12px 20px;
-      font-size: 20px;
+      font-size: 16px;
       border-radius: 6px;
       cursor: pointer;
       margin-top: 10px;
+      transition: background-color 0.3s;
     }
     button:hover {
       background-color: #155ec2;
@@ -89,6 +92,17 @@
       color: red;
       font-weight: bold;
     }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
     @media (max-width: 600px) {
       .container {
         padding: 15px;
@@ -114,9 +128,29 @@
       cursor: pointer;
       z-index: 1000;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      transition: background-color 0.3s;
     }
     .home-btn:hover {
       background: #155ec2;
+    }
+    .led-type-container {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+    .led-type-option {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .led-type-option.selected {
+      background-color: #1a73e8;
+      color: white;
+      border-color: #1a73e8;
     }
   </style>
 </head>
@@ -124,34 +158,66 @@
   <div class="container">
     <button class="home-btn" onclick="location.href='index.html'">← 홈으로</button>
     <h2>LED 전압 강하 계산기</h2>
-    <form>
-      <label>입력 전압 (V)
-        <input type="number" id="smps_voltage" value="220" />
+    
+    <div class="led-type-container">
+      <div class="led-type-option selected" data-voltage="220" onclick="selectLedType(this)">
+        220V LED
+      </div>
+      <div class="led-type-option" data-voltage="24" onclick="selectLedType(this)">
+        24V LED
+      </div>
+      <div class="led-type-option" data-voltage="12" onclick="selectLedType(this)">
+        12V LED
+      </div>
+    </div>
+    
+    <form id="calcForm">
+      <label for="smps_voltage">입력 전압 (V)
+        <input type="number" id="smps_voltage" value="220" min="1" step="0.1" 
+               aria-describedby="voltage-help" required />
+        <span id="voltage-help" class="info-text">공급 전압을 입력하세요</span>
       </label>
-      <label>LED 전력 (W)
-        <input type="number" id="led_power" value="50" />
+      
+      <label for="led_power">LED 전력 (W)
+        <input type="number" id="led_power" value="1" min="0.1" step="0.1" 
+               aria-describedby="power-help" required />
+        <span id="power-help" class="info-text">LED 하나당 소비 전력을 입력하세요</span>
       </label>
-      <label>LED 개수
-        <input type="number" id="led_count" value="10" />
+      
+      <label for="led_count">LED 개수
+        <input type="number" id="led_count" value="100" min="1" 
+               aria-describedby="count-help" required />
+        <span id="count-help" class="info-text">연결할 LED 개수를 입력하세요</span>
       </label>
-      <label>1번 LED까지 거리 (m)
-        <input type="number" step="0.1" id="first_distance" value="20" />
+      
+      <label for="first_distance">1번 LED까지 거리 (m)
+        <input type="number" step="0.1" id="first_distance" value="5" min="0" 
+               aria-describedby="distance-help" required />
+        <span id="distance-help" class="info-text">전원부터 첫 번째 LED까지 거리</span>
       </label>
-      <label>LED 간 간격 (m)
-        <input type="number" step="0.1" id="spacing" value="20" />
+      
+      <label for="spacing">LED 간 간격 (m)
+        <input type="number" step="0.1" id="spacing" value="0.1" min="0" 
+               aria-describedby="spacing-help" required />
+        <span id="spacing-help" class="info-text">LED 사이의 간격을 입력하세요</span>
       </label>
-      <label>1번 LED까지 전선
-        <select id="wire1_select" onchange="updateWireInfo()"></select>
+      
+      <label for="wire1_select">1번 LED까지 전선
+        <select id="wire1_select" aria-describedby="wire1-help" required></select>
+        <span id="wire1-help" class="sr-only">첫 번째 구간에 사용할 전선을 선택하세요</span>
         <span id="wire1_info" class="info-text"></span>
       </label>
-      <label>1번 LED이후 전선
-        <select id="wire2_select" onchange="updateWireInfo()"></select>
+      
+      <label for="wire2_select">1번 LED이후 전선
+        <select id="wire2_select" aria-describedby="wire2-help" required></select>
+        <span id="wire2-help" class="sr-only">이후 구간에 사용할 전선을 선택하세요</span>
         <span id="wire2_info" class="info-text"></span>
       </label>
-      <button type="button" onclick="calculate()">계산하기</button>
+      
+      <button type="button" id="calculateBtn" onclick="calculate()">계산하기</button>
     </form>
 
-    <div id="warnings" class="warning"></div>
+    <div id="warnings" class="warning" role="alert" aria-live="assertive"></div>
     <div id="summary" class="info-text" style="margin-top:20px; font-size:15px; font-weight:500;"></div>
 
     <div class="table-container">
@@ -161,8 +227,8 @@
             <th>LED 번호</th>
             <th>구간 거리 (m)</th>
             <th>사용 전류 (A)</th>
-            <th>누적 전압 강하 (V, %)</th>
-            <th>전압 강하 계산식</th>
+            <th>누적 전압 강하 (V, %)</th> <!-- 이동된 컬럼 -->
+            <th>전압 강하 계산식</th> <!-- 이동된 컬럼 -->
             <th>LED 전압 계산식</th>
           </tr>
         </thead>
@@ -172,6 +238,7 @@
   </div>
 
 <script>
+// 전선 옵션 데이터
 const wireOptions = [
   { label: "0.25 ㎟", mm2: 0.25, resistance: 0.073, current: 3 },
   { label: "0.5 ㎟", mm2: 0.5, resistance: 0.048, current: 6 },
@@ -198,51 +265,109 @@ const wireOptions = [
   { label: "600.0 ㎟", mm2: 600.0, resistance: 0.0000303, current: 680 }
 ];
 
+// LED 타입 선택 함수
+function selectLedType(element) {
+  document.querySelectorAll('.led-type-option').forEach(opt => {
+    opt.classList.remove('selected');
+  });
+  element.classList.add('selected');
+  document.getElementById('smps_voltage').value = element.dataset.voltage;
+}
+
+// 전선 정보 업데이트 함수
 function updateWireInfo() {
-  const wire1 = JSON.parse(document.getElementById("wire1_select").value);
-  const wire2 = JSON.parse(document.getElementById("wire2_select").value);
+  const wire1Select = document.getElementById("wire1_select");
+  const wire2Select = document.getElementById("wire2_select");
+  
+  const wire1 = wireOptions[wire1Select.selectedIndex];
+  const wire2 = wireOptions[wire2Select.selectedIndex];
+  
   document.getElementById("wire1_info").textContent = `허용전류 ${wire1.current}A`;
   document.getElementById("wire2_info").textContent = `허용전류 ${wire2.current}A`;
 }
 
+// 전선 옵션 초기화 함수
 function populateWireOptions() {
-  const wire1 = document.getElementById("wire1_select");
-  const wire2 = document.getElementById("wire2_select");
-  wire1.innerHTML = "";
-  wire2.innerHTML = "";
-  wireOptions.forEach(opt => {
-    const option1 = new Option(opt.label, JSON.stringify(opt));
-    const option2 = new Option(opt.label, JSON.stringify(opt));
-    wire1.appendChild(option1);
-    wire2.appendChild(option2);
+  const wire1Select = document.getElementById("wire1_select");
+  const wire2Select = document.getElementById("wire2_select");
+  
+  wireOptions.forEach((opt, index) => {
+    const option1 = new Option(opt.label, index);
+    const option2 = new Option(opt.label, index);
+    
+    // 기본값 설정 (0.75㎟와 1.5㎟)
+    if (opt.mm2 === 0.75) wire1Select.add(option1);
+    if (opt.mm2 === 1.5) wire2Select.add(option2);
+    
+    if (opt.mm2 !== 0.75) wire1Select.add(option1.cloneNode(true));
+    if (opt.mm2 !== 1.5) wire2Select.add(option2.cloneNode(true));
   });
+  
   updateWireInfo();
 }
 
+// 입력 유효성 검사 함수
+function validateInputs() {
+  const smpsV = parseFloat(document.getElementById("smps_voltage").value);
+  const ledW = parseFloat(document.getElementById("led_power").value);
+  const count = parseInt(document.getElementById("led_count").value);
+  
+  if (isNaN(smpsV) || smpsV <= 0) {
+    alert("유효한 전압 값을 입력해주세요 (0보다 큰 값)");
+    return false;
+  }
+  
+  if (isNaN(ledW) || ledW <= 0) {
+    alert("유효한 전력 값을 입력해주세요 (0보다 큰 값)");
+    return false;
+  }
+  
+  if (isNaN(count) || count <= 0) {
+    alert("유효한 LED 개수를 입력해주세요 (1 이상의 정수)");
+    return false;
+  }
+  
+  return true;
+}
+
+// 계산 함수 (수정된 테이블 컬럼 순서 반영)
 function calculate() {
+  if (!validateInputs()) return;
+  
   const smpsV = parseFloat(document.getElementById("smps_voltage").value);
   const ledW = parseFloat(document.getElementById("led_power").value);
   const count = parseInt(document.getElementById("led_count").value);
   const firstDist = parseFloat(document.getElementById("first_distance").value);
   const spacing = parseFloat(document.getElementById("spacing").value);
-  const wire1 = JSON.parse(document.getElementById("wire1_select").value);
-  const wire2 = JSON.parse(document.getElementById("wire2_select").value);
-
+  
+  const wire1Index = document.getElementById("wire1_select").selectedIndex;
+  const wire2Index = document.getElementById("wire2_select").selectedIndex;
+  const wire1 = wireOptions[wire1Index];
+  const wire2 = wireOptions[wire2Index];
+  
   const currentPerLED = ledW / smpsV;
   const totalCurrent = currentPerLED * count;
   let remainingCurrent = totalCurrent;
   let cumulativeDrop = 0;
-  const table = document.querySelector("#resultTable tbody");
-  table.innerHTML = "";
+  
+  const tableBody = document.querySelector("#resultTable tbody");
+  const fragment = document.createDocumentFragment();
   const warnings = [];
   let overDropWarned = false;
-
-  if (totalCurrent > wire1.current) warnings.push(`1번 LED까지 전류 (${totalCurrent.toFixed(2)}A)가 허용전류 ${wire1.current}A 초과`);
-  if (currentPerLED > wire2.current) warnings.push(`이후 LED당 전류 (${currentPerLED.toFixed(3)}A)가 허용전류 ${wire2.current}A 초과`);
-
+  
+  // 전류 초과 경고
+  if (totalCurrent > wire1.current) {
+    warnings.push(`⚠️ 1번 LED까지 전류 (${totalCurrent.toFixed(2)}A)가 허용전류 ${wire1.current}A 초과`);
+  }
+  
+  if (currentPerLED > wire2.current) {
+    warnings.push(`⚠️ 이후 LED당 전류 (${currentPerLED.toFixed(3)}A)가 허용전류 ${wire2.current}A 초과`);
+  }
+  
+  // 테이블 생성 (컬럼 순서 변경 반영)
   for (let i = 1; i <= count; i++) {
     if (remainingCurrent <= 0) break;
-
+    
     const isFirst = i === 1;
     const segmentLength = isFirst ? firstDist : spacing;
     const resistance = isFirst ? wire1.resistance : wire2.resistance;
@@ -252,33 +377,47 @@ function calculate() {
     const ledVoltage = smpsV - cumulativeDrop;
     const percentDrop = (cumulativeDrop / smpsV) * 100;
     const overLimit = percentDrop > 3;
-
+    
+    // 전압 강하 경고 (3% 초과 시)
     if (overLimit && !overDropWarned) {
-      warnings.push(`LED ${i}번 이후 전압강하 ${percentDrop.toFixed(1)}% 발생 (3% 초과)`);
+      warnings.push(`⚠️ LED ${i}번 이후 전압강하 ${percentDrop.toFixed(1)}% 발생 (3% 초과)`);
       overDropWarned = true;
     }
-
+    
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>${i}</td>
       <td>${segmentLength.toFixed(2)}</td>
       <td>${remainingCurrent.toFixed(3)}</td>
-       <td class="${overLimit ? "high-drop" : ""}">${cumulativeDrop.toFixed(3)}V (${percentDrop.toFixed(1)}%)</td>
+      <td class="${overLimit ? "high-drop" : ""}">${cumulativeDrop.toFixed(3)}V (${percentDrop.toFixed(1)}%)</td>
       <td>${remainingCurrent.toFixed(3)} × ${resistance.toExponential(3)} × ${wireLength.toFixed(2)} = ${voltageDrop.toFixed(3)}V</td>
       <td>${smpsV.toFixed(1)} - ${cumulativeDrop.toFixed(3)} = ${ledVoltage.toFixed(3)}V</td>`;
-    table.appendChild(row);
-
+    fragment.appendChild(row);
+    
     remainingCurrent -= currentPerLED;
   }
-
-  document.getElementById("warnings").innerHTML = warnings.join("<br>");
-
+  
+  // 결과 업데이트
+  tableBody.innerHTML = "";
+  tableBody.appendChild(fragment);
+  
+  // 경고 메시지 표시
+  const warningsElement = document.getElementById("warnings");
+  if (warnings.length > 0) {
+    warningsElement.innerHTML = warnings.join("<br>");
+    warningsElement.style.display = "block";
+  } else {
+    warningsElement.style.display = "none";
+  }
+  
+  // 요약 정보 표시
   const totalDistance = firstDist + spacing * (count - 1);
   const totalCableLength = totalDistance * 2;
   const percentDrop = (cumulativeDrop / smpsV) * 100;
   const finalVoltage = smpsV - cumulativeDrop;
-
+  
   document.getElementById("summary").innerHTML = `
+    <strong>계산 결과 요약:</strong><br>
     총 거리: ${totalDistance.toFixed(2)}m<br>
     총 전선 길이 (왕복): ${totalCableLength.toFixed(2)}m<br>
     최종 누적 전압 강하: ${cumulativeDrop.toFixed(3)}V (${percentDrop.toFixed(1)}%)<br>
@@ -286,7 +425,23 @@ function calculate() {
   `;
 }
 
-window.addEventListener("DOMContentLoaded", populateWireOptions);
+// 초기화
+window.addEventListener("DOMContentLoaded", () => {
+  populateWireOptions();
+  
+  // 폼 제출 방지
+  document.getElementById("calcForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    calculate();
+  });
+  
+  // 계산 버튼에 키보드 접근성 추가
+  document.getElementById("calculateBtn").addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      calculate();
+    }
+  });
+});
 </script>
 </body>
 </html>
