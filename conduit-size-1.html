@@ -424,9 +424,11 @@
     }
     
     .tooltip {
-      position: relative;
-      display: inline-block;
-    }
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  padding: 8px; /* 터치 영역 확장 */
+}
     
     .tooltip .tooltip-text {
       visibility: hidden;
@@ -664,6 +666,46 @@
       <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
     </svg>
   </button>
+
+<script>
+
+// 툴팁 터치 이벤트 처리
+document.addEventListener('DOMContentLoaded', function() {
+  const tooltips = document.querySelectorAll('.tooltip');
+  
+  tooltips.forEach(tooltip => {
+    tooltip.addEventListener('touchstart', function(e) {
+      e.preventDefault();
+      
+      // 다른 모든 툴팁 닫기
+      document.querySelectorAll('.tooltip-text').forEach(tt => {
+        tt.style.visibility = 'hidden';
+        tt.style.opacity = '0';
+      });
+      
+      // 현재 툴팁 토글
+      const tooltipText = this.querySelector('.tooltip-text');
+      if (tooltipText.style.visibility === 'visible') {
+        tooltipText.style.visibility = 'hidden';
+        tooltipText.style.opacity = '0';
+      } else {
+        tooltipText.style.visibility = 'visible';
+        tooltipText.style.opacity = '1';
+      }
+    });
+  });
+  
+  // 바깥쪽 터치하면 모든 툴팁 닫기
+  document.addEventListener('touchstart', function(e) {
+    if (!e.target.closest('.tooltip')) {
+      document.querySelectorAll('.tooltip-text').forEach(tt => {
+        tt.style.visibility = 'hidden';
+        tt.style.opacity = '0';
+      });
+    }
+  });
+});
+</script>
 
 <script>
 // 케이블 외경 데이터베이스
