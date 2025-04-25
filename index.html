@@ -4,82 +4,432 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>전기 계산기 메인 페이지</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+    :root {
+      --primary-color: #1a73e8;
+      --hover-color: #155ec2;
+      --text-color: #333;
+      --light-bg: #f6f9fc;
+      --shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
     body {
       font-family: 'Segoe UI', 'Noto Sans KR', sans-serif;
-      background: #f6f9fc;
+      background: var(--light-bg);
       margin: 0;
-      padding: 40px 20px;
+      padding: 0;
+      color: var(--text-color);
+    }
+    
+    /* 헤더 스타일 */
+    .header {
+      background-color: white;
+      box-shadow: var(--shadow);
+      padding: 15px 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      color: var(--primary-color);
+    }
+    
+    .logo i {
+      font-size: 28px;
+      margin-right: 10px;
+    }
+    
+    .logo-text {
+      font-weight: bold;
+      font-size: 24px;
+    }
+    
+    /* 메인 컨텐츠 */
+    .main-content {
+      padding: 40px 0;
       text-align: center;
     }
+    
     h1 {
-      color: #1a73e8;
+      color: var(--primary-color);
       margin-bottom: 40px;
+      font-size: 32px;
     }
-    .btn {
-      display: block;
-      margin: 15px auto;
-      padding: 15px 30px;
-      font-size: 15px;
-      background-color: #1a73e8;
-      color: white;
-      border: none;
-      border-radius: 8px;
+    
+    /* 계산기 그리드 */
+    .calculator-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    @media (min-width: 768px) {
+      .calculator-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (min-width: 992px) {
+      .calculator-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    
+    .calculator-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      padding: 25px 20px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
       cursor: pointer;
-      width: 260px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-    .btn:hover {
-      background-color: #155ec2;
+    
+    .calculator-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+      background-color: #f8fcff;
     }
-    .note {
-      margin-top: 60px;
-      font-size: 16px;
-      color: #1a73e8;
-      line-height: 1.7;
-      max-width: 680px;
+    
+    .calculator-icon {
+      font-size: 36px;
+      color: var(--primary-color);
+      margin-bottom: 15px;
+      transition: transform 0.3s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 70px;
+    }
+    
+    .calculator-card:hover .calculator-icon {
+      transform: scale(1.1);
+    }
+    
+    .dual-icon {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 100px;
+      margin: 0 auto;
+    }
+    
+    .icon-left {
+      margin-right: 5px;
+    }
+    
+    .icon-right {
+      margin-left: 5px;
+    }
+    
+    .calculator-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--primary-color);
+      background-color: rgba(26, 115, 232, 0.08);
+      padding: 8px 12px;
+      border-radius: 6px;
+      transition: background-color 0.3s ease;
+    }
+    
+    .calculator-card:hover .calculator-title {
+      background-color: rgba(26, 115, 232, 0.15);
+    }
+    
+    .calculator-desc {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 5px;
+      line-height: 1.5;
+      flex-grow: 1;
+      background-color: rgba(0, 0, 0, 0.02);
+      padding: 12px;
+      border-radius: 6px;
+      transition: background-color 0.3s ease;
+    }
+    
+    .calculator-card:hover .calculator-desc {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+    
+    /* 최근 사용 섹션 */
+    .recent-section {
+      background-color: white;
+      padding: 20px;
+      margin-bottom: 40px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      max-width: 800px;
       margin-left: auto;
       margin-right: auto;
-      font-weight: 500;
     }
+    
+    .recent-title {
+      font-size: 18px;
+      color: var(--primary-color);
+      margin-bottom: 15px;
+      text-align: left;
+    }
+    
+    .recent-items {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 10px;
+    }
+    
+    .recent-item {
+      background-color: #f0f4f8;
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-size: 14px;
+      white-space: nowrap;
+      color: var(--primary-color);
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    
+    .recent-item:hover {
+      background-color: #e0e8f0;
+    }
+    
+    /* 노트 섹션 */
+    .note {
+      margin-top: 60px;
+      font-size: 15px;
+      color: #555;
+      line-height: 1.7;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+      background-color: rgba(26, 115, 232, 0.05);
+      padding: 20px;
+      border-radius: 8px;
+      border-left: 4px solid var(--primary-color);
+    }
+    
+    /* 푸터 */
     .footer {
+      background-color: white;
+      padding: 30px 0;
       margin-top: 80px;
-      font-size: 13px;
-      color: #999;
     }
-    @media (max-width: 500px) {
-      .btn {
-        width: 90%;
-        font-size: 25px;
-        padding: 12px 20px;
-      }
-      .note {
-        font-size: 17px;
-        padding: 0 10px;
-      }
-      .footer {
-        font-size: 14px;
-      }
+    
+    .footer-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .footer-text {
+      font-size: 14px;
+      color: #999;
+      margin-bottom: 15px;
+    }
+    
+    .social-links {
+      display: flex;
+      gap: 15px;
+    }
+    
+    .social-link {
+      color: #666;
+      font-size: 18px;
+      transition: color 0.2s ease;
+    }
+    
+    .social-link:hover {
+      color: var(--primary-color);
     }
   </style>
 </head>
 <body>
-  <h1>전기 계산기</h1>
-  <button class="btn" onclick="location.href='cable.html'">전선(차단기) 계산기</button>
-  <button class="btn" onclick="location.href='cable2.html'">케이블 계산기(고급)</button>
-  <button class="btn" onclick="location.href='conduit-size-1.html'">전선관 계산기</button>
-  <button class="btn" onclick="location.href='voltage-drop.html'">전압강하 계산기 (LED)</button>
-  <button class="btn" onclick="location.href='moltal.html'">충전재 계산기 (몰탈, 아스콘 등)</button>
+  <!-- 헤더 섹션 -->
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <a href="index.html" class="logo">
+          <i class="fas fa-bolt"></i>
+          <span class="logo-text">전기 계산기</span>
+        </a>
+      </div>
+    </div>
+  </header>
 
-  <div class="note">
-    ※ 본 계산기는 「전기설비기술기준(KEC)」을 기반으로 하여 신중하게 설계되었으며,<br>
-    일반적인 조건을 고려한 보수적 기준으로 산출된 참고 자료입니다.<br>
-    실제 시공 및 설계 시에는 현장 여건과 다양한 변수들을 종합적으로 고려하여<br>
-    전문가의 검토와 판단을 병행하시기 바랍니다.
+  <!-- 메인 컨텐츠 -->
+  <div class="main-content">
+    <div class="container">
+      <h1>전문가를 위한 전기 계산기</h1>
+      
+      <!-- 최근 사용 섹션 -->
+      <div class="recent-section">
+        <h3 class="recent-title">최근 사용한 계산기</h3>
+        <div class="recent-items">
+          <div class="recent-item" onclick="location.href='cable.html'">전선(차단기) 계산기</div>
+          <div class="recent-item" onclick="location.href='voltage-drop.html'">전압강하 계산기</div>
+          <div class="recent-item" onclick="location.href='conduit-size-1.html'">전선관 계산기</div>
+        </div>
+      </div>
+      
+      <!-- 계산기 그리드 -->
+      <div class="calculator-grid">
+        <!-- 계산기 1 -->
+        <div class="calculator-card" onclick="location.href='cable.html'">
+          <div class="calculator-icon">
+            <svg width="50" height="50" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M400 100C450 100 500 150 500 200V600C500 650 550 700 600 700" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
+              <path d="M200 100C150 100 100 150 100 200V600C100 650 150 700 200 700" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
+              <rect x="200" y="70" width="200" height="60" rx="15" fill="#1a73e8"/>
+              <rect x="200" y="670" width="200" height="60" rx="15" fill="#1a73e8"/>
+            </svg>
+          </div>
+          <div class="calculator-title">전선(차단기) 계산기</div>
+          <div class="calculator-desc">
+            부하 용량에 따른 적정 전선 규격과 차단기 용량을 계산하여 안전한 전기 설비를 구축할 수 있습니다.
+          </div>
+        </div>
+        
+        <!-- 계산기 2 -->
+        <div class="calculator-card" onclick="location.href='cable2.html'">
+          <div class="calculator-icon">
+            <svg width="50" height="50" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M170 200H630C680 200 720 240 720 290V350C720 400 680 440 630 440H170C120 440 80 400 80 350V290C80 240 120 200 170 200Z" stroke="#1a73e8" stroke-width="40"/>
+              <rect x="140" y="260" width="170" height="120" rx="10" fill="#f8d86a"/>
+              <rect x="490" y="260" width="170" height="120" rx="10" fill="#a9d18e"/>
+              <path d="M225 440V600C225 650 265 690 315 690H485C535 690 575 650 575 600V440" stroke="#1a73e8" stroke-width="40"/>
+            </svg>
+          </div>
+          <div class="calculator-title">케이블 계산기(고급)</div>
+          <div class="calculator-desc">
+            다양한 환경과 조건에서의 케이블 용량을 정밀하게 계산하여 최적의 케이블 선정을 도와드립니다.
+          </div>
+        </div>
+        
+        <!-- 계산기 3 -->
+        <div class="calculator-card" onclick="location.href='conduit-size-1.html'">
+          <div class="calculator-icon dual-icon">
+            <svg width="40" height="40" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-left">
+              <path d="M150 100H250V700H150V100Z" stroke="#1a73e8" stroke-width="30"/>
+              <path d="M250 150H650C650 150 700 150 700 200V300C700 300 700 350 650 350H250" stroke="#1a73e8" stroke-width="30"/>
+              <path d="M250 450H650C650 450 700 450 700 500V600C700 600 700 650 650 650H250" stroke="#1a73e8" stroke-width="30"/>
+            </svg>
+            <svg width="40" height="40" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-right">
+              <path d="M200 100V700" stroke="#1a73e8" stroke-width="30"/>
+              <path d="M600 100V700" stroke="#1a73e8" stroke-width="30"/>
+              <path d="M200 200H600" stroke="#1a73e8" stroke-width="30"/>
+              <path d="M200 400H600" stroke="#1a73e8" stroke-width="30"/>
+              <path d="M200 600H600" stroke="#1a73e8" stroke-width="30"/>
+            </svg>
+          </div>
+          <div class="calculator-title">전선관(트레이) 계산기</div>
+          <div class="calculator-desc">
+            전선 수량과 규격에 따른 적정 전선관 크기와 케이블 트레이 규격을 계산하여 시공의 효율성과 안전성을 확보합니다.
+          </div>
+        </div>
+        
+        <!-- 계산기 4 -->
+        <div class="calculator-card" onclick="location.href='voltage-drop.html'">
+          <div class="calculator-icon">
+            <svg width="50" height="50" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="400" cy="300" r="180" stroke="#1a73e8" stroke-width="40"/>
+              <path d="M400 100V180" stroke="#1a73e8" stroke-width="30"/>
+              <path d="M400 420V500" stroke="#1a73e8" stroke-width="30"/>
+              <path d="M200 300H280" stroke="#1a73e8" stroke-width="30"/>
+              <path d="M520 300H600" stroke="#1a73e8" stroke-width="30"/>
+              <path d="M275 175L330 230" stroke="#1a73e8" stroke-width="30"/>
+              <path d="M470 370L525 425" stroke="#1a73e8" stroke-width="30"/>
+              <path d="M525 175L470 230" stroke="#1a73e8" stroke-width="30"/>
+              <path d="M330 370L275 425" stroke="#1a73e8" stroke-width="30"/>
+              <path d="M350 550L450 550L400 650L350 550Z" fill="#f8d86a"/>
+              <path d="M300 600L500 600L400 750L300 600Z" fill="#f8d86a"/>
+            </svg>
+          </div>
+          <div class="calculator-title">전압강하 계산기 (LED)</div>
+          <div class="calculator-desc">
+            LED 조명 시스템의 전압강하를 계산하여 안정적인 조명 설계를 지원합니다.
+          </div>
+        </div>
+        
+        <!-- 계산기 5 -->
+        <div class="calculator-card" onclick="location.href='moltal.html'">
+          <div class="calculator-icon">
+            <svg width="50" height="50" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M200 300V600C200 650 250 700 300 700H500C550 700 600 650 600 600V300H200Z" stroke="#1a73e8" stroke-width="40"/>
+              <path d="M150 300H650" stroke="#1a73e8" stroke-width="40"/>
+              <path d="M250 100H550L600 300H200L250 100Z" stroke="#1a73e8" stroke-width="40"/>
+              <path d="M250 400L550 400" stroke="#a9d18e" stroke-width="30"/>
+              <path d="M300 500L500 500" stroke="#a9d18e" stroke-width="30"/>
+              <path d="M350 600L450 600" stroke="#a9d18e" stroke-width="30"/>
+            </svg>
+          </div>
+          <div class="calculator-title">충전재 계산기</div>
+          <div class="calculator-desc">
+            몰탈, 아스콘 등 충전재의 필요 용량을 정확히 계산하여 자재 낭비를 방지합니다.
+          </div>
+        </div>
+      </div>
+      
+      <!-- 노트 섹션 -->
+      <div class="note">
+        <p>
+          ※ 본 계산기는 「전기설비기술기준(KEC)」을 기반으로 하여 신중하게 설계되었으며,
+          일반적인 조건을 고려한 보수적 기준으로 산출된 참고 자료입니다.
+          실제 시공 및 설계 시에는 현장 여건과 다양한 변수들을 종합적으로 고려하여
+          전문가의 검토와 판단을 병행하시기 바랍니다.
+        </p>
+      </div>
+    </div>
   </div>
+  
+  <!-- 푸터 섹션 -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-text">
+          © 2025 Electric Calculator ｜ Developed by Park Pyung Hwan
+        </div>
+        <div class="social-links">
+          <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
+          <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+          <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+        </div>
+      </div>
+    </div>
+  </footer>
 
-  <div class="footer">
-    © 2025 Electric Calculator ｜ Developed by Park Pyung Hwan
-  </div>
+  <script>
+    // 최근 사용한 계산기 기록을 위한 간단한 스크립트
+    document.querySelectorAll('.calculator-card').forEach(card => {
+      card.addEventListener('click', function(e) {
+        // 실제로는 로컬 스토리지에 저장하는 등의 기능이 필요합니다
+        // 여기서는 개념만 표현했습니다
+        console.log('계산기 사용 기록: ' + this.querySelector('.calculator-title').textContent);
+      });
+    });
+  </script>
 </body>
 </html>
