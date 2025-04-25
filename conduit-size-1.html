@@ -13,7 +13,8 @@
       --success-light: #e8f5e9;
       --danger-color: #e53935;
       --danger-light: #ffebee;
-      --warning-color: #f39c12;
+      --warning-color: #ff9800;
+      --warning-light: #fff3e0;
       --gray-light: #f6f9fc;
       --gray: #ddd;
       --text-dark: #333;
@@ -224,8 +225,8 @@
       top: 0;
       z-index: 10;
     }
-    
-    .cable-list {
+
+.cable-list {
       max-height: 250px;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
@@ -266,6 +267,12 @@
       color: var(--danger-color);
     }
     
+    .result-warning {
+      background-color: var(--warning-light);
+      border-left: 6px solid var(--warning-color);
+      color: #e65100;
+    }
+    
     .recommend-box {
       background: var(--primary-light);
       border: 2px dashed var(--primary-color);
@@ -286,6 +293,10 @@
     
     .red {
       color: var(--danger-color);
+    }
+    
+    .yellow {
+      color: var(--warning-color);
     }
     
     .text-center {
@@ -424,11 +435,11 @@
     }
     
     .tooltip {
-  position: relative;
-  display: inline-block;
-  cursor: pointer;
-  padding: 8px; /* 터치 영역 확장 */
-}
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+      padding: 8px;
+    }
     
     .tooltip .tooltip-text {
       visibility: hidden;
@@ -485,8 +496,39 @@
       stroke-linejoin: round;
       fill: none;
     }
+    
+    /* 단면도 시각화 스타일 */
+    .cross-section-container {
+      margin: 20px 0;
+      padding: 15px;
+      background: #f9f9f9;
+      border-radius: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .cross-section-container h3 {
+      margin-top: 0;
+      margin-bottom: 15px;
+      color: #1a73e8;
+      font-size: 1.1rem;
+    }
+    
+    /* 채움률 범위별 배경색 관련 클래스 */
+    .fill-normal {
+      background-color: rgba(76, 175, 80, 0.1);
+    }
+
+    .fill-warning {
+      background-color: rgba(255, 152, 0, 0.1);
+    }
+
+    .fill-danger {
+      background-color: rgba(229, 57, 53, 0.1);
+    }
   </style>
 </head>
+
 <body>
   <div class="container">
     <h1>전선관 계산기</h1>
@@ -668,46 +710,6 @@
   </button>
 
 <script>
-
-// 툴팁 터치 이벤트 처리
-document.addEventListener('DOMContentLoaded', function() {
-  const tooltips = document.querySelectorAll('.tooltip');
-  
-  tooltips.forEach(tooltip => {
-    tooltip.addEventListener('touchstart', function(e) {
-      e.preventDefault();
-      
-      // 다른 모든 툴팁 닫기
-      document.querySelectorAll('.tooltip-text').forEach(tt => {
-        tt.style.visibility = 'hidden';
-        tt.style.opacity = '0';
-      });
-      
-      // 현재 툴팁 토글
-      const tooltipText = this.querySelector('.tooltip-text');
-      if (tooltipText.style.visibility === 'visible') {
-        tooltipText.style.visibility = 'hidden';
-        tooltipText.style.opacity = '0';
-      } else {
-        tooltipText.style.visibility = 'visible';
-        tooltipText.style.opacity = '1';
-      }
-    });
-  });
-  
-  // 바깥쪽 터치하면 모든 툴팁 닫기
-  document.addEventListener('touchstart', function(e) {
-    if (!e.target.closest('.tooltip')) {
-      document.querySelectorAll('.tooltip-text').forEach(tt => {
-        tt.style.visibility = 'hidden';
-        tt.style.opacity = '0';
-      });
-    }
-  });
-});
-</script>
-
-<script>
 // 케이블 외경 데이터베이스
 const cableDiameters = {
   'CV': {
@@ -831,6 +833,41 @@ window.addEventListener("load", function() {
   updateExternalDiameter();
   loadFromLocalStorage();
   updateHistoryList();
+  
+  // 툴팁 터치 이벤트 처리
+  const tooltips = document.querySelectorAll('.tooltip');
+  
+  tooltips.forEach(tooltip => {
+    tooltip.addEventListener('touchstart', function(e) {
+      e.preventDefault();
+      
+      // 다른 모든 툴팁 닫기
+      document.querySelectorAll('.tooltip-text').forEach(tt => {
+        tt.style.visibility = 'hidden';
+        tt.style.opacity = '0';
+      });
+      
+      // 현재 툴팁 토글
+      const tooltipText = this.querySelector('.tooltip-text');
+      if (tooltipText.style.visibility === 'visible') {
+        tooltipText.style.visibility = 'hidden';
+        tooltipText.style.opacity = '0';
+      } else {
+        tooltipText.style.visibility = 'visible';
+        tooltipText.style.opacity = '1';
+      }
+    });
+  });
+  
+  // 바깥쪽 터치하면 모든 툴팁 닫기
+  document.addEventListener('touchstart', function(e) {
+    if (!e.target.closest('.tooltip')) {
+      document.querySelectorAll('.tooltip-text').forEach(tt => {
+        tt.style.visibility = 'hidden';
+        tt.style.opacity = '0';
+      });
+    }
+  });
 });
 
 // 홈으로 돌아가기
@@ -1233,6 +1270,184 @@ function groupByName(arr) {
   return Object.values(map);
 }
 
+// 채움률에 따른 색상 반환 함수
+function getFillColor(fillPercent, limit) {
+  if (fillPercent <= limit) {
+    return "#4caf50"; // 녹색 - 기준 이내
+  } else if (fillPercent <= 60) {
+    return "#ff9800"; // 노란색 - 기준 초과 ~ 60%
+  } else {
+    return "#e53935"; // 붉은색 - 60% 초과
+  }
+}
+
+// 채움률 상태 CSS 클래스 반환 함수
+function getFillStatusClass(fillPercent, limit) {
+  if (fillPercent <= limit) {
+    return ""; // 기준 이내
+  } else if (fillPercent <= 60) {
+    return "result-warning"; // 기준 초과 ~ 60%
+  } else {
+    return "result-error"; // 60% 초과
+  }
+}
+
+// 채움률 상태 메시지 반환 함수
+function getFillStatusMessage(fillPercent, limit) {
+  if (fillPercent <= limit) {
+    return "적합";
+  } else if (fillPercent <= 60) {
+    return "초과 (주의 필요)";
+  } else {
+    return "부적합 (매우 위험)";
+  }
+}
+
+// 단면도 시각화 함수 - 업데이트된 버전
+function generateCrossSectionSVG(pipeType, innerDia, cables, totalArea, usedArea, fillPercent, limit) {
+  // SVG 기본 설정
+  const svgSize = 300;
+  const padding = 20;
+  const centerX = svgSize / 2;
+  const centerY = svgSize / 2;
+  
+  // 채움률에 따른 색상 결정
+  const fillColor = getFillColor(fillPercent, limit);
+  
+  let svg = '';
+  
+  // 전선관인 경우 (원형)
+  if (pipeType !== 'TRAY') {
+    const radius = (svgSize - (padding * 2)) / 2;
+    const actualRadius = radius * 0.8; // SVG에서의 전선관 크기
+    
+    // 전선관 외곽 그리기
+    svg = `<svg width="${svgSize}" height="${svgSize}" viewBox="0 0 ${svgSize} ${svgSize}">
+      <defs>
+        <pattern id="diagonalHatch" patternUnits="userSpaceOnUse" width="4" height="4">
+          <path d="M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2" style="stroke:${fillColor}; stroke-width:0.5" />
+        </pattern>
+      </defs>
+      
+      <!-- 전선관 외곽 -->
+      <circle cx="${centerX}" cy="${centerY}" r="${actualRadius}" 
+        fill="white" stroke="#333" stroke-width="2" />
+      
+      <!-- 전선관 내부 유효면적 표시 -->
+      <circle cx="${centerX}" cy="${centerY}" r="${actualRadius * 0.9}" 
+        fill="none" stroke="#1a73e8" stroke-width="1" stroke-dasharray="5,2" />
+      
+      <!-- 한계선 표시 -->
+      <circle cx="${centerX}" cy="${centerY}" r="${actualRadius * Math.sqrt(limit / 100)}" 
+        fill="none" stroke="#1a73e8" stroke-width="1" stroke-dasharray="3,3" />`;
+    
+    // 케이블 영역 (채워진 부분) - 실제 채움률에 맞게 면적 조정
+    const filledRadius = actualRadius * Math.sqrt(Math.min(fillPercent, 100) / 100);
+    
+    svg += `<!-- 케이블 영역 -->
+      <circle cx="${centerX}" cy="${centerY}" r="${filledRadius}" 
+        fill="url(#diagonalHatch)" stroke="${fillColor}" stroke-width="2" />
+        
+      <!-- 내경 치수선 -->
+      <line x1="${centerX - actualRadius}" y1="${centerY + actualRadius + 15}" 
+        x2="${centerX + actualRadius}" y2="${centerY + actualRadius + 15}" 
+        stroke="#333" stroke-width="1" />
+      <line x1="${centerX - actualRadius}" y1="${centerY + actualRadius + 10}" 
+        x2="${centerX - actualRadius}" y2="${centerY + actualRadius + 20}" 
+        stroke="#333" stroke-width="1" />
+      <line x1="${centerX + actualRadius}" y1="${centerY + actualRadius + 10}" 
+        x2="${centerX + actualRadius}" y2="${centerY + actualRadius + 20}" 
+        stroke="#333" stroke-width="1" />
+      <text x="${centerX}" y="${centerY + actualRadius + 30}" 
+        text-anchor="middle" font-size="12">내경 ${innerDia}mm</text>
+        
+      <!-- 채움률 정보 -->
+      <text x="${centerX}" y="${centerY}" 
+        text-anchor="middle" font-size="14" font-weight="bold" fill="#333">
+        채움률: ${fillPercent.toFixed(1)}%${fillPercent > limit ? ' (기준 초과)' : ''}
+      </text>
+      <text x="${centerX}" y="${centerY + 20}" 
+        text-anchor="middle" font-size="12" fill="#555">
+        ${usedArea.toFixed(1)}㎟ / ${totalArea.toFixed(1)}㎟
+      </text>
+      
+      <!-- 한계선 표시 레이블 -->
+      <text x="${centerX}" y="${centerY - actualRadius * Math.sqrt(limit / 100) - 5}" 
+        text-anchor="middle" font-size="10" fill="#1a73e8">
+        ${limit}% 한계선
+      </text>
+    </svg>`;
+  } 
+  // 트레이인 경우 (직사각형)
+  else {
+    const trayWidth = innerDia; // 트레이 폭
+    const trayHeight = 100; // 고정 높이
+    
+    // 트레이 크기를 SVG 영역에 맞게 조정
+    const scale = (svgSize - (padding * 2)) / Math.max(trayWidth, trayHeight);
+    const scaledWidth = trayWidth * scale;
+    const scaledHeight = trayHeight * scale;
+    
+    // 트레이 위치 계산
+    const trayX = (svgSize - scaledWidth) / 2;
+    const trayY = (svgSize - scaledHeight) / 2;
+    
+    // 케이블 사용 너비 (채움률에 따라)
+    const usedWidth = scaledWidth * Math.min(fillPercent, 100) / 100;
+    // 한계선 위치
+    const limitX = trayX + (scaledWidth * limit / 100);
+    
+    svg = `<svg width="${svgSize}" height="${svgSize}" viewBox="0 0 ${svgSize} ${svgSize}">
+      <defs>
+        <pattern id="diagonalHatch" patternUnits="userSpaceOnUse" width="4" height="4">
+          <path d="M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2" style="stroke:${fillColor}; stroke-width:0.5" />
+        </pattern>
+      </defs>
+      
+      <!-- 트레이 외곽 -->
+      <rect x="${trayX}" y="${trayY}" width="${scaledWidth}" height="${scaledHeight}" 
+        fill="white" stroke="#333" stroke-width="2" />
+      
+      <!-- 케이블 영역 (채워진 부분) -->
+      <rect x="${trayX}" y="${trayY}" width="${usedWidth}" height="${scaledHeight}" 
+        fill="url(#diagonalHatch)" stroke="${fillColor}" stroke-width="1" />
+      
+      <!-- 한계선 표시 -->
+      <line x1="${limitX}" y1="${trayY}" x2="${limitX}" y2="${trayY + scaledHeight}" 
+        stroke="#1a73e8" stroke-width="1" stroke-dasharray="5,2" />
+      <text x="${limitX}" y="${trayY - 5}" 
+        text-anchor="middle" font-size="10" fill="#1a73e8">
+        ${limit}% 한계선
+      </text>
+        
+      <!-- 트레이 폭 치수선 -->
+      <line x1="${trayX}" y1="${trayY + scaledHeight + 15}" 
+        x2="${trayX + scaledWidth}" y2="${trayY + scaledHeight + 15}" 
+        stroke="#333" stroke-width="1" />
+      <line x1="${trayX}" y1="${trayY + scaledHeight + 10}" 
+        x2="${trayX}" y2="${trayY + scaledHeight + 20}" 
+        stroke="#333" stroke-width="1" />
+      <line x1="${trayX + scaledWidth}" y1="${trayY + scaledHeight + 10}" 
+        x2="${trayX + scaledWidth}" y2="${trayY + scaledHeight + 20}" 
+        stroke="#333" stroke-width="1" />
+      <text x="${trayX + scaledWidth/2}" y="${trayY + scaledHeight + 30}" 
+        text-anchor="middle" font-size="12">트레이 폭 ${trayWidth}mm</text>
+        
+      <!-- 채움률 정보 -->
+      <text x="${trayX + scaledWidth/2}" y="${trayY + scaledHeight/2}" 
+        text-anchor="middle" font-size="14" font-weight="bold" fill="#333">
+        채움률: ${fillPercent.toFixed(1)}%${fillPercent > limit ? ' (기준 초과)' : ''}
+      </text>
+      <text x="${trayX + scaledWidth/2}" y="${trayY + scaledHeight/2 + 20}" 
+        text-anchor="middle" font-size="12" fill="#555">
+        ${(cables.reduce((sum, c) => sum + c.dia * c.count, 0)).toFixed(1)}mm / ${trayWidth.toFixed(1)}mm
+      </text>
+    </svg>`;
+  }
+  
+  return svg;
+}
+
 // 계산 실행
 function calculate() {
   // 로딩 표시
@@ -1300,8 +1515,8 @@ function performCalculation() {
   
   // 채움률 제한
   const limit = fillLimit[pipeType];
-  
-  // 케이블 트레이인 경우
+
+// 케이블 트레이인 경우
   if (pipeType === "TRAY") {
     let trayWidth = selectedVal;
     
@@ -1327,6 +1542,8 @@ function performCalculation() {
     }
     
     const fill = (totalWidth / trayWidth) * 100;
+    const statusClass = getFillStatusClass(fill, limit);
+    const statusMessage = getFillStatusMessage(fill, limit);
     
     resultHTML += `<div class="table-container">
       <table class="result-table"><thead><tr>
@@ -1335,16 +1552,21 @@ function performCalculation() {
       <tr>
         <td class="bold-text">${trayWidth}</td>
         <td class="bold-text">${totalWidth.toFixed(1)}</td>
-        <td class="bold-text ${fill > limit ? 'red' : ''}">${fill.toFixed(1)}%</td>
+        <td class="bold-text ${fill > limit ? (fill > 60 ? 'red' : 'yellow') : ''}">${fill.toFixed(1)}%</td>
       </tr></tbody></table>
     </div>`;
     
-    // 적합 여부 표시
-    if (fill <= limit) {
-      resultHTML += `<div class="result-highlight">※ 결과: <strong>적합</strong> (채움률 ${fill.toFixed(1)}% ≤ ${limit}%)</div>`;
-    } else {
-      resultHTML += `<div class="result-highlight result-error">※ 결과: <strong>부적합</strong> (채움률 ${fill.toFixed(1)}% > ${limit}%)</div>`;
-      
+    // 항상 결과 표시 (상태에 따라 CSS 클래스 변경)
+    resultHTML += `<div class="result-highlight ${statusClass}">※ 결과: <strong>${statusMessage}</strong> (채움률 ${fill.toFixed(1)}% ${fill > limit ? '&gt;' : '≤'} ${limit}%)</div>`;
+    
+    // 항상 단면도 추가
+    resultHTML += `<div class="cross-section-container">
+      <h3>트레이 단면도</h3>
+      ${generateCrossSectionSVG('TRAY', trayWidth, cables, trayWidth, totalWidth, fill, limit)}
+    </div>`;
+    
+    // 기준 초과시 추천 조합 표시
+    if (fill > limit) {
       // 여러 트레이 조합 추천 (비슷한 사이즈의 조합 우선)
       const required = totalWidth / (limit / 100);
       const combo = findBalancedCombo(trayWidths, required);
@@ -1356,14 +1578,16 @@ function performCalculation() {
         resultHTML += `<div class="recommend-box"><h3>※ 추천 조합</h3>
           <div class="table-container">
             <table class="result-table"><thead><tr><th>트레이 폭 조합</th><th>총 폭</th><th>채움률</th></tr></thead><tbody>
-            <tr><td class="bold-text">${combo.join(" + ")}</td><td>${sum}</td><td class="${fill2 > limit ? 'red' : ''}">${fill2.toFixed(1)}%</td></tr>
+            <tr><td class="bold-text">${combo.join(" + ")}</td><td>${sum}</td><td class="${fill2 > limit ? (fill2 > 60 ? 'red' : 'yellow') : ''}">${fill2.toFixed(1)}%</td></tr>
           </tbody></table>
           </div>
         </div>`;
       }
     }
-    
-  } else {
+  }
+
+// 일반 전선관인 경우
+  else {
     // 일반 전선관인 경우
     const conduitList = (pipeType === 'ELP') ? elpConduits : generalConduits[pipeType] || [];
     let selected = null;
@@ -1382,6 +1606,11 @@ function performCalculation() {
           break;
         }
       }
+      
+      // 적합한 전선관을 못 찾은 경우 가장 큰 전선관 선택
+      if (!selected && conduitList.length > 0) {
+        selected = conduitList[conduitList.length-1];
+      }
     }
     
     // 선택된 전선관이 있는 경우
@@ -1390,6 +1619,8 @@ function performCalculation() {
       const innerDia = selected.innerDia;
       const eff = fullArea * correction;
       const fill = (totalArea / eff) * 100;
+      const statusClass = getFillStatusClass(fill, limit);
+      const statusMessage = getFillStatusMessage(fill, limit);
       
       resultHTML += `<div class="table-container">
         <table class="result-table"><thead><tr>
@@ -1400,16 +1631,21 @@ function performCalculation() {
           <td>${innerDia}</td>
           <td>${fullArea.toLocaleString()}</td>
           <td>${eff.toFixed(1)}</td>
-          <td class="bold-text ${fill > limit ? 'red' : ''}">${fill.toFixed(1)}%</td>
+          <td class="bold-text ${fill > limit ? (fill > 60 ? 'red' : 'yellow') : ''}">${fill.toFixed(1)}%</td>
         </tr></tbody></table>
       </div>`;
       
-      // 적합 여부 표시
-      if (fill <= limit) {
-        resultHTML += `<div class="result-highlight">※ 결과: <strong>적합</strong> (채움률 ${fill.toFixed(1)}% ≤ ${limit}%)</div>`;
-      } else {
-        resultHTML += `<div class="result-highlight result-error">※ 결과: <strong>부적합</strong> (채움률 ${fill.toFixed(1)}% > ${limit}%)</div>`;
-        
+      // 항상 결과 표시 (상태에 따라 CSS 클래스 변경)
+      resultHTML += `<div class="result-highlight ${statusClass}">※ 결과: <strong>${statusMessage}</strong> (채움률 ${fill.toFixed(1)}% ${fill > limit ? '&gt;' : '≤'} ${limit}%)</div>`;
+      
+      // 항상 단면도 추가
+      resultHTML += `<div class="cross-section-container">
+        <h3>전선관 단면도</h3>
+        ${generateCrossSectionSVG(pipeType, innerDia, cables, eff, totalArea, fill, limit)}
+      </div>`;
+      
+      // 기준 초과 시 추천 조합 표시
+      if (fill > limit) {
         // 여러 전선관 조합 추천
         const required = totalArea / (limit / 100 * correction);
         const combo = findBalancedCombo(conduitList.map(c => c.area), required);
@@ -1440,40 +1676,12 @@ function performCalculation() {
         }
       }
     } else {
-      // 자동 추천인데 단일 전선관으로 만족할 수 없는 경우
-      const required = totalArea / (limit / 100 * correction);
-      const combo = findBalancedCombo(conduitList.map(c => c.area), required);
-      
-      if (combo) {
-        const comboDetails = combo.map(area => conduitList.find(c => c.area === area));
-        const totalComboArea = combo.reduce((a, b) => a + b, 0);
-        const effArea = totalComboArea * correction;
-        const fill2 = (totalArea / effArea) * 100;
-        
-        resultHTML += `<div class="recommend-box"><h3>※ 자동 추천 조합</h3>
-          <div class="table-container">
-            <table class="result-table"><thead><tr><th>전선관</th><th>내경(mm)</th><th>단면적(㎟)</th></tr></thead><tbody>`;
-          
-        const grouped = groupByName(comboDetails);
-        grouped.forEach(c => {
-          resultHTML += `<tr><td class="bold-text">${c.count > 1 ? `${c.name} x ${c.count}` : c.name}</td><td>${c.innerDia}</td><td>${c.area}</td></tr>`;
-        });
-        
-        resultHTML += `</tbody></table>
-          </div>
-          <p style="margin-top: 10px;">
-            <strong>총 단면적:</strong> ${totalComboArea.toLocaleString()}㎟<br>
-            <strong>유효 면적:</strong> ${totalComboArea} × ${correction} = ${effArea.toFixed(1)}㎟<br>
-            <strong>채움률:</strong> ${fill2.toFixed(1)}%
-          </p>
-        </div>`;
-      } else {
-        resultHTML += `<div class="result-highlight result-error">※ 결과: <strong>부적합</strong><br>※ 적합한 조합이 없습니다.</div>`;
-      }
+      // 전선관을 선택할 수 없는 경우 (데이터가 없는 경우)
+      resultHTML += `<div class="result-highlight result-error">※ 오류: 전선관 정보를 찾을 수 없습니다.</div>`;
     }
   }
-  
-  // KEC 권장 채움률 정보
+
+// KEC 권장 채움률 정보
   resultHTML += `<p style="margin-top: 16px; color: #666; font-size: 0.9rem;">
     ※ KEC 권장 채움률: ELP 40%, CD/PE 40%, HI 45%, 스틸 50%, 트레이 50%</p>
   </div>`;
@@ -1481,7 +1689,6 @@ function performCalculation() {
   // 결과 표시
   document.getElementById("result").innerHTML = resultHTML;
   
-  // 결과 영역으로 스크롤
   // 결과 영역으로 스크롤
   document.getElementById("result").scrollIntoView({ behavior: 'smooth' });
 }
