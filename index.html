@@ -267,7 +267,7 @@
     
     /* 노트 섹션 */
     .note {
-      margin-top: 60px;
+      margin-top: 30px;
       font-size: 15px;
       color: #555;
       line-height: 1.7;
@@ -336,61 +336,30 @@
       <!-- 계산기 그리드 -->
       <div class="calculator-grid">
         <!-- 계산기 1 -->
-        <div class="calculator-card" onclick="window.location.href='cable.html'">
+        <a href="cable2.html" class="calculator-card">
           <div class="calculator-icon">
             <svg width="50" height="50" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <!-- 차단기 패널 -->
-              <rect x="150" y="150" width="500" height="500" rx="20" stroke="#1a73e8" stroke-width="40" fill="white"/>
-              
-              <!-- 차단기 스위치 -->
-              <rect x="250" y="250" width="80" height="300" rx="5" fill="#f8d86a"/>
-              <rect x="400" y="250" width="80" height="300" rx="5" fill="#f8d86a"/>
-              <rect x="550" y="250" width="80" height="300" rx="5" fill="#f8d86a"/>
-              
-              <!-- 위쪽 표시등 -->
-              <circle cx="250" cy="200" r="15" fill="red"/>
-              <circle cx="400" cy="200" r="15" fill="red"/>
-              <circle cx="550" cy="200" r="15" fill="red"/>
-              
-              <!-- 배선 -->
-              <path d="M250 120V170" stroke="#1a73e8" stroke-width="20"/>
-              <path d="M400 120V170" stroke="#1a73e8" stroke-width="20"/>
-              <path d="M550 120V170" stroke="#1a73e8" stroke-width="20"/>
-            </svg>
-          </div>
-          <div class="calculator-title">전선(차단기) 계산기</div>
-          <div class="calculator-desc">
-            부하 용량에 따른 적정 전선 규격과 차단기 용량을 계산하여 안전한 전기 설비를 구축할 수 있습니다.
-          </div>
-        </div>
-        
-        <!-- 계산기 2 -->
-        <div class="calculator-card" onclick="window.location.href='cable2.html'">
-          <div class="calculator-icon">
-            <svg width="50" height="50" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <!-- 케이블 외부 -->
-              <rect x="200" y="300" width="400" height="200" rx="100" fill="#f8d86a" />
-              <rect x="200" y="300" width="400" height="200" rx="100" stroke="#1a73e8" stroke-width="40" />
+              <!-- 전선 케이블 - 간결하고 직관적인 디자인 -->
+              <path d="M150 200C150 150 200 100 250 100H550C600 100 650 150 650 200" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
+              <path d="M150 600C150 650 200 700 250 700H550C600 700 650 650 650 600" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
+              <path d="M150 200V600" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
+              <path d="M650 200V600" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
               
               <!-- 내부 전선 -->
-              <circle cx="250" cy="400" r="30" fill="#ed7d31"/>
-              <circle cx="350" cy="400" r="30" fill="#0070c0"/>
-              <circle cx="450" cy="400" r="30" fill="#00b050"/>
-              <circle cx="550" cy="400" r="30" fill="#7030a0"/>
-              
-              <!-- 케이블 접속부 -->
-              <rect x="100" y="350" width="100" height="100" rx="10" stroke="#1a73e8" stroke-width="20" fill="white"/>
-              <rect x="600" y="350" width="100" height="100" rx="10" stroke="#1a73e8" stroke-width="20" fill="white"/>
+              <path d="M250 100V700" stroke="#ed7d31" stroke-width="25" stroke-linecap="round"/>
+              <path d="M350 100V700" stroke="#0070c0" stroke-width="25" stroke-linecap="round"/>
+              <path d="M450 100V700" stroke="#00b050" stroke-width="25" stroke-linecap="round"/>
+              <path d="M550 100V700" stroke="#7030a0" stroke-width="25" stroke-linecap="round"/>
             </svg>
           </div>
-          <div class="calculator-title">케이블 계산기(고급)</div>
+          <div class="calculator-title">케이블 계산기</div>
           <div class="calculator-desc">
             다양한 환경과 조건에서의 케이블 용량을 정밀하게 계산하여 최적의 케이블 선정을 도와드립니다.
           </div>
-        </div>
+        </a>
         
-        <!-- 계산기 3 -->
-        <div class="calculator-card" onclick="window.location.href='conduit-size-1.html'">
+        <!-- 계산기 2 -->
+        <a href="conduit-size.html" class="calculator-card">
           <div class="calculator-icon dual-icon">
             <svg width="40" height="40" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-left">
               <!-- 전선관 -->
@@ -427,10 +396,10 @@
           <div class="calculator-desc">
             전선 수량과 규격에 따른 적정 전선관 크기와 케이블 트레이 규격을 계산하여 시공의 효율성과 안전성을 확보합니다.
           </div>
-        </div>
+        </a>
         
-        <!-- 계산기 4 -->
-        <div class="calculator-card" onclick="window.location.href='voltage-drop.html'">
+        <!-- 계산기 3 -->
+        <a href="voltage-drop.html" class="calculator-card">
           <div class="calculator-icon">
             <svg width="50" height="50" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
               <!-- LED 평면도 -->
@@ -455,10 +424,10 @@
           <div class="calculator-desc">
             LED 조명 시스템의 전압강하를 계산하여 안정적인 조명 설계를 지원합니다.
           </div>
-        </div>
+        </a>
         
-        <!-- 계산기 5 -->
-        <div class="calculator-card" onclick="window.location.href='moltal.html'">
+        <!-- 계산기 4 -->
+        <a href="moltal.html" class="calculator-card">
           <div class="calculator-icon">
             <svg width="50" height="50" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
               <!-- 충전재 통 -->
@@ -471,6 +440,17 @@
               <rect x="270" y="350" width="260" height="60" fill="#a9d18e"/>
               <rect x="270" y="450" width="260" height="60" fill="#a9d18e"/>
               <rect x="270" y="550" width="260" height="60" fill="#a9d18e"/>
+              
+              <!-- 스푼 -->
+              <path d="M580 300C650 300 680 350 680 400C680 450 650 500 580 500" stroke="#1a73e8" stroke-width="15"/>
+              <path d="M580 310V490" stroke="#1a73e8" stroke-width="15"/>
+            </svg>
+          </div>
+          <div class="calculator-title">충전재 계산기</div>
+          <div class="calculator-desc">
+            몰탈, 아스콘 등 충전재의 필요 용량을 정확히 계산하여 자재 낭비를 방지합니다.
+          </div>
+        </a>" height="60" fill="#a9d18e"/>
               
               <!-- 스푼 -->
               <path d="M580 300C650 300 680 350 680 400C680 450 650 500 580 500" stroke="#1a73e8" stroke-width="15"/>
