@@ -1370,30 +1370,43 @@ function setupTabs() {
     
     // 전선 종류에 따른 코어 옵션 업데이트
     function updateCoreOptions(typeId, coreId) {
-      const typeSelect = document.getElementById(typeId);
-      const coreSelect = document.getElementById(coreId);
-      const selectedType = typeSelect.value;
-      
-      // 기존 옵션 삭제
-      coreSelect.innerHTML = "";
-      
-      // 케이블 타입에 따라 사용 가능한 코어 옵션 설정
-      const options = selectedType === "HFIX" || selectedType === "HIV"
-        ? [{value: "1", label: "1C"}]
-        : [
-            {value: "1", label: "1C"},
-            {value: "2", label: "2C"},
-            {value: "3", label: "3C"},
-            {value: "4", label: "4C"}
-          ];
-      
-      options.forEach(opt => {
-        const option = document.createElement('option');
-        option.value = opt.value;
-        option.textContent = opt.label;
-        coreSelect.appendChild(option);
-      });
-    }
+  const typeSelect = document.getElementById(typeId);
+  const coreSelect = document.getElementById(coreId);
+  const selectedType = typeSelect.value;
+
+  // 기존 옵션 초기화
+  coreSelect.innerHTML = "";
+
+  // 1C만 가능한 전선 종류인지 확인
+  if (selectedType === "HFIX" || selectedType === "HIV") {
+    // 1C 하나만 추가
+    const option = document.createElement('option');
+    option.value = "1";
+    option.textContent = "1C";
+    coreSelect.appendChild(option);
+
+    // 드롭다운 비활성화
+    coreSelect.disabled = true;
+  } else {
+    // 1C~4C 모두 추가
+    const options = [
+      {value: "1", label: "1C"},
+      {value: "2", label: "2C"},
+      {value: "3", label: "3C"},
+      {value: "4", label: "4C"}
+    ];
+
+    options.forEach(opt => {
+      const option = document.createElement('option');
+      option.value = opt.value;
+      option.textContent = opt.label;
+      coreSelect.appendChild(option);
+    });
+
+    // 드롭다운 활성화
+    coreSelect.disabled = false;
+  }
+}
     
     // 고급 설정 토글
     function toggleAdvancedOptions() {
@@ -1949,8 +1962,10 @@ function setupTabs() {
       const sinPhi = Math.sqrt(1 - powerFactor * powerFactor);
       
       // 비교할 대표적인 케이블 굵기들
-      const displaySizes = ["1.5", "2.5", "4", "6", "10", "16", "25", "35", "50", "70", "95", "120"];
-      const availableSizes = Object.keys(resistance[cableType]).filter(s => displaySizes.includes(s));
+      const displaySizes = ["1.5", "2.5", "4", "6", "10", "16", "25", "35", "50", "70", "95", "120", "150", "185", "240", "300", "400", "500", "600"];
+const availableSizes = Object.keys(resistance[cableType])
+  .filter(s => displaySizes.includes(s))
+  .sort((a, b) => parseFloat(a) - parseFloat(b)); // 숫자 오름차순 정렬
       
       // 테이블 형태의 HTML 생성
       let tableRows = '';
