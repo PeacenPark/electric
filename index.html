@@ -297,13 +297,16 @@
       <!-- 계산기 그리드 -->
       <div class="calculator-grid">
         <!-- 계산기 1 -->
-        <div class="calculator-card" onclick="location.href='cable.html'">
+        <div class="calculator-card" onclick="window.location.href='cable.html'">
           <div class="calculator-icon">
             <svg width="50" height="50" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M400 100C450 100 500 150 500 200V600C500 650 550 700 600 700" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
-              <path d="M200 100C150 100 100 150 100 200V600C100 650 150 700 200 700" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
-              <rect x="200" y="70" width="200" height="60" rx="15" fill="#1a73e8"/>
-              <rect x="200" y="670" width="200" height="60" rx="15" fill="#1a73e8"/>
+              <rect x="150" y="150" width="500" height="400" rx="20" stroke="#1a73e8" stroke-width="40"/>
+              <line x1="250" y1="150" x2="250" y2="550" stroke="#1a73e8" stroke-width="30"/>
+              <line x1="350" y1="150" x2="350" y2="550" stroke="#1a73e8" stroke-width="30"/>
+              <line x1="450" y1="150" x2="450" y2="550" stroke="#1a73e8" stroke-width="30"/>
+              <line x1="550" y1="150" x2="550" y2="550" stroke="#1a73e8" stroke-width="30"/>
+              <rect x="210" y="80" width="80" height="180" rx="5" fill="#f8d86a"/>
+              <rect x="410" y="80" width="80" height="180" rx="5" fill="#f8d86a"/>
             </svg>
           </div>
           <div class="calculator-title">전선(차단기) 계산기</div>
@@ -313,13 +316,18 @@
         </div>
         
         <!-- 계산기 2 -->
-        <div class="calculator-card" onclick="location.href='cable2.html'">
+        <div class="calculator-card" onclick="window.location.href='cable2.html'">
           <div class="calculator-icon">
             <svg width="50" height="50" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M170 200H630C680 200 720 240 720 290V350C720 400 680 440 630 440H170C120 440 80 400 80 350V290C80 240 120 200 170 200Z" stroke="#1a73e8" stroke-width="40"/>
-              <rect x="140" y="260" width="170" height="120" rx="10" fill="#f8d86a"/>
-              <rect x="490" y="260" width="170" height="120" rx="10" fill="#a9d18e"/>
-              <path d="M225 440V600C225 650 265 690 315 690H485C535 690 575 650 575 600V440" stroke="#1a73e8" stroke-width="40"/>
+              <path d="M200 200C150 200 100 250 100 300V500C100 550 150 600 200 600" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
+              <path d="M600 200C650 200 700 250 700 300V500C700 550 650 600 600 600" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
+              <rect x="200" y="200" width="400" height="400" rx="10" stroke="#1a73e8" stroke-width="40"/>
+              <circle cx="250" cy="300" r="30" fill="#f8d86a"/>
+              <circle cx="250" cy="400" r="30" fill="#a9d18e"/>
+              <circle cx="250" cy="500" r="30" fill="#f8d86a"/>
+              <circle cx="550" cy="300" r="30" fill="#a9d18e"/>
+              <circle cx="550" cy="400" r="30" fill="#f8d86a"/>
+              <circle cx="550" cy="500" r="30" fill="#a9d18e"/>
             </svg>
           </div>
           <div class="calculator-title">케이블 계산기(고급)</div>
@@ -329,19 +337,24 @@
         </div>
         
         <!-- 계산기 3 -->
-        <div class="calculator-card" onclick="location.href='conduit-size-1.html'">
+        <div class="calculator-card" onclick="window.location.href='conduit-size.html'">
           <div class="calculator-icon dual-icon">
             <svg width="40" height="40" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-left">
-              <path d="M150 100H250V700H150V100Z" stroke="#1a73e8" stroke-width="30"/>
-              <path d="M250 150H650C650 150 700 150 700 200V300C700 300 700 350 650 350H250" stroke="#1a73e8" stroke-width="30"/>
-              <path d="M250 450H650C650 450 700 450 700 500V600C700 600 700 650 650 650H250" stroke="#1a73e8" stroke-width="30"/>
+              <path d="M300 150V650" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
+              <path d="M300 150C300 150 300 120 330 120H470C500 120 500 150 500 150" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
+              <path d="M300 650C300 650 300 680 330 680H470C500 680 500 650 500 650" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
+              <path d="M500 150V650" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
+              <circle cx="400" cy="400" r="25" fill="#f8d86a"/>
+              <circle cx="400" cy="250" r="25" fill="#f8d86a"/>
+              <circle cx="400" cy="550" r="25" fill="#f8d86a"/>
             </svg>
             <svg width="40" height="40" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-right">
-              <path d="M200 100V700" stroke="#1a73e8" stroke-width="30"/>
-              <path d="M600 100V700" stroke="#1a73e8" stroke-width="30"/>
-              <path d="M200 200H600" stroke="#1a73e8" stroke-width="30"/>
-              <path d="M200 400H600" stroke="#1a73e8" stroke-width="30"/>
-              <path d="M200 600H600" stroke="#1a73e8" stroke-width="30"/>
+              <path d="M150 150H650" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
+              <path d="M150 300H650" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
+              <path d="M150 450H650" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
+              <path d="M150 600H650" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
+              <path d="M150 150V600" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
+              <path d="M650 150V600" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
             </svg>
           </div>
           <div class="calculator-title">전선관(트레이) 계산기</div>
@@ -351,20 +364,16 @@
         </div>
         
         <!-- 계산기 4 -->
-        <div class="calculator-card" onclick="location.href='voltage-drop.html'">
+        <div class="calculator-card" onclick="window.location.href='voltage-drop.html'">
           <div class="calculator-icon">
             <svg width="50" height="50" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="400" cy="300" r="180" stroke="#1a73e8" stroke-width="40"/>
-              <path d="M400 100V180" stroke="#1a73e8" stroke-width="30"/>
-              <path d="M400 420V500" stroke="#1a73e8" stroke-width="30"/>
-              <path d="M200 300H280" stroke="#1a73e8" stroke-width="30"/>
-              <path d="M520 300H600" stroke="#1a73e8" stroke-width="30"/>
-              <path d="M275 175L330 230" stroke="#1a73e8" stroke-width="30"/>
-              <path d="M470 370L525 425" stroke="#1a73e8" stroke-width="30"/>
-              <path d="M525 175L470 230" stroke="#1a73e8" stroke-width="30"/>
-              <path d="M330 370L275 425" stroke="#1a73e8" stroke-width="30"/>
-              <path d="M350 550L450 550L400 650L350 550Z" fill="#f8d86a"/>
-              <path d="M300 600L500 600L400 750L300 600Z" fill="#f8d86a"/>
+              <circle cx="400" cy="250" r="150" stroke="#1a73e8" stroke-width="40"/>
+              <path d="M280 250H520" stroke="#f8d86a" stroke-width="30"/>
+              <path d="M400 130L400 370" stroke="#f8d86a" stroke-width="30"/>
+              <path d="M400 400V450" stroke="#1a73e8" stroke-width="30"/>
+              <path d="M300 450L500 450" stroke="#1a73e8" stroke-width="30"/>
+              <path d="M250 500L350 500L400 600L450 500L550 500" stroke="#1a73e8" stroke-width="40"/>
+              <path d="M200 600L350 600L400 700L450 600L600 600" stroke="#1a73e8" stroke-width="40"/>
             </svg>
           </div>
           <div class="calculator-title">전압강하 계산기 (LED)</div>
@@ -374,15 +383,15 @@
         </div>
         
         <!-- 계산기 5 -->
-        <div class="calculator-card" onclick="location.href='moltal.html'">
+        <div class="calculator-card" onclick="window.location.href='moltal.html'">
           <div class="calculator-icon">
             <svg width="50" height="50" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M200 300V600C200 650 250 700 300 700H500C550 700 600 650 600 600V300H200Z" stroke="#1a73e8" stroke-width="40"/>
-              <path d="M150 300H650" stroke="#1a73e8" stroke-width="40"/>
-              <path d="M250 100H550L600 300H200L250 100Z" stroke="#1a73e8" stroke-width="40"/>
-              <path d="M250 400L550 400" stroke="#a9d18e" stroke-width="30"/>
-              <path d="M300 500L500 500" stroke="#a9d18e" stroke-width="30"/>
-              <path d="M350 600L450 600" stroke="#a9d18e" stroke-width="30"/>
+              <path d="M250 300V600C250 650 300 700 350 700H450C500 700 550 650 550 600V300H250Z" stroke="#1a73e8" stroke-width="40"/>
+              <path d="M200 300H600" stroke="#1a73e8" stroke-width="40"/>
+              <path d="M300 300V200C300 150 340 100 400 100C460 100 500 150 500 200V300" stroke="#1a73e8" stroke-width="40"/>
+              <rect x="250" y="350" width="300" height="80" fill="#a9d18e"/>
+              <rect x="250" y="450" width="300" height="80" fill="#a9d18e"/>
+              <rect x="250" y="550" width="300" height="80" fill="#a9d18e"/>
             </svg>
           </div>
           <div class="calculator-title">충전재 계산기</div>
@@ -422,13 +431,81 @@
   </footer>
 
   <script>
-    // 최근 사용한 계산기 기록을 위한 간단한 스크립트
+    // 로컬 스토리지에서 최근 사용 기록 가져오기
+    function getRecentCalculators() {
+      const recentData = localStorage.getItem('recentCalculators');
+      return recentData ? JSON.parse(recentData) : [];
+    }
+
+    // 최근 사용 기록 저장하기
+    function saveRecentCalculator(title, url) {
+      let recent = getRecentCalculators();
+      
+      // 이미 있는 항목이면 제거 (중복 방지)
+      recent = recent.filter(item => item.url !== url);
+      
+      // 새 항목 추가
+      recent.unshift({
+        title: title,
+        url: url,
+        timestamp: new Date().getTime()
+      });
+      
+      // 최대 3개만 유지
+      if (recent.length > 3) {
+        recent = recent.slice(0, 3);
+      }
+      
+      // 저장
+      localStorage.setItem('recentCalculators', JSON.stringify(recent));
+      
+      // UI 업데이트
+      updateRecentUI();
+    }
+    
+    // 최근 사용 UI 업데이트
+    function updateRecentUI() {
+      const recentItems = document.querySelector('.recent-items');
+      const recent = getRecentCalculators();
+      
+      // 컨테이너 비우기
+      recentItems.innerHTML = '';
+      
+      if (recent.length === 0) {
+        // 기본 항목 표시
+        recentItems.innerHTML = `
+          <div class="recent-item" onclick="window.location.href='cable.html'">전선(차단기) 계산기</div>
+          <div class="recent-item" onclick="window.location.href='voltage-drop.html'">전압강하 계산기</div>
+          <div class="recent-item" onclick="window.location.href='conduit-size.html'">전선관(트레이) 계산기</div>
+        `;
+      } else {
+        // 저장된 항목 표시
+        recent.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'recent-item';
+          div.textContent = item.title;
+          div.onclick = function() {
+            window.location.href = item.url;
+          };
+          recentItems.appendChild(div);
+        });
+      }
+    }
+    
+    // 계산기 카드 클릭 이벤트 처리
     document.querySelectorAll('.calculator-card').forEach(card => {
       card.addEventListener('click', function(e) {
-        // 실제로는 로컬 스토리지에 저장하는 등의 기능이 필요합니다
-        // 여기서는 개념만 표현했습니다
-        console.log('계산기 사용 기록: ' + this.querySelector('.calculator-title').textContent);
+        const title = this.querySelector('.calculator-title').textContent;
+        const url = this.getAttribute('onclick').replace("window.location.href='", "").replace("')", "");
+        
+        // 최근 사용 기록에 저장
+        saveRecentCalculator(title, url);
       });
+    });
+    
+    // 페이지 로드 시 최근 사용 UI 업데이트
+    document.addEventListener('DOMContentLoaded', function() {
+      updateRecentUI();
     });
   </script>
 </body>
