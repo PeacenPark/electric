@@ -104,12 +104,33 @@
       display: flex;
       flex-direction: column;
       cursor: pointer;
+      border: 2px solid transparent;
+      position: relative;
     }
     
     .calculator-card:hover {
       transform: translateY(-5px);
       box-shadow: 0 8px 16px rgba(0,0,0,0.15);
       background-color: #f8fcff;
+      border-color: var(--primary-color);
+    }
+    
+    .calculator-card::after {
+      content: "Click";
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: var(--primary-color);
+      color: white;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .calculator-card:hover::after {
+      opacity: 1;
     }
     
     .calculator-icon {
@@ -290,7 +311,7 @@
         <div class="recent-items">
           <div class="recent-item" onclick="location.href='cable.html'">전선(차단기) 계산기</div>
           <div class="recent-item" onclick="location.href='voltage-drop.html'">전압강하 계산기</div>
-          <div class="recent-item" onclick="location.href='conduit-size-1.html'">전선관 계산기</div>
+          <div class="recent-item" onclick="location.href='conduit-size.html'">전선관 계산기</div>
         </div>
       </div>
       
@@ -300,13 +321,23 @@
         <div class="calculator-card" onclick="window.location.href='cable.html'">
           <div class="calculator-icon">
             <svg width="50" height="50" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="150" y="150" width="500" height="400" rx="20" stroke="#1a73e8" stroke-width="40"/>
-              <line x1="250" y1="150" x2="250" y2="550" stroke="#1a73e8" stroke-width="30"/>
-              <line x1="350" y1="150" x2="350" y2="550" stroke="#1a73e8" stroke-width="30"/>
-              <line x1="450" y1="150" x2="450" y2="550" stroke="#1a73e8" stroke-width="30"/>
-              <line x1="550" y1="150" x2="550" y2="550" stroke="#1a73e8" stroke-width="30"/>
-              <rect x="210" y="80" width="80" height="180" rx="5" fill="#f8d86a"/>
-              <rect x="410" y="80" width="80" height="180" rx="5" fill="#f8d86a"/>
+              <!-- 차단기 패널 -->
+              <rect x="150" y="150" width="500" height="500" rx="20" stroke="#1a73e8" stroke-width="40" fill="white"/>
+              
+              <!-- 차단기 스위치 -->
+              <rect x="250" y="250" width="80" height="300" rx="5" fill="#f8d86a"/>
+              <rect x="400" y="250" width="80" height="300" rx="5" fill="#f8d86a"/>
+              <rect x="550" y="250" width="80" height="300" rx="5" fill="#f8d86a"/>
+              
+              <!-- 위쪽 표시등 -->
+              <circle cx="250" cy="200" r="15" fill="red"/>
+              <circle cx="400" cy="200" r="15" fill="red"/>
+              <circle cx="550" cy="200" r="15" fill="red"/>
+              
+              <!-- 배선 -->
+              <path d="M250 120V170" stroke="#1a73e8" stroke-width="20"/>
+              <path d="M400 120V170" stroke="#1a73e8" stroke-width="20"/>
+              <path d="M550 120V170" stroke="#1a73e8" stroke-width="20"/>
             </svg>
           </div>
           <div class="calculator-title">전선(차단기) 계산기</div>
@@ -319,15 +350,19 @@
         <div class="calculator-card" onclick="window.location.href='cable2.html'">
           <div class="calculator-icon">
             <svg width="50" height="50" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M200 200C150 200 100 250 100 300V500C100 550 150 600 200 600" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
-              <path d="M600 200C650 200 700 250 700 300V500C700 550 650 600 600 600" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
-              <rect x="200" y="200" width="400" height="400" rx="10" stroke="#1a73e8" stroke-width="40"/>
-              <circle cx="250" cy="300" r="30" fill="#f8d86a"/>
-              <circle cx="250" cy="400" r="30" fill="#a9d18e"/>
-              <circle cx="250" cy="500" r="30" fill="#f8d86a"/>
-              <circle cx="550" cy="300" r="30" fill="#a9d18e"/>
-              <circle cx="550" cy="400" r="30" fill="#f8d86a"/>
-              <circle cx="550" cy="500" r="30" fill="#a9d18e"/>
+              <!-- 케이블 외부 -->
+              <rect x="200" y="300" width="400" height="200" rx="100" fill="#f8d86a" />
+              <rect x="200" y="300" width="400" height="200" rx="100" stroke="#1a73e8" stroke-width="40" />
+              
+              <!-- 내부 전선 -->
+              <circle cx="250" cy="400" r="30" fill="#ed7d31"/>
+              <circle cx="350" cy="400" r="30" fill="#0070c0"/>
+              <circle cx="450" cy="400" r="30" fill="#00b050"/>
+              <circle cx="550" cy="400" r="30" fill="#7030a0"/>
+              
+              <!-- 케이블 접속부 -->
+              <rect x="100" y="350" width="100" height="100" rx="10" stroke="#1a73e8" stroke-width="20" fill="white"/>
+              <rect x="600" y="350" width="100" height="100" rx="10" stroke="#1a73e8" stroke-width="20" fill="white"/>
             </svg>
           </div>
           <div class="calculator-title">케이블 계산기(고급)</div>
@@ -340,21 +375,34 @@
         <div class="calculator-card" onclick="window.location.href='conduit-size-1.html'">
           <div class="calculator-icon dual-icon">
             <svg width="40" height="40" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-left">
-              <path d="M300 150V650" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
-              <path d="M300 150C300 150 300 120 330 120H470C500 120 500 150 500 150" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
-              <path d="M300 650C300 650 300 680 330 680H470C500 680 500 650 500 650" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
-              <path d="M500 150V650" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
-              <circle cx="400" cy="400" r="25" fill="#f8d86a"/>
-              <circle cx="400" cy="250" r="25" fill="#f8d86a"/>
-              <circle cx="400" cy="550" r="25" fill="#f8d86a"/>
+              <!-- 전선관 -->
+              <path d="M250 100V700" stroke="#1a73e8" stroke-width="60" stroke-linecap="round"/>
+              <path d="M550 100V700" stroke="#1a73e8" stroke-width="60" stroke-linecap="round"/>
+              <path d="M250 100C250 100 250 50 400 50C550 50 550 100 550 100" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
+              <path d="M250 700C250 700 250 750 400 750C550 750 550 700 550 700" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
+              
+              <!-- 내부 전선 -->
+              <path d="M350 100V700" stroke="#f8d86a" stroke-width="20" stroke-linecap="round"/>
+              <path d="M400 100V700" stroke="#ed7d31" stroke-width="20" stroke-linecap="round"/>
+              <path d="M450 100V700" stroke="#00b050" stroke-width="20" stroke-linecap="round"/>
             </svg>
             <svg width="40" height="40" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-right">
-              <path d="M150 150H650" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
-              <path d="M150 300H650" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
-              <path d="M150 450H650" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
-              <path d="M150 600H650" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
-              <path d="M150 150V600" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
-              <path d="M650 150V600" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
+              <!-- 트레이 사다리 -->
+              <path d="M150 100V700" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
+              <path d="M650 100V700" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
+              
+              <!-- 가로 단 -->
+              <path d="M150 150H650" stroke="#1a73e8" stroke-width="30" stroke-linecap="round"/>
+              <path d="M150 250H650" stroke="#1a73e8" stroke-width="30" stroke-linecap="round"/>
+              <path d="M150 350H650" stroke="#1a73e8" stroke-width="30" stroke-linecap="round"/>
+              <path d="M150 450H650" stroke="#1a73e8" stroke-width="30" stroke-linecap="round"/>
+              <path d="M150 550H650" stroke="#1a73e8" stroke-width="30" stroke-linecap="round"/>
+              <path d="M150 650H650" stroke="#1a73e8" stroke-width="30" stroke-linecap="round"/>
+              
+              <!-- 케이블 -->
+              <path d="M200 150C200 150 250 200 400 200C550 200 600 150 600 150" stroke="#f8d86a" stroke-width="10"/>
+              <path d="M200 350C200 350 250 400 400 400C550 400 600 350 600 350" stroke="#f8d86a" stroke-width="10"/>
+              <path d="M200 550C200 550 250 600 400 600C550 600 600 550 600 550" stroke="#f8d86a" stroke-width="10"/>
             </svg>
           </div>
           <div class="calculator-title">전선관(트레이) 계산기</div>
@@ -367,13 +415,22 @@
         <div class="calculator-card" onclick="window.location.href='voltage-drop.html'">
           <div class="calculator-icon">
             <svg width="50" height="50" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="400" cy="250" r="150" stroke="#1a73e8" stroke-width="40"/>
-              <path d="M280 250H520" stroke="#f8d86a" stroke-width="30"/>
-              <path d="M400 130L400 370" stroke="#f8d86a" stroke-width="30"/>
-              <path d="M400 400V450" stroke="#1a73e8" stroke-width="30"/>
-              <path d="M300 450L500 450" stroke="#1a73e8" stroke-width="30"/>
-              <path d="M250 500L350 500L400 600L450 500L550 500" stroke="#1a73e8" stroke-width="40"/>
-              <path d="M200 600L350 600L400 700L450 600L600 600" stroke="#1a73e8" stroke-width="40"/>
+              <!-- LED 평면도 -->
+              <rect x="250" y="150" width="300" height="300" rx="10" stroke="#1a73e8" stroke-width="30" fill="white"/>
+              
+              <!-- LED 칩 -->
+              <rect x="300" y="200" width="200" height="200" fill="#f8d86a"/>
+              <path d="M300 300H500" stroke="#1a73e8" stroke-width="20"/>
+              <path d="M400 200V400" stroke="#1a73e8" stroke-width="20"/>
+              
+              <!-- 전압강하 표시 -->
+              <path d="M400 450L400 550" stroke="#1a73e8" stroke-width="20" stroke-dasharray="10 10"/>
+              <path d="M350 550L450 550" stroke="#1a73e8" stroke-width="20"/>
+              <path d="M320 600L480 600" stroke="#1a73e8" stroke-width="20"/>
+              <path d="M300 650L500 650" stroke="#1a73e8" stroke-width="20"/>
+              
+              <!-- 화살표 -->
+              <path d="M350 500L400 550L450 500" stroke="#1a73e8" stroke-width="15" fill="none"/>
             </svg>
           </div>
           <div class="calculator-title">전압강하 계산기 (LED)</div>
@@ -386,12 +443,20 @@
         <div class="calculator-card" onclick="window.location.href='moltal.html'">
           <div class="calculator-icon">
             <svg width="50" height="50" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M250 300V600C250 650 300 700 350 700H450C500 700 550 650 550 600V300H250Z" stroke="#1a73e8" stroke-width="40"/>
-              <path d="M200 300H600" stroke="#1a73e8" stroke-width="40"/>
-              <path d="M300 300V200C300 150 340 100 400 100C460 100 500 150 500 200V300" stroke="#1a73e8" stroke-width="40"/>
-              <rect x="250" y="350" width="300" height="80" fill="#a9d18e"/>
-              <rect x="250" y="450" width="300" height="80" fill="#a9d18e"/>
-              <rect x="250" y="550" width="300" height="80" fill="#a9d18e"/>
+              <!-- 충전재 통 -->
+              <path d="M250 250H550V650C550 650 550 700 400 700C250 700 250 650 250 650V250Z" stroke="#1a73e8" stroke-width="40" fill="white"/>
+              
+              <!-- 손잡이 -->
+              <path d="M300 250V150C300 150 300 100 400 100C500 100 500 150 500 150V250" stroke="#1a73e8" stroke-width="30"/>
+              
+              <!-- 충전재 층 -->
+              <rect x="270" y="350" width="260" height="60" fill="#a9d18e"/>
+              <rect x="270" y="450" width="260" height="60" fill="#a9d18e"/>
+              <rect x="270" y="550" width="260" height="60" fill="#a9d18e"/>
+              
+              <!-- 스푼 -->
+              <path d="M580 300C650 300 680 350 680 400C680 450 650 500 580 500" stroke="#1a73e8" stroke-width="15"/>
+              <path d="M580 310V490" stroke="#1a73e8" stroke-width="15"/>
             </svg>
           </div>
           <div class="calculator-title">충전재 계산기</div>
