@@ -85,12 +85,14 @@
     @media (min-width: 768px) {
       .calculator-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
       }
     }
     
     @media (min-width: 992px) {
       .calculator-grid {
         grid-template-columns: repeat(3, 1fr);
+        gap: 30px;
       }
     }
     
@@ -104,29 +106,31 @@
       display: flex;
       flex-direction: column;
       cursor: pointer;
-      border: 2px solid transparent;
+      border: 3px solid #e0e5ec;
       position: relative;
     }
     
     .calculator-card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 8px 16px rgba(0,0,0,0.15);
-      background-color: #f8fcff;
+      box-shadow: 0 10px 20px rgba(26, 115, 232, 0.2);
+      background-color: #f0f7ff;
       border-color: var(--primary-color);
     }
     
     .calculator-card::after {
-      content: "Click";
+      content: "Click to Open";
       position: absolute;
-      top: 10px;
-      right: 10px;
+      top: -12px;
+      right: 20px;
       background-color: var(--primary-color);
       color: white;
-      padding: 3px 8px;
+      padding: 4px 10px;
       border-radius: 4px;
-      font-size: 11px;
+      font-size: 12px;
       opacity: 0;
       transition: opacity 0.3s ease;
+      font-weight: 500;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
     
     .calculator-card:hover::after {
@@ -166,14 +170,15 @@
     }
     
     .calculator-title {
-      font-size: 18px;
+      font-size: 20px;
       font-weight: 600;
       margin-bottom: 10px;
       color: var(--primary-color);
       background-color: rgba(26, 115, 232, 0.08);
-      padding: 8px 12px;
+      padding: 10px 12px;
       border-radius: 6px;
       transition: background-color 0.3s ease;
+      text-align: center;
     }
     
     .calculator-card:hover .calculator-title {
@@ -181,8 +186,8 @@
     }
     
     .calculator-desc {
-      font-size: 14px;
-      color: #666;
+      font-size: 15px;
+      color: #555;
       margin-bottom: 5px;
       line-height: 1.5;
       flex-grow: 1;
@@ -199,42 +204,65 @@
     /* 최근 사용 섹션 */
     .recent-section {
       background-color: white;
-      padding: 20px;
+      padding: 25px;
       margin-bottom: 40px;
       border-radius: 12px;
       box-shadow: var(--shadow);
       max-width: 800px;
       margin-left: auto;
       margin-right: auto;
+      border: 2px solid #e0e5ec;
     }
     
     .recent-title {
-      font-size: 18px;
+      font-size: 20px;
       color: var(--primary-color);
-      margin-bottom: 15px;
+      margin-bottom: 18px;
       text-align: left;
+      font-weight: 600;
+      position: relative;
+      padding-left: 15px;
+    }
+    
+    .recent-title:before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 5px;
+      height: 20px;
+      background-color: var(--primary-color);
+      border-radius: 3px;
     }
     
     .recent-items {
       display: flex;
-      gap: 10px;
+      gap: 15px;
       overflow-x: auto;
       padding-bottom: 10px;
     }
     
     .recent-item {
       background-color: #f0f4f8;
-      padding: 8px 15px;
+      padding: 10px 15px;
       border-radius: 20px;
       font-size: 14px;
       white-space: nowrap;
       color: var(--primary-color);
       cursor: pointer;
-      transition: background-color 0.2s ease;
+      transition: all 0.2s ease;
+      border: 2px solid transparent;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      text-decoration: none;
+      display: inline-block;
     }
     
     .recent-item:hover {
-      background-color: #e0e8f0;
+      background-color: #e1eaf4;
+      border-color: var(--primary-color);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
     
     /* 노트 섹션 */
@@ -304,16 +332,6 @@
   <div class="main-content">
     <div class="container">
       <h1>전문가를 위한 전기 계산기</h1>
-      
-      <!-- 최근 사용 섹션 -->
-      <div class="recent-section">
-        <h3 class="recent-title">최근 사용한 계산기</h3>
-        <div class="recent-items">
-          <div class="recent-item" onclick="location.href='cable.html'">전선(차단기) 계산기</div>
-          <div class="recent-item" onclick="location.href='voltage-drop.html'">전압강하 계산기</div>
-          <div class="recent-item" onclick="location.href='conduit-size.html'">전선관 계산기</div>
-        </div>
-      </div>
       
       <!-- 계산기 그리드 -->
       <div class="calculator-grid">
@@ -496,81 +514,9 @@
   </footer>
 
   <script>
-    // 로컬 스토리지에서 최근 사용 기록 가져오기
-    function getRecentCalculators() {
-      const recentData = localStorage.getItem('recentCalculators');
-      return recentData ? JSON.parse(recentData) : [];
-    }
-
-    // 최근 사용 기록 저장하기
-    function saveRecentCalculator(title, url) {
-      let recent = getRecentCalculators();
-      
-      // 이미 있는 항목이면 제거 (중복 방지)
-      recent = recent.filter(item => item.url !== url);
-      
-      // 새 항목 추가
-      recent.unshift({
-        title: title,
-        url: url,
-        timestamp: new Date().getTime()
-      });
-      
-      // 최대 3개만 유지
-      if (recent.length > 3) {
-        recent = recent.slice(0, 3);
-      }
-      
-      // 저장
-      localStorage.setItem('recentCalculators', JSON.stringify(recent));
-      
-      // UI 업데이트
-      updateRecentUI();
-    }
-    
-    // 최근 사용 UI 업데이트
-    function updateRecentUI() {
-      const recentItems = document.querySelector('.recent-items');
-      const recent = getRecentCalculators();
-      
-      // 컨테이너 비우기
-      recentItems.innerHTML = '';
-      
-      if (recent.length === 0) {
-        // 기본 항목 표시
-        recentItems.innerHTML = `
-          <div class="recent-item" onclick="window.location.href='cable.html'">전선(차단기) 계산기</div>
-          <div class="recent-item" onclick="window.location.href='voltage-drop.html'">전압강하 계산기</div>
-          <div class="recent-item" onclick="window.location.href='conduit-size.html'">전선관(트레이) 계산기</div>
-        `;
-      } else {
-        // 저장된 항목 표시
-        recent.forEach(item => {
-          const div = document.createElement('div');
-          div.className = 'recent-item';
-          div.textContent = item.title;
-          div.onclick = function() {
-            window.location.href = item.url;
-          };
-          recentItems.appendChild(div);
-        });
-      }
-    }
-    
-    // 계산기 카드 클릭 이벤트 처리
-    document.querySelectorAll('.calculator-card').forEach(card => {
-      card.addEventListener('click', function(e) {
-        const title = this.querySelector('.calculator-title').textContent;
-        const url = this.getAttribute('onclick').replace("window.location.href='", "").replace("')", "");
-        
-        // 최근 사용 기록에 저장
-        saveRecentCalculator(title, url);
-      });
-    });
-    
-    // 페이지 로드 시 최근 사용 UI 업데이트
+    // 계산기 카드 클릭 이벤트 추적
     document.addEventListener('DOMContentLoaded', function() {
-      updateRecentUI();
+      console.log('전기 계산기 페이지가 로드되었습니다.');
     });
   </script>
 </body>
