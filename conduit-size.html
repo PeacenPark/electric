@@ -2,123 +2,117 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-  <title>케이블 계산기(고급)</title>
+  <title>전선관 계산기</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <style>
     :root {
-      --primary-color: #0056b3;
-      --accent-color: #007bff;
-      --background: #f9fafa;
-      --text: #222;
-      --border: #ccc;
-      --warning: #fd7e14;
-      --danger: #dc3545;
-      --success: #198754;
+      --primary-color: #1a73e8;
+      --primary-dark: #0d47a1;
+      --primary-light: #e8f0fe;
+      --success-color: #4caf50;
+      --success-light: #e8f5e9;
+      --danger-color: #e53935;
+      --danger-light: #ffebee;
+      --warning-color: #ff9800;
+      --warning-light: #fff3e0;
+      --gray-light: #f6f9fc;
+      --gray: #ddd;
+      --text-dark: #333;
+      --box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      --border-radius: 12px;
     }
-    * { box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+    
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      background: var(--background);
-      color: var(--text);
-      -webkit-text-size-adjust: 100%;
-      -webkit-font-smoothing: antialiased;
     }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      background: var(--gray-light);
+      color: var(--text-dark);
+      line-height: 1.5;
+      padding: 0;
+      margin: 0;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: rgba(0,0,0,0);
+    }
+    
     .container {
-      max-width: 800px;
+      max-width: 100%;
       margin: 0 auto;
-      padding: 30px 20px;
+      padding: 16px;
+      padding-bottom: 80px; /* Bottom space for fixed buttons */
     }
-    .calculator {
+    
+    .card {
       background: #fff;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      padding: 16px;
+      margin-bottom: 16px;
     }
+    
     h1 {
       text-align: center;
       color: var(--primary-color);
-      margin-bottom: 25px;
-      font-size: 1.7em;
+      margin: 10px 0 20px;
+      font-size: 1.8rem;
     }
-    .tab-container {
-      margin-bottom: 20px;
+    
+    h2 {
+      color: var(--primary-color);
+      margin: 8px 0 12px;
+      font-size: 1.3rem;
     }
-    .tabs {
-      display: flex;
-      border-bottom: 1px solid #ddd;
-      margin-bottom: 20px;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-      white-space: nowrap;
+    
+    .badge {
+      display: inline-block;
+      font-size: 0.8rem;
+      padding: 2px 8px;
+      border-radius: 12px;
+      margin-left: 6px;
+      color: white;
+      background: var(--primary-color);
     }
-    .tabs::-webkit-scrollbar {
-      display: none;
-    }
-    .tab {
-      padding: 10px 20px;
-      cursor: pointer;
-      border-bottom: 3px solid transparent;
-      font-weight: 500;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .tab.active {
-      border-bottom: 3px solid var(--accent-color);
-      color: var(--accent-color);
-      position: relative;
-    }
-    .tab.active::after {
-      content: "";
-      position: absolute;
-      bottom: -3px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background-color: var(--accent-color);
-    }
-    .tab-content {
-      display: none;
-    }
-    .tab-content.active {
-      display: block;
-      animation: fadeIn 0.3s ease-in-out;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    .input-row {
+    
+    .field-group {
       display: flex;
       flex-wrap: wrap;
-      margin: 0 -10px;
+      gap: 8px;
+      margin-bottom: 12px;
     }
-    .input-group {
-      flex: 1;
-      min-width: 200px;
-      padding: 0 10px;
-      margin-bottom: 15px;
+    
+    .field {
+      flex: 1 1 calc(50% - 4px);
+      min-width: 130px;
     }
+    
+    @media screen and (max-width: 480px) {
+      .field {
+        flex: 1 1 100%;
+      }
+    }
+    
     label {
-      font-weight: bold;
-      margin-top: 15px;
+      font-weight: 600;
       display: block;
-      font-size: 1em;
-      margin-bottom: 5px;
+      margin-bottom: 4px;
+      font-size: 0.95rem;
     }
-    select, input {
+    
+    select, input, button {
       width: 100%;
-      padding: 10px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      background: #fefefe;
-      font-size: 16px;
+      padding: 10px 12px;
+      border: 1px solid var(--gray);
+      border-radius: 8px;
+      font-size: 1rem;
+      background: white;
       -webkit-appearance: none;
       appearance: none;
     }
+    
     select {
       background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
       background-repeat: no-repeat;
@@ -126,2517 +120,1578 @@
       background-size: 16px;
       padding-right: 30px;
     }
-    button {
-      background: var(--accent-color);
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 1em;
-      font-weight: 500;
-      margin-top: 20px;
-      width: 100%;
-      transition: background 0.2s, transform 0.1s;
-      -webkit-tap-highlight-color: transparent;
+    
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
     }
-    button:active {
-      transform: scale(0.98);
-      background-color: #0051a9;
-    }
-    button:hover {
-      background: var(--primary-color);
-    }
-    .action-buttons {
-      display: flex;
-      gap: 10px;
-      margin-top: 20px;
-    }
-    .action-buttons button {
-      flex: 1;
-      margin-top: 0;
-    }
-    .result {
-      margin-top: 25px;
-      background: #e8f1ff;
-      border-left: 6px solid var(--accent-color);
-      padding: 20px 24px;
-      border-radius: 10px;
-      font-size: 1em;
-      line-height: 1.7em;
-      font-weight: 400;
-      color: #222;
-    }
-    .result-section {
-      margin-bottom: 15px;
-      padding-bottom: 15px;
-      border-bottom: 1px dashed #ccc;
-    }
-    .result-section:last-child {
-      border-bottom: none;
-      margin-bottom: 0;
-      padding-bottom: 0;
-    }
-    .result h2 {
-      font-size: 1.2em;
-      margin: 0 0 10px 0;
-      color: var(--primary-color);
-    }
-    .result-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 8px;
-    }
-    .result-label {
-      font-weight: 500;
-      flex: 2;
-    }
-    .result-value {
-      font-weight: 700;
-      flex: 3;
-      text-align: right;
-    }
-    .result strong {
-      display: inline-block;
-      color: #003366;
-    }
-    .result span.highlight {
-      font-weight: bold;
-      color: #d62828;
-    }
-    .result .warning {
-      color: var(--warning);
-    }
-    .result .danger {
-      color: var(--danger);
-    }
-    .result .success {
-      color: var(--success);
-    }    
-    .result .sub {
-      font-size: 0.9em;
-      color: #555;
-      margin-top: 4px;
-    }
-    .reference {
-      margin-top: 20px;
-      font-size: 0.8em;
-      color: #555;
-      border-top: 1px dashed #bbb;
-      padding-top: 12px;
-    }
-    .hidden {
-      display: none;
-    }
-    .comparison-table-wrapper {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      margin: 10px -10px;
-      padding: 0 10px 5px;
-    }
-    .comparison-table {
-      width: 100%;
-      min-width: 500px;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    .comparison-table th, .comparison-table td {
-      border: 1px solid #ddd;
-      padding: 8px 12px;
-      text-align: center;
-    }
-    .comparison-table th {
-      background: #f0f6ff;
-    }
-    .comparison-row:nth-child(even) {
-      background: #f9f9f9;
-    }
-    .comparison-row.selected {
-      background: #e0f0ff;
-    }
-    .advanced-options {
-      background: #f5f5f5;
-      border-radius: 8px;
-      padding: 15px;
-      margin-top: 20px;
-    }
-    .toggle-advanced {
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .toggle-advanced i {
-      transition: transform 0.3s;
-      margin-left: 8px;
-    }
-    .toggle-advanced.open i {
-      transform: rotate(180deg);
-    }
-    .advanced-content {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease-out;
-    }
-    .advanced-content.open {
-      max-height: 500px;
-    }
-    .chart-container {
-      width: 100%;
-      height: 300px;
-      margin-top: 20px;
-    }
-.tooltip {
-  position: relative;
-  display: inline-block;
-  margin-left: 5px;
-  cursor: help;
-}
-
-.tooltip-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 16px;
-  height: 16px;
-  background-color: #888;
-  color: white;
-  border-radius: 50%;
-  font-size: 12px;
-  font-weight: bold;
-}
-
-.tooltip-text {
-  visibility: hidden;
-  width: 200px;
-  max-width: 85vw; /* 추가: 뷰포트 너비의 85%로 제한 */
-  background-color: #333;
-  color: #fff;
-  text-align: center;
-  border-radius: 6px;
-  padding: 8px;
-  position: absolute;
-  z-index: 100;
-  bottom: 125%;
-  left: 50%;
-  transform: translateX(-50%);
-  opacity: 0;
-  transition: opacity 0.3s;
-  font-size: 0.8em;
-  font-weight: normal;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-}
-
-.tooltip:hover .tooltip-text {
-  visibility: visible;
-  opacity: 1;
-}
-    .input-with-unit {
-      display: flex;
-      align-items: center;
-    }
-    .input-with-unit input {
-      flex: 1;
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
-    }
-    .input-with-unit select {
-      width: 80px;
-      border-top-left-radius: 0;
-      border-bottom-left-radius: 0;
-    }
-    .sticky-header {
-      position: sticky;
-      top: 0;
-      background: #fff;
-      z-index: 100;
-      padding: 10px 15px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .home-btn {
-      width: auto;
-      height: auto;
-      background: #1a73e8;
-      color: white;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 6px;
-      font-size: 14px;
-      cursor: pointer;
-      z-index: 1000;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      display: inline-flex;
-      align-items: center;
+    
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
       margin: 0;
     }
-    .home-btn svg {
-      margin-right: 5px;
-    }
-    .home-btn:hover { background: #155ec2; }
     
-    .loading {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255,255,255,.3);
-      border-radius: 50%;
-      border-top-color: #fff;
-      animation: spin 1s ease-in-out infinite;
-      margin-right: 10px;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    input[type=number] {
+      -moz-appearance: textfield;
     }
     
-    .saved-configs {
-      max-height: 300px;
+    .bottom-buttons {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      gap: 8px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+      z-index: 1000;
+    }
+    
+    button {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: background 0.2s;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    button:active {
+      transform: scale(0.98);
+    }
+    
+    button.primary {
+      background: var(--primary-color);
+    }
+    
+    button.primary:active {
+      background: var(--primary-dark);
+    }
+    
+    button.secondary {
+      background: white;
+      color: var(--primary-color);
+      border: 1px solid var(--primary-color);
+    }
+    
+    button.warning {
+      background: var(--warning-color);
+    }
+    
+    button.danger {
+      background: var(--danger-color);
+    }
+    
+    button.icon-button {
+      width: auto;
+      padding: 8px;
+      flex: 0 0 auto;
+    }
+    
+    .table-container {
+      overflow-x: auto;
+      margin: 12px 0;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    .result-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    
+    .result-table th, .result-table td {
+      border: 1px solid var(--gray);
+      padding: 8px;
+      text-align: center;
+    }
+    
+    .result-table th {
+      background-color: var(--primary-light);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+.cable-list {
+      max-height: 250px;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      margin-top: 15px;
     }
-    .saved-config-item {
-      padding: 10px 15px;
-      border-bottom: 1px solid #eee;
+    
+    .cable-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      border: 1px solid var(--gray);
+      border-radius: 8px;
+      margin-bottom: 8px;
+      background: white;
+    }
+    
+    .cable-info {
+      flex: 1;
+    }
+    
+    .cable-actions {
+      display: flex;
+      gap: 4px;
+    }
+    
+    .result-highlight {
+      background-color: var(--success-light);
+      padding: 12px;
+      border-left: 6px solid var(--success-color);
+      margin: 16px 0;
+      font-weight: 600;
+      border-radius: 8px;
+    }
+    
+    .result-error {
+      background-color: var(--danger-light);
+      border-left: 6px solid var(--danger-color);
+      color: var(--danger-color);
+    }
+    
+    .result-warning {
+      background-color: var(--warning-light);
+      border-left: 6px solid var(--warning-color);
+      color: #e65100;
+    }
+    
+    .recommend-box {
+      background: var(--primary-light);
+      border: 2px dashed var(--primary-color);
+      padding: 12px;
+      border-radius: 10px;
+      margin: 16px 0;
+    }
+    
+    .recommend-box h3 {
+      margin-top: 0;
+      color: var(--primary-color);
+      font-size: 1.1rem;
+    }
+    
+    .bold-text {
+      font-weight: 700;
+    }
+    
+    .red {
+      color: var(--danger-color);
+    }
+    
+    .yellow {
+      color: var(--warning-color);
+    }
+    
+    .text-center {
+      text-align: center;
+    }
+    
+    .tabs {
+      display: flex;
+      margin: 0 -16px 16px;
+      background: white;
+      border-bottom: 1px solid var(--gray);
+    }
+    
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 12px;
       cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .saved-config-item:last-child {
-      border-bottom: none;
-    }
-    .saved-config-item:hover {
-      background: #f0f7ff;
-    }
-    .saved-config-item .config-title {
-      font-weight: 500;
-    }
-    .saved-config-item .config-details {
-      font-size: 0.85em;
-      color: #666;
-      margin-top: 3px;
+      font-weight: 600;
+      color: var(--text-dark);
+      transition: all 0.2s;
+      position: relative;
     }
     
-    .fade-in {
-      animation: fadeIn 0.5s;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+    .tab.active {
+      color: var(--primary-color);
     }
     
-    .print-only {
+    .tab.active::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 3px;
+      background: var(--primary-color);
+    }
+    
+    .tab-content {
       display: none;
     }
     
-    @media print {
-      .container {
-        max-width: 100%;
-        padding: 0;
-      }
-      .calculator {
-        box-shadow: none;
-        padding: 0;
-      }
-      .tabs, .action-buttons, button, .home-btn, .advanced-options,
-      select, input, .saved-configs {
-        display: none !important;
-      }
-      .result {
-        border: none;
-        padding: 0;
-        background: none;
-      }
-      .print-only {
-        display: block;
-      }
-      .tab-content {
-        display: block !important;
-      }
-      .results-container {
-        margin-top: 20px;
-      }
-      
-      .table-container {
-        margin-bottom: 30px;
-        background: #fff;
-        padding: 15px;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      }
-      
-      .table-container h3 {
-        color: var(--primary-color);
-        margin-top: 0;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #eee;
-      }
-      
-      .no-results {
-        text-align: center;
-        padding: 20px;
-        background: #fff8f8;
-        border-radius: 8px;
-        border-left: 4px solid var(--danger);
-      }
-      
-      .no-results p {
-        margin: 5px 0;
-      }
-      
-      .no-results ul {
-        text-align: left;
-        display: inline-block;
-        margin: 10px 0;
-      }
-      
-      .comparison-row.selected {
-        background-color: #f0f8ff;
-      }
+    .tab-content.active {
+      display: block;
+    }
+    
+    .history-item {
+      border: 1px solid var(--gray);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+      background: white;
+    }
+    
+    .history-title {
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    
+    .history-date {
+      font-size: 0.8rem;
+      color: #666;
+    }
+    
+    .history-details {
+      font-size: 0.9rem;
+    }
+    
+    .loading {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255,255,255,0.8);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(26, 115, 232, 0.2);
+      border-radius: 50%;
+      border-top-color: var(--primary-color);
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .btn-fab {
+      position: fixed;
+      right: 20px;
+      bottom: 80px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--primary-color);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.16);
+      z-index: 100;
+      transition: all 0.2s;
+    }
+    
+    .btn-fab:active {
+      transform: scale(0.95);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.16);
+    }
+    
+    /* 도움말 스타일 */
+    .help-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--primary-color);
+      color: white;
+      font-size: 12px;
+      margin-left: 6px;
+      cursor: pointer;
+      vertical-align: middle;
+    }
+    
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+      padding: 8px;
+    }
+    
+    .tooltip .tooltip-text {
+      visibility: hidden;
+      width: 180px;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 8px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 0.8rem;
+      pointer-events: none;
+    }
+    
+    .tooltip:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    .notification {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+      z-index: 2000;
+      opacity: 0;
+      transition: opacity 0.3s;
+      max-width: 90%;
+      text-align: center;
+    }
+    
+    .notification.show {
+      opacity: 1;
+    }
+    
+    /* 아이콘 */
+    .icon {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+    
+    /* 단면도 시각화 스타일 */
+    .cross-section-container {
+      margin: 20px 0;
+      padding: 15px;
+      background: #f9f9f9;
+      border-radius: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      text-align: center;
     }
 
-    /* 모바일 최적화 추가 스타일 */
-    @media (max-width: 768px) {
-      .input-group {
-        flex: 100%;
-        min-width: 100%;
-      }
-      .result-row {
-        flex-direction: column;
-      }
-      .result-value {
-        text-align: left;
-        margin-top: 3px;
-      }
-      .action-buttons {
-        flex-direction: column;
-      }
-      .tooltip-text {
-    position: fixed; /* 고정 위치로 변경 */
-    transform: none;
-    left: 20px; /* 왼쪽 여백 */
-    right: 20px; /* 오른쪽 여백 */
-    width: auto; /* 너비 자동 조정 */
-    max-width: calc(100vw - 40px); /* 양쪽 여백 제외한 최대 너비 */
-    top: 50%; /* 화면 중앙에 배치 */
-    bottom: auto;
-    transform: translateY(-50%); /* 세로 중앙 정렬 */
-  }
+    .cross-section-container h3 {
+      margin-top: 0;
+      margin-bottom: 15px;
+      color: #1a73e8;
+      font-size: 1.1rem;
+    }
+    
+    /* 채움률 범위별 배경색 관련 클래스 */
+    .fill-normal {
+      background-color: rgba(76, 175, 80, 0.1);
     }
 
-    @media (max-width: 480px) {
-      .container { 
-        padding: 15px 10px; 
-      }
-      .calculator {
-        padding: 15px 12px;
-        border-radius: 8px;
-      }
-      h1 { 
-        font-size: 1.4em; 
-        margin-bottom: 15px;
-      }
-      select, input { 
-        font-size: 16px; 
-        padding: 10px;
-      }
-      label { 
-        font-size: 0.9em; 
-      }
-      .tab { 
-        padding: 8px 10px; 
-        font-size: 0.85em; 
-      }
-      button {
-        padding: 10px 15px;
-      }
-      .result {
-        padding: 15px;
-        font-size: 0.9em;
-        line-height: 1.5;
-      }
-      .comparison-table th, .comparison-table td {
-        padding: 6px 8px;
-        font-size: 0.85em;
-      }
+    .fill-warning {
+      background-color: rgba(255, 152, 0, 0.1);
     }
 
-    /* 토스트 메시지 애니메이션 */
-    @keyframes fadeInOut {
-      0% { opacity: 0; transform: translate(-50%, 20px); }
-      15% { opacity: 1; transform: translate(-50%, 0); }
-      85% { opacity: 1; transform: translate(-50%, 0); }
-      100% { opacity: 0; transform: translate(-50%, -20px); }
+    .fill-danger {
+      background-color: rgba(229, 57, 53, 0.1);
     }
   </style>
 </head>
+
 <body>
-  <div class="sticky-header">
-    <button class="home-btn" onclick="goBack()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-        <polyline points="9 22 9 12 15 12 15 22"></polyline>
-      </svg>
-      홈으로
-    </button>
-    <div style="font-size: 1em; font-weight: 500; color: var(--primary-color);">케이블 계산기</div>
-  </div>
-  
   <div class="container">
-    <div class="calculator">
-      <h1>케이블 계산기(고급)</h1>
+    <h1>전선관 계산기</h1>
+    
+    <div class="tabs">
+      <div class="tab active" data-tab="calculator">계산기</div>
+      <div class="tab" data-tab="history">히스토리</div>
+      <div class="tab" data-tab="info">정보</div>
+    </div>
+    
+    <div id="calculator-tab" class="tab-content active">
+      <div class="card">
+        <h2>케이블 추가 
+          <span class="tooltip">
+            <span class="help-icon">?</span>
+            <span class="tooltip-text">전선 종류, 굵기, 코어 수, 회로 수를 입력하여 케이블을 추가하세요.</span>
+          </span>
+        </h2>
+        
+        <div class="field-group">
+          <div class="field">
+            <label>전선 종류</label>
+            <select id="type" onchange="updateSizeOptions(); updateExternalDiameter();">
+              <option value="CV">CV</option>
+              <option value="HFIX">HFIX</option>
+              <option value="CNCV">CNCV</option>
+              <option value="GV">GV</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>전선 굵기(㎟)</label>
+            <select id="size" onchange="updateExternalDiameter()"></select>
+          </div>
+        </div>
+        
+        <div class="field-group">
+          <div class="field">
+            <label>Core 수</label>
+            <select id="core" onchange="updateExternalDiameter()">
+              <option value="1">1C</option>
+              <option value="2">2C</option>
+              <option value="3">3C</option>
+              <option value="4">4C</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>회로 수</label>
+            <input type="number" id="count" value="1" min="1" />
+          </div>
+        </div>
+        
+        <div class="field-group">
+          <div class="field">
+            <label>외경(mm)
+              <span class="tooltip">
+                <span class="help-icon">?</span>
+                <span class="tooltip-text">직접 입력하거나 비워두면 자동으로 계산됩니다.</span>
+              </span>
+            </label>
+            <input type="number" step="0.1" id="customDia" placeholder="자동 또는 수동 입력" />
+          </div>
+        </div>
+        
+        <button onclick="addCable()" class="primary">
+          <svg class="icon" viewBox="0 0 24 24">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          케이블 추가
+        </button>
+      </div>
       
-      <div class="tab-container">
-        <div class="tabs">
-          <div class="tab active" data-tab="basic">기본 계산</div>
-          <div class="tab" data-tab="voltage-drop">전압 강하</div>
-          <div class="tab" data-tab="compare">케이블 선정</div>
-          <div class="tab" data-tab="saved">저장된 설정</div>
-        </div>
+      <div class="card">
+        <h2>추가된 케이블 <span class="badge" id="cable-count">0</span></h2>
+        <div class="cable-list" id="cable-list"></div>
+      </div>
+      
+      <div class="card">
+        <h2>전선관 선택
+          <span class="tooltip">
+            <span class="help-icon">?</span>
+            <span class="tooltip-text">전선관 종류와 사이즈를 선택하세요. 자동 추천을 원하면 사이즈를 비워두세요.</span>
+          </span>
+        </h2>
         
-        <!-- 기본 계산 탭 -->
-        <div class="tab-content active" id="basic-tab">
-          <div class="input-row">
-            <div class="input-group">
-              <label for="cableType">
-                전선 종류
-                <span class="tooltip">
-                  <span class="tooltip-icon">?</span>
-                  <span class="tooltip-text">사용할 전선의 종류를 선택하세요. 각 유형에 따라 허용 전류가 다릅니다.</span>
-                </span>
-              </label>
-              <select id="cableType">
-                <option value="HFIX">HFIX (난연성 가교 폴리올레핀 절연전선)</option>
-                <option value="HIV">HIV (비닐절연전선)</option>
-                <option value="TFR-CV">TFR-CV (난연성 가교 폴리에틸렌 절연전선)</option>
-                <option value="XLPE">XLPE (가교 폴리에틸렌 절연전선)</option>
-              </select>
-            </div>
-            
-            <div class="input-group">
-              <label for="cableSize">
-                전선 굵기 (㎟)
-                <span class="tooltip">
-                  <span class="tooltip-icon">?</span>
-                  <span class="tooltip-text">전선의 단면적을 선택하세요. 단위는 제곱밀리미터(㎟)입니다.</span>
-                </span>
-              </label>
-              <select id="cableSize"></select>
-            </div>
+        <div class="field-group">
+          <div class="field">
+            <label>전선관 종류</label>
+            <select id="pipeType" onchange="updateConduitSizes()">
+              <option value="">선택</option>
+              <option value="ELP">ELP관</option>
+              <option value="CD_PE">CD/PE관</option>
+              <option value="HI">HI관</option>
+              <option value="STEEL">스틸/GW관</option>
+              <option value="TRAY">케이블 트레이</option>
+            </select>
           </div>
-          
-          <div class="input-row">
-            <div class="input-group">
-              <label for="installMethod">
-                설치 방법
-                <span class="tooltip">
-                  <span class="tooltip-icon">?</span>
-                  <span class="tooltip-text">전선 설치 방법에 따라 허용 전류 값이 달라집니다.</span>
-                </span>
-              </label>
-              <select id="installMethod">
-                <option value="공기">공기 중</option>
-                <option value="관">관내 배선</option>
-                <option value="지중">지중 매설(관 없음)</option>
-                <option value="트레이">케이블 트레이</option>
-                <option value="덕트">덕트 내 배선</option>
-              </select>
-            </div>
-            
-            <div class="input-group">
-              <label for="voltageType">
-                전원 종류
-                <span class="tooltip">
-                  <span class="tooltip-icon">?</span>
-                  <span class="tooltip-text">사용하는 전원의 종류를 선택하세요.</span>
-                </span>
-              </label>
-              <select id="voltageType">
-                <option value="단상">단상 220V</option>
-                <option value="삼상">삼상 380V</option>
-                <option value="직류">직류 전원</option>
-              </select>
-            </div>
-          </div>
-          
-          <div class="input-row">
-            <div class="input-group">
-              <label for="coreCount">
-                Core 수
-                <span class="tooltip">
-                  <span class="tooltip-icon">?</span>
-                  <span class="tooltip-text">전선의 코어 수를 선택하세요.</span>
-                </span>
-              </label>
-              <select id="coreCount">
-                <option value="1">1C</option>
-                <option value="2">2C</option>
-                <option value="3">3C</option>
-                <option value="4">4C</option>
-              </select>
-            </div>
-            
-            <div class="input-group">
-              <label for="load">
-                예상 부하
-                <span class="tooltip">
-                  <span class="tooltip-icon">?</span>
-                  <span class="tooltip-text">실제 흐르는 예상 부하를 입력하세요. 전류(A) 또는 전력(kW)을 선택할 수 있습니다. 비워두면 허용 전류의 80%로 계산합니다.</span>
-                </span>
-              </label>
-              <div class="input-with-unit">
-                <input type="number" id="load" inputmode="decimal" pattern="[0-9]*" placeholder="선택 사항" min="0" step="0.1">
-                <select id="loadUnit">
-                  <option value="A">전류(A)</option>
-                  <option value="kW">전력(kW)</option>
-                </select>
-              </div>
-            </div>
-          </div>
-          
-          <div class="advanced-options">
-            <div class="toggle-advanced">
-              <strong>고급 설정</strong>
-              <i>▼</i>
-            </div>
-            <div class="advanced-content">
-              <div class="input-row">
-                <div class="input-group">
-                  <label for="temperature">
-                    주변 온도 (°C)
-                    <span class="tooltip">
-                      <span class="tooltip-icon">?</span>
-                      <span class="tooltip-text">주변 온도에 따른 보정 계수가 적용됩니다. 기본값은 30°C입니다.</span>
-                    </span>
-                  </label>
-                  <input type="number" id="temperature" inputmode="decimal" pattern="[0-9]*" value="30" min="-20" max="60" step="1">
-                </div>
-                
-                <div class="input-group">
-                  <label for="parallelCount">
-                    병렬 회로 수
-                    <span class="tooltip">
-                      <span class="tooltip-icon">?</span>
-                      <span class="tooltip-text">여러 전선을 병렬로 연결할 경우 회로 수를 선택하세요.</span>
-                    </span>
-                  </label>
-                  <select id="parallelCount">
-                    <option value="1">1개 (단일 회로)</option>
-                    <option value="2">2개 병렬</option>
-                    <option value="3">3개 병렬</option>
-                    <option value="4">4개 병렬</option>
-                    <option value="5">5개 병렬</option>
-                    <option value="6">6개 병렬</option>
-                  </select>
-                </div>
-              </div>
-              
-              <div class="input-row">
-                <div class="input-group">
-                  <label for="groupingFactor">
-                    그룹화 보정 계수
-                    <span class="tooltip">
-                      <span class="tooltip-icon">?</span>
-                      <span class="tooltip-text">케이블 그룹화에 따른 보정 계수를 입력하세요. 기본값은 1입니다.</span>
-                    </span>
-                  </label>
-                  <input type="number" id="groupingFactor" inputmode="decimal" pattern="[0-9]*" value="1" min="0.5" max="1" step="0.01">
-                </div>
-                
-                <div class="input-group">
-                  <label for="soilResistivity">
-                    토양 열저항 (K·m/W)
-                    <span class="tooltip">
-                      <span class="tooltip-icon">?</span>
-                      <span class="tooltip-text">지중 매설 시 토양의 열저항을 입력하세요. 일반 토양은 1.0~2.5입니다.</span>
-                    </span>
-                  </label>
-                  <input type="number" id="soilResistivity" inputmode="decimal" pattern="[0-9]*" value="1.5" min="0.5" max="5" step="0.1">
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <button id="calculateBtn">계산하기</button>
-          
-          <div class="result" id="result">
-            선택 정보를 바탕으로 결과가 표시됩니다.
-          </div>
-          
-          <div class="action-buttons">
-            <button id="saveConfigBtn">현재 설정 저장</button>
-            <button id="printResultBtn">결과 인쇄</button>
-            <button id="exportPdfBtn">PDF로 내보내기</button>
+          <div class="field">
+            <label>전선관 사이즈</label>
+            <select id="pipeSize">
+              <option value="">먼저 전선관 종류를 선택하세요</option>
+            </select>
           </div>
         </div>
-        
-        <!-- 전압 강하 탭 -->
-        <div class="tab-content" id="voltage-drop-tab">
-          <div class="input-row">
-            <div class="input-group">
-              <label for="vdCableType">전선 종류</label>
-              <select id="vdCableType">
-                <option value="HFIX">HFIX (난연성 가교 폴리올레핀 절연전선)</option>
-                <option value="HIV">HIV (비닐절연전선)</option>
-                <option value="TFR-CV">TFR-CV (난연성 가교 폴리에틸렌 절연전선)</option>
-                <option value="XLPE">XLPE (가교 폴리에틸렌 절연전선)</option>
-              </select>
-            </div>
-            
-            <div class="input-group">
-              <label for="vdCableSize">전선 굵기 (㎟)</label>
-              <select id="vdCableSize"></select>
-            </div>
-          </div>
-          
-          <div class="input-row">
-            <div class="input-group">
-              <label for="vdVoltageType">전원 종류</label>
-              <select id="vdVoltageType">
-                <option value="단상">단상 220V</option>
-                <option value="삼상">삼상 380V</option>
-                <option value="직류">직류 전원</option>
-              </select>
-            </div>
-            
-            <div class="input-group">
-              <label for="vdCurrent">
-                부하
-                <span class="tooltip">
-                  <span class="tooltip-icon">?</span>
-                  <span class="tooltip-text">전류(A) 또는 전력(kW) 단위로 부하를 입력하세요.</span>
-                </span>
-              </label>
-              <div class="input-with-unit">
-                <input type="number" id="vdCurrent" inputmode="decimal" pattern="[0-9]*" placeholder="예: 30" min="0" step="0.1" required>
-                <select id="vdLoadUnit">
-                  <option value="A">전류(A)</option>
-                  <option value="kW">전력(kW)</option>
-                </select>
-              </div>
-            </div>
-          </div>
-          
-          <div class="input-row">
-            <div class="input-group">
-              <label for="vdLength">
-                케이블 길이 (m)
-                <span class="tooltip">
-                  <span class="tooltip-icon">?</span>
-                  <span class="tooltip-text">전원에서 부하까지의 케이블 길이를 미터(m) 단위로 입력하세요.</span>
-                </span>
-              </label>
-              <input type="number" id="vdLength" inputmode="decimal" pattern="[0-9]*" placeholder="예: 100" min="1" step="1" required>
-            </div>
-            
-            <div class="input-group">
-              <label for="vdPowerFactor">
-                역률 (PF)
-                <span class="tooltip">
-                  <span class="tooltip-icon">?</span>
-                  <span class="tooltip-text">부하의 역률을 입력하세요. 일반적으로 0.8~0.95 사이입니다. 모르는 경우 0.9를 사용하세요.</span>
-                </span>
-              </label>
-              <input type="number" id="vdPowerFactor" inputmode="decimal" pattern="[0-9]*" value="0.9" min="0.5" max="1" step="0.01">
-            </div>
-          </div>
-          
-          <button id="calculateVoltageDropBtn">전압 강하 계산</button>
-          
-          <div class="result" id="voltageDropResult">
-            케이블 길이와 부하 전류를 입력하면 전압 강하를 계산합니다.
-          </div>
-          
-          <div class="chart-container" id="voltageDropChart">
-            <div style="text-align: center; color: #666;">
-              <p>다양한 케이블 굵기별 전압 강하 비교 차트</p>
-              <p style="font-size: 0.9em;">결과를 계산하면 차트가 표시됩니다</p>
-            </div>
-          </div>
-        </div>
-        
-        <!-- 케이블 선정 탭 -->
-        <div class="tab-content" id="compare-tab">
-          <div class="input-row">
-            <div class="input-group">
-              <label for="compareVoltageType">전원 종류</label>
-              <select id="compareVoltageType">
-                <option value="단상">단상 220V</option>
-                <option value="삼상">삼상 380V</option>
-              </select>
-            </div>
-            
-            <div class="input-group">
-              <label for="compareInstallMethod">설치 방법</label>
-              <select id="compareInstallMethod">
-                <option value="공기">공기 중</option>
-                <option value="관">관내 배선</option>
-                <option value="지중">지중 매설(관 없음)</option>
-                <option value="트레이">케이블 트레이</option>
-              </select>
-            </div>
-          </div>
-          
-          <div class="input-row">
-            <div class="input-group">
-              <label for="compareCurrentNeeded">
-                필요 부하
-                <span class="tooltip">
-                  <span class="tooltip-icon">?</span>
-                  <span class="tooltip-text">필요한 최소 부하를 전류(A) 또는 전력(kW) 단위로 입력하세요.</span>
-                </span>
-              </label>
-              <div class="input-with-unit">
-                <input type="number" id="compareCurrentNeeded" inputmode="decimal" pattern="[0-9]*" placeholder="예: 50" min="1" step="0.1" required>
-                <select id="compareLoadUnit">
-                  <option value="A">전류(A)</option>
-                  <option value="kW">전력(kW)</option>
-                </select>
-              </div>
-            </div>
-            
-            <div class="input-group">
-              <label for="compareLength">
-                케이블 길이 (m)
-                <span class="tooltip">
-                  <span class="tooltip-icon">?</span>
-                  <span class="tooltip-text">케이블의 길이를 입력하세요. 전압 강하 계산에 사용됩니다.</span>
-                </span>
-              </label>
-              <input type="number" id="compareLength" inputmode="decimal" pattern="[0-9]*" placeholder="예: 100" min="1" step="1" required>
-            </div>
-          </div>
-          
-          <button id="compareBtn">케이블 선정</button>
-          
-          <div class="result" id="compareResult" style="display: none;">
-            <h2>케이블 선정 결과</h2>
-            <div class="sub">필요 전류 기준으로 가능한 케이블 옵션을 선정합니다.</div>
-            
-            <div class="comparison-table-wrapper">
-              <table class="comparison-table">
-                <tbody id="comparisonTableBody">
-                  <!-- 선정 결과가 여기에 추가됩니다 -->
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-        
-        <!-- 저장된 설정 탭 -->
-        <div class="tab-content" id="saved-tab">
-          <h2>저장된 설정</h2>
-          <div class="sub">이전에 저장한 설정을 불러와 사용할 수 있습니다.</div>
-          
-          <div class="saved-configs" id="savedConfigList">
-            <div style="padding: 15px; text-align: center; color: #777;">
-              저장된 설정이 없습니다.
-            </div>
-          </div>
-          
-          <div class="action-buttons">
-            <button id="clearSavedBtn">모든 설정 삭제</button>
-            <button id="exportConfigsBtn">설정 내보내기</button>
-            <button id="importConfigsBtn">설정 가져오기</button>
-          </div>
-          
-          <input type="file" id="importConfigFile" accept=".json" style="display: none;">
+      </div>
+      
+      <div id="result"></div>
+    </div>
+    
+    <div id="history-tab" class="tab-content">
+      <div class="card">
+        <div id="history-list">
+          <div class="text-center">저장된 계산 기록이 없습니다.</div>
         </div>
       </div>
     </div>
+    
+    <div id="info-tab" class="tab-content">
+      <div class="card">
+        <h2>KEC 권장 채움률</h2>
+        <table class="result-table">
+          <thead>
+            <tr>
+              <th>전선관 종류</th>
+              <th>채움률 제한</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>ELP관</td>
+              <td>40%</td>
+            </tr>
+            <tr>
+              <td>CD/PE관</td>
+              <td>40%</td>
+            </tr>
+            <tr>
+              <td>HI관</td>
+              <td>45%</td>
+            </tr>
+            <tr>
+              <td>스틸/GW관</td>
+              <td>50%</td>
+            </tr>
+            <tr>
+              <td>케이블 트레이</td>
+              <td>50%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="card">
+        <h2>앱 정보</h2>
+        <p>전선관 계산기 v2.0</p>
+        <p>최종 업데이트: 2025.04.25</p>
+        <p>이 앱은 한국 전기 설비 기술 기준에 따라 전선관 채움률을 계산합니다.</p>
+      </div>
+    </div>
   </div>
-
-  <script>
-    // 홈으로 돌아가기
-    function goBack() {
-      window.location.href = 'index.html';
-    }
-    
-    // 각 케이블 타입별 전선 굵기에 따른 허용 전류 데이터
-    const cableData = {
-      HFIX: {
-        "1.5": 15, "2.5": 21, "4": 28, "6": 36, "10": 50, "16": 68, "25": 89,
-        "35": 112, "50": 138, "70": 175, "95": 210, "120": 245
-      },
-      HIV: {
-        "1.5": 17, "2.5": 23, "4": 31, "6": 40, "10": 55, "16": 74, "25": 97,
-        "35": 120, "50": 145, "70": 185, "95": 220, "120": 255, "150": 290
-      },
-      "TFR-CV": {
-        "1.5": 17, "2.5": 23, "4": 31, "6": 40, "10": 55, "16": 74, "25": 97,
-        "35": 120, "50": 145, "70": 185, "95": 224, "120": 259, "150": 299,
-        "185": 341, "240": 403, "300": 472, "400": 545, "500": 614, "600": 690
-      },
-      XLPE: {
-        "1.5": 19, "2.5": 26, "4": 35, "6": 45, "10": 63, "16": 84, "25": 110,
-        "35": 137, "50": 167, "70": 214, "95": 259, "120": 301, "150": 343,
-        "185": 391, "240": 468
-      }
-    };
-
-    // 설치 방법별 보정 계수
-    const installFactor = { 
-      "공기": 1.0, 
-      "관": 0.87, 
-      "지중": 0.75, 
-      "트레이": 0.95, 
-      "덕트": 0.80 
-    };
-    
-    // Core 수에 따른 보정 계수
-    const coreFactor = { "1": 1.0, "2": 0.94, "3": 0.9, "4": 0.87 };
-    
-    // 온도 보정 계수 (주변 온도에 따른)
-    const temperatureFactor = {
-      "-20": 1.35, "-10": 1.29, "0": 1.22, "10": 1.15, "20": 1.08, "30": 1.00,
-      "35": 0.96, "40": 0.91, "45": 0.87, "50": 0.82, "55": 0.76, "60": 0.71
-    };
-    
-    // 병렬 배치 보정 계수
-    const parallelFactor = { "1": 1.0, "2": 0.8, "3": 0.7, "4": 0.65, "5": 0.6, "6": 0.57 };
-    
-    // 차단기 규격 사이즈 (A)
-    const breakerSizes = [15, 20, 30, 40, 50, 60, 75, 100, 125, 150, 175, 200, 225, 250, 300, 350, 400, 500, 600, 800];
-    
-    // 접지선 사이즈 (㎟)
-    const groundSizes = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240, 300, 400, 500, 600];
-    
-    // 전선 저항 값 (Ω·mm²/m)
-    const resistivity = {
-      copper: 0.0175,    // 구리선
-      aluminum: 0.0283   // 알루미늄선
-    };
-    
-    // 저장된 설정 관리용 키
-    const STORAGE_KEY = 'cableCalculatorSavedConfigs';
-    
-    // DOM이 로드된 후 실행
-    document.addEventListener('DOMContentLoaded', () => {
-      // 탭 전환 기능 설정
-      setupTabs();
-      
-      // 기본 탭 초기화
-      updateCableOptions('cableType', 'cableSize');
-      updateCoreOptions('cableType', 'coreCount');
-      
-      // 전압 강하 탭 초기화
-      updateCableOptions('vdCableType', 'vdCableSize');
-      
-      // 이벤트 리스너 등록
-      document.getElementById('cableType').addEventListener('change', () => {
-        updateCableOptions('cableType', 'cableSize');
-        updateCoreOptions('cableType', 'coreCount');
-      });
-      
-      document.getElementById('vdCableType').addEventListener('change', () => {
-        updateCableOptions('vdCableType', 'vdCableSize');
-      });
-      
-      // 고급 설정 토글
-      document.querySelector('.toggle-advanced').addEventListener('click', toggleAdvancedOptions);
-      
-      // 계산 버튼 이벤트
-      document.getElementById('calculateBtn').addEventListener('click', calculateWithLoading);
-      document.getElementById('calculateVoltageDropBtn').addEventListener('click', calculateVoltageDrop);
-      document.getElementById('compareBtn').addEventListener('click', compareOptions);
-      
-      // 저장 및 내보내기 기능
-      document.getElementById('saveConfigBtn').addEventListener('click', saveCurrentConfig);
-      document.getElementById('printResultBtn').addEventListener('click', printResults);
-      document.getElementById('exportPdfBtn').addEventListener('click', exportToPdf);
-      
-      // 저장된 설정 관리
-      document.getElementById('clearSavedBtn').addEventListener('click', clearSavedConfigs);
-      document.getElementById('exportConfigsBtn').addEventListener('click', exportConfigs);
-      document.getElementById('importConfigsBtn').addEventListener('click', () => {
-        document.getElementById('importConfigFile').click();
-      });
-      
-      document.getElementById('importConfigFile').addEventListener('change', importConfigs);
-      
-      // 저장된 설정 로드
-      loadSavedConfigs();
-      
-      // 전력-전류 변환 이벤트 등록
-      setupPowerCurrentConversion();
-      
-      // iOS 포커스 이슈 완화
-      fixIOSFocusIssues();
-      
-      // 모바일 입력 키보드 최적화
-      optimizeInputKeyboardType();
-    });
-    
-    // iOS 포커스 이슈 완화
-    function fixIOSFocusIssues() {
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-      if (!isIOS) return;
-      
-      // 스크롤 문제 해결
-      document.querySelectorAll('input, select').forEach(el => {
-        el.addEventListener('focus', function() {
-          // 포커스가 맞춰진 요소가 화면 중앙에 오도록 스크롤
-          setTimeout(() => {
-            const elRect = this.getBoundingClientRect();
-            const offset = elRect.top - (window.innerHeight / 2);
-            window.scrollBy({top: offset, behavior: 'smooth'});
-          }, 300);
-        });
-      });
-    }
-    
-    // 모바일에서 입력 필드 키보드 타입 최적화
-    function optimizeInputKeyboardType() {
-      document.querySelectorAll('input[type="number"]').forEach(input => {
-        // 이미 속성이 있으면 추가하지 않음
-        if (!input.hasAttribute('inputmode')) {
-          input.setAttribute('inputmode', 'decimal');
-        }
-        if (!input.hasAttribute('pattern')) {
-          input.setAttribute('pattern', '[0-9]*');
-        }
-      });
-    }
-    
-    // 계산 버튼에 로딩 표시 추가
-    function calculateWithLoading() {
-      const btn = document.getElementById('calculateBtn');
-      const originalText = btn.textContent;
-      btn.innerHTML = '<div class="loading"></div> 계산 중...';
-      btn.disabled = true;
-      
-      setTimeout(() => {
-        // 원래 계산 로직 실행
-        calculateResults();
-        
-        // 버튼 상태 복원
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-        
-        // 결과로 스크롤
-        document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
-      }, 300);
-    }
-    
-    // 토스트 메시지 표시 함수
-    function showToast(message, type = 'success') {
-      const toast = document.createElement('div');
-      const bgColor = type === 'success' ? 'rgba(25, 135, 84, 0.9)' : 
-                    type === 'warning' ? 'rgba(255, 193, 7, 0.9)' : 
-                    'rgba(220, 53, 69, 0.9)';
-                    
-      toast.style.cssText = `
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: ${bgColor};
-        color: white;
-        padding: 10px 20px;
-        border-radius: 5px;
-        z-index: 1000;
-        animation: fadeInOut 2.5s forwards;
-        font-size: 14px;
-        max-width: 280px;
-        text-align: center;
-      `;
-      toast.textContent = message;
-      
-      document.body.appendChild(toast);
-      
-      setTimeout(() => {
-        document.body.removeChild(toast);
-      }, 2500);
-      
-      // 토스트 애니메이션 스타일 추가
-      if (!document.getElementById('toastAnimStyle')) {
-        const style = document.createElement('style');
-        style.id = 'toastAnimStyle';
-        style.textContent = `
-          @keyframes fadeInOut {
-            0% { opacity: 0; transform: translate(-50%, 20px); }
-            15% { opacity: 1; transform: translate(-50%, 0); }
-            85% { opacity: 1; transform: translate(-50%, 0); }
-            100% { opacity: 0; transform: translate(-50%, -20px); }
-          }
-        `;
-        document.head.appendChild(style);
-      }
-    }
-    
-    // 전력-전류 변환 설정
-    function setupPowerCurrentConversion() {
-      // 기본 계산 탭
-      document.getElementById('loadUnit').addEventListener('change', updateBasicLoadValue);
-      document.getElementById('load').addEventListener('input', updateBasicLoadValue);
-      document.getElementById('voltageType').addEventListener('change', () => {
-        if (document.getElementById('loadUnit').value === 'kW') {
-          updateBasicLoadValue();
-        }
-      });
-      
-      // 전압 강하 탭
-      document.getElementById('vdLoadUnit').addEventListener('change', updateVoltageDropLoadValue);
-      document.getElementById('vdCurrent').addEventListener('input', updateVoltageDropLoadValue);
-      document.getElementById('vdVoltageType').addEventListener('change', () => {
-        if (document.getElementById('vdLoadUnit').value === 'kW') {
-          updateVoltageDropLoadValue();
-        }
-      });
-      
-      // 케이블 선정 탭
-      document.getElementById('compareLoadUnit').addEventListener('change', updateCompareLoadValue);
-      document.getElementById('compareCurrentNeeded').addEventListener('input', updateCompareLoadValue);
-      document.getElementById('compareVoltageType').addEventListener('change', () => {
-        if (document.getElementById('compareLoadUnit').value === 'kW') {
-          updateCompareLoadValue();
-        }
-      });
-    }
-    
-    // 기본 탭의 부하 값 업데이트 (전력-전류 변환)
-    function updateBasicLoadValue() {
-      const loadInput = document.getElementById('load');
-      const loadUnit = document.getElementById('loadUnit').value;
-      const voltageType = document.getElementById('voltageType').value;
-      
-      // 입력값이 없으면 변환하지 않음
-      if (!loadInput.value) return;
-      
-      const loadValue = parseFloat(loadInput.value);
-      
-      // 전압 값 결정
-      const voltageVal = voltageType === "단상" ? 220 : voltageType === "삼상" ? 380 : 110;
-      
-      // 전력(kW)을 전류(A)로 변환 또는 그대로 유지
-      if (loadUnit === 'kW') {
-        // kW를 내부적으로 계산에 사용하기 위해 A로 변환하지만 표시는 그대로 kW로 유지
-        // loadInput은 그대로 두고 calculateResults 함수에서 변환 처리
-        loadInput.setAttribute('data-power', loadValue); // 원래 전력값 저장
-      } else {
-        // A 단위인 경우 전력 데이터 속성 삭제
-        loadInput.removeAttribute('data-power');
-      }
-    }
-    
-    // 전압 강하 탭의 부하 값 업데이트 (전력-전류 변환)
-    function updateVoltageDropLoadValue() {
-      const loadInput = document.getElementById('vdCurrent');
-      const loadUnit = document.getElementById('vdLoadUnit').value;
-      const voltageType = document.getElementById('vdVoltageType').value;
-      
-      // 입력값이 없으면 변환하지 않음
-      if (!loadInput.value) return;
-      
-      const loadValue = parseFloat(loadInput.value);
-      
-      // 전압 값 결정
-      const voltageVal = voltageType === "단상" ? 220 : voltageType === "삼상" ? 380 : 110;
-      
-      // 전력(kW)을 전류(A)로 변환 또는 그대로 유지
-      if (loadUnit === 'kW') {
-        // kW를 내부적으로 계산에 사용하기 위해 A로 변환하지만 표시는 그대로 kW로 유지
-        loadInput.setAttribute('data-power', loadValue); // 원래 전력값 저장
-      } else {
-        // A 단위인 경우 전력 데이터 속성 삭제
-        loadInput.removeAttribute('data-power');
-      }
-    }
-    
-    // 케이블 선정 탭의 부하 값 업데이트 (전력-전류 변환)
-    function updateCompareLoadValue() {
-      const loadInput = document.getElementById('compareCurrentNeeded');
-      const loadUnit = document.getElementById('compareLoadUnit').value;
-      const voltageType = document.getElementById('compareVoltageType').value;
-      
-      // 입력값이 없으면 변환하지 않음
-      if (!loadInput.value) return;
-      
-      const loadValue = parseFloat(loadInput.value);
-      
-      // 전압 값 결정
-      const voltageVal = voltageType === "단상" ? 220 : voltageType === "삼상" ? 380 : 110;
-      
-      // 전력(kW)을 전류(A)로 변환 또는 그대로 유지
-      if (loadUnit === 'kW') {
-        // kW를 내부적으로 계산에 사용하기 위해 A로 변환하지만 표시는 그대로 kW로 유지
-        loadInput.setAttribute('data-power', loadValue); // 원래 전력값 저장
-      } else {
-        // A 단위인 경우 전력 데이터 속성 삭제
-        loadInput.removeAttribute('data-power');
-      }
-    }
-    
-    // 전력(kW)을 전류(A)로 변환
-    function convertPowerToCurrent(power, voltageType) {
-      const voltageVal = voltageType === "단상" ? 220 : voltageType === "삼상" ? 380 : 110;
-      let current;
-      
-      if (voltageType === "단상") {
-        current = (power * 1000) / voltageVal;
-      } else if (voltageType === "삼상") {
-        current = (power * 1000) / (Math.sqrt(3) * voltageVal);
-      } else { // 직류
-        current = (power * 1000) / voltageVal;
-      }
-      
-      return current;
-    }
-    
-    // 전류(A)를 전력(kW)으로 변환
-    function convertCurrentToPower(current, voltageType) {
-      const voltageVal = voltageType === "단상" ? 220 : voltageType === "삼상" ? 380 : 110;
-      let power;
-      
-      if (voltageType === "단상") {
-        power = (voltageVal * current) / 1000;
-      } else if (voltageType === "삼상") {
-        power = (Math.sqrt(3) * voltageVal * current) / 1000;
-      } else { // 직류
-        power = (voltageVal * current) / 1000;
-      }
-      
-      return power;
-    }
-    
-// 스와이프 기능을 완전히 제거한 setupTabs 함수
-
-function setupTabs() {
-  const tabs = document.querySelectorAll('.tab');
-  const tabContents = document.querySelectorAll('.tab-content');
   
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      // 활성화된 탭 클래스 제거
-      tabs.forEach(t => t.classList.remove('active'));
-      tabContents.forEach(c => c.classList.remove('active'));
+  <div class="bottom-buttons">
+    <button onclick="calculate()" class="primary">계산하기</button>
+    <button onclick="clearAll()" class="warning">초기화</button>
+    <button onclick="saveCalculation()" class="secondary">저장</button>
+  </div>
+  
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <p>계산중...</p>
+  </div>
+  
+  <div class="notification" id="notification"></div>
+  
+  <button class="btn-fab" onclick="goBack()" title="홈으로 돌아가기">
+    <svg class="icon" viewBox="0 0 24 24">
+      <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+    </svg>
+  </button>
+
+<script>
+// 케이블 외경 데이터베이스
+const cableDiameters = {
+  'CV': {
+    '1.5': { '1': 6.3, '2': 11.0, '3': 12.1, '4': 13.0 },
+    '2.5': { '1': 6.7, '2': 12.0, '3': 13.2, '4': 14.0 },
+    '4': { '1': 7.2, '2': 13.0, '3': 14.5, '4': 15.5 },
+    '6': { '1': 7.8, '2': 14.0, '3': 15.8, '4': 17.0 },
+    '10': { '1': 9.4, '2': 17.0, '3': 19.0, '4': 20.5 },
+    '16': { '1': 10.0, '2': 19.0, '3': 21.5, '4': 23.0 },
+    '25': { '1': 11.5, '2': 22.0, '3': 25.0, '4': 26.5 },
+    '35': { '1': 13.0, '2': 24.5, '3': 28.0, '4': 30.0 },
+    '50': { '1': 15.0, '2': 28.0, '3': 32.0, '4': 34.5 },
+    '70': { '1': 17.0, '2': 32.0, '3': 36.5, '4': 39.5 },
+    '95': { '1': 19.5, '2': 36.5, '3': 42.0, '4': 45.5 },
+    '120': { '1': 21.0, '2': 40.0, '3': 46.0, '4': 50.0 },
+    '150': { '1': 23.5, '2': 44.0, '3': 50.5, '4': 55.0 },
+    '185': { '1': 25.5, '2': 48.0, '3': 55.0, '4': 59.5 },
+    '240': { '1': 28.5, '2': 53.5, '3': 61.5, '4': 66.5 },
+    '300': { '1': 31.5, '2': 59.0, '3': 68.0, '4': 73.0 },
+    '400': { '1': 35.0, '2': 65.0, '3': 75.0, '4': 80.0 },
+    '500': { '1': 39.0, '2': 71.0, '3': 82.0, '4': 88.0 },
+    '600': { '1': 42.0, '2': 76.0, '3': 88.0, '4': 94.0 }
+  },
+  'HFIX': {
+    '1.5': { '1': 3.0 }, '2.5': { '1': 3.4 }, '4': { '1': 3.9 },
+    '6': { '1': 4.5 }, '10': { '1': 5.5 }, '16': { '1': 6.8 }
+  },
+  'CNCV': {
+    '38': { '1': 34.0 }, '60': { '1': 36.0 }, '100': { '1': 39.0 },
+    '150': { '1': 43.0 }, '200': { '1': 45.0 }, '250': { '1': 48.0 },
+    '325': { '1': 51.0 }, '400': { '1': 55.0 }, '500': { '1': 57.0 }, '600': { '1': 61.0 }
+  },
+  'GV': {
+    '2.5': { '1': 9.0 }, '4': { '1': 10.0 }, '6': { '1': 11.0 },
+    '10': { '1': 13.0 }, '16': { '1': 15.0 }, '25': { '1': 17.0 },
+    '35': { '1': 18.5 }, '50': { '1': 20.5 }, '70': { '1': 24.0 },
+    '95': { '1': 27.0 }, '120': { '1': 30.0 }, '150': { '1': 32.5 },
+    '185': { '1': 35.0 }, '240': { '1': 38.5 }, '300': { '1': 42.5 }
+  }
+};
+
+// 전선관 채움률 제한
+const fillLimit = {
+  'ELP': 40, 'CD_PE': 40, 'HI': 45, 'STEEL': 50, 'TRAY': 50
+};
+
+// 케이블 트레이 너비 규격
+const trayWidths = [50, 100, 150, 200, 300, 400, 500, 600, 700, 800];
+
+// ELP관 규격 정보
+const elpConduits = [
+  { name: '30mm', area: 600, innerDia: 27.6 },
+  { name: '40mm', area: 1100, innerDia: 36.6 },
+  { name: '50mm', area: 1700, innerDia: 46.6 },
+  { name: '65mm', area: 2800, innerDia: 59.8 },
+  { name: '80mm', area: 4200, innerDia: 73.4 },
+  { name: '100mm', area: 6700, innerDia: 92.4 },
+  { name: '125mm', area: 10500, innerDia: 115.8 },
+  { name: '150mm', area: 15000, innerDia: 138.0 },
+  { name: '175mm', area: 21000, innerDia: 164.0 },
+  { name: '200mm', area: 26000, innerDia: 182.0 }
+];
+
+// 일반 전선관 규격 정보
+const generalConduits = {
+  'CD_PE': [
+    { name: '16호', area: 200, innerDia: 15.9 },
+    { name: '22호', area: 300, innerDia: 19.5 },
+    { name: '28호', area: 500, innerDia: 26.0 },
+    { name: '36호', area: 800, innerDia: 32.0 },
+    { name: '42호', area: 1200, innerDia: 39.2 },
+    { name: '54호', area: 1500, innerDia: 43.9 },
+    { name: '70호', area: 2500, innerDia: 56.4 },
+    { name: '82호', area: 3600, innerDia: 67.6 },
+    { name: '104호', area: 5400, innerDia: 83.0 }
+  ],
+  'HI': [
+    { name: '16호', area: 200, innerDia: 15.2 },
+    { name: '22호', area: 300, innerDia: 19.0 },
+    { name: '28호', area: 500, innerDia: 25.3 },
+    { name: '36호', area: 800, innerDia: 31.6 },
+    { name: '42호', area: 1200, innerDia: 38.0 },
+    { name: '54호', area: 1500, innerDia: 43.6 },
+    { name: '70호', area: 2500, innerDia: 56.2 },
+    { name: '82호', area: 3600, innerDia: 67.2 },
+    { name: '100호', area: 4800, innerDia: 77.5 }
+  ],
+  'STEEL': [
+    { name: '16호', area: 200, innerDia: 16.0 },
+    { name: '22호', area: 300, innerDia: 21.7 },
+    { name: '28호', area: 500, innerDia: 27.6 },
+    { name: '36호', area: 800, innerDia: 35.1 },
+    { name: '42호', area: 1200, innerDia: 41.6 },
+    { name: '54호', area: 1500, innerDia: 48.1 },
+    { name: '70호', area: 2500, innerDia: 59.5 },
+    { name: '82호', area: 3600, innerDia: 72.1 },
+    { name: '104호', area: 5400, innerDia: 86.0 }
+  ]
+};
+
+// 케이블 목록
+let cables = [];
+// 저장된 계산 기록
+let savedCalculations = [];
+
+// 탭 전환 관리
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    
+    this.classList.add('active');
+    const tabName = this.getAttribute('data-tab');
+    document.getElementById(tabName + '-tab').classList.add('active');
+  });
+});
+
+// 페이지 로드 시 실행
+window.addEventListener("load", function() {
+  updateSizeOptions();
+  updateExternalDiameter();
+  loadFromLocalStorage();
+  updateHistoryList();
+  
+  // 툴팁 터치 이벤트 처리
+  const tooltips = document.querySelectorAll('.tooltip');
+  
+  tooltips.forEach(tooltip => {
+    tooltip.addEventListener('touchstart', function(e) {
+      e.preventDefault();
       
-      // 선택한 탭 활성화
-      tab.classList.add('active');
-      const tabId = tab.getAttribute('data-tab');
-      document.getElementById(`${tabId}-tab`).classList.add('active');
+      // 다른 모든 툴팁 닫기
+      document.querySelectorAll('.tooltip-text').forEach(tt => {
+        tt.style.visibility = 'hidden';
+        tt.style.opacity = '0';
+      });
       
-      // 탭을 클릭하면 해당 탭이 더 잘 보이도록 스크롤
-      const tabsContainer = document.querySelector('.tabs');
-      const tabRect = tab.getBoundingClientRect();
-      const containerRect = tabsContainer.getBoundingClientRect();
-      
-      // 탭이 컨테이너 왼쪽에 가깝게 있다면 스크롤 조정
-      if (tabRect.left < containerRect.left + 20) {
-        tabsContainer.scrollLeft += (tabRect.left - containerRect.left - 20);
-      } 
-      // 탭이 컨테이너 오른쪽에 가깝게 있다면 스크롤 조정
-      else if (tabRect.right > containerRect.right - 20) {
-        tabsContainer.scrollLeft += (tabRect.right - containerRect.right + 20);
-      }
-      
-      // 저장된 설정 탭이 선택된 경우 목록 새로고침
-      if (tabId === 'saved') {
-        loadSavedConfigs();
+      // 현재 툴팁 토글
+      const tooltipText = this.querySelector('.tooltip-text');
+      if (tooltipText.style.visibility === 'visible') {
+        tooltipText.style.visibility = 'hidden';
+        tooltipText.style.opacity = '0';
+      } else {
+        tooltipText.style.visibility = 'visible';
+        tooltipText.style.opacity = '1';
       }
     });
   });
   
-  // 스와이프 관련 코드는 모두 제거됨
-}
-    
-    // 전선 종류에 따른 굵기 옵션 업데이트
-    function updateCableOptions(typeId, sizeId) {
-      const typeSelect = document.getElementById(typeId);
-      const sizeSelect = document.getElementById(sizeId);
-      const selectedType = typeSelect.value;
-      
-      // 기존 옵션 삭제
-      sizeSelect.innerHTML = "";
-      
-      // 선택된 케이블 타입에 따른 사이즈 옵션 추가
-      const sizes = Object.keys(cableData[selectedType]).map(Number).sort((a, b) => a - b);
-      
-      sizes.forEach(size => {
-        const option = document.createElement('option');
-        option.value = size;
-        option.textContent = `${size} ㎟`;
-        sizeSelect.appendChild(option);
+  // 바깥쪽 터치하면 모든 툴팁 닫기
+  document.addEventListener('touchstart', function(e) {
+    if (!e.target.closest('.tooltip')) {
+      document.querySelectorAll('.tooltip-text').forEach(tt => {
+        tt.style.visibility = 'hidden';
+        tt.style.opacity = '0';
       });
-      
-      // 첫 번째 옵션 선택
-      sizeSelect.selectedIndex = 0;
     }
-    
-    // 전선 종류에 따른 코어 옵션 업데이트
-    function updateCoreOptions(typeId, coreId) {
-  const typeSelect = document.getElementById(typeId);
-  const coreSelect = document.getElementById(coreId);
-  const selectedType = typeSelect.value;
+  });
+});
 
-  // 기존 옵션 초기화
-  coreSelect.innerHTML = "";
+// 홈으로 돌아가기
+function goBack() {
+  window.location.href = 'index.html';
+}
 
-  // 1C만 가능한 전선 종류인지 확인
-  if (selectedType === "HFIX" || selectedType === "HIV") {
-    // 1C 하나만 추가
-    const option = document.createElement('option');
-    option.value = "1";
-    option.textContent = "1C";
-    coreSelect.appendChild(option);
-
-    // 드롭다운 비활성화
-    coreSelect.disabled = true;
-  } else {
-    // 1C~4C 모두 추가
-    const options = [
-      {value: "1", label: "1C"},
-      {value: "2", label: "2C"},
-      {value: "3", label: "3C"},
-      {value: "4", label: "4C"}
-    ];
-
-    options.forEach(opt => {
-      const option = document.createElement('option');
-      option.value = opt.value;
-      option.textContent = opt.label;
-      coreSelect.appendChild(option);
-    });
-
-    // 드롭다운 활성화
-    coreSelect.disabled = false;
+// 로컬 스토리지에서 데이터 로드
+function loadFromLocalStorage() {
+  try {
+    const saved = localStorage.getItem('savedCalculations');
+    if (saved) {
+      savedCalculations = JSON.parse(saved);
+    }
+  } catch (e) {
+    console.error('로컬 스토리지 로드 실패:', e);
   }
 }
+
+// 로컬 스토리지에 데이터 저장
+function saveToLocalStorage() {
+  try {
+    localStorage.setItem('savedCalculations', JSON.stringify(savedCalculations));
+  } catch (e) {
+    console.error('로컬 스토리지 저장 실패:', e);
+    showNotification('저장 실패. 저장 공간이 부족할 수 있습니다.');
+  }
+}
+
+// 알림 표시
+function showNotification(message, duration = 2000) {
+  const notification = document.getElementById('notification');
+  notification.textContent = message;
+  notification.classList.add('show');
+  
+  setTimeout(() => {
+    notification.classList.remove('show');
+  }, duration);
+}
+
+// 전선 종류에 따른 굵기 옵션 업데이트
+function updateSizeOptions() {
+  const type = document.getElementById("type").value;
+  const sizeSelect = document.getElementById("size");
+  const coreSelect = document.getElementById("core");
+  
+  // 선택한 전선 종류에 해당하는 굵기 가져오기
+  const sizes = Object.keys(cableDiameters[type] || {}).sort((a, b) => parseFloat(a) - parseFloat(b));
+  sizeSelect.innerHTML = sizes.map(s => `<option value="${s}">${s}㎟</option>`).join('');
+  
+  // HFIX, CNCV, GV는 Core가 항상 1C로 고정됨
+  if (type === "HFIX" || type === "CNCV" || type === "GV") {
+    coreSelect.innerHTML = `<option value="1">1C</option>`;
+    coreSelect.disabled = true;
+  } else {
+    coreSelect.innerHTML = `<option value="1">1C</option><option value="2">2C</option><option value="3">3C</option><option value="4">4C</option>`;
+    coreSelect.disabled = false;
+  }
+  
+  // 외경 정보 업데이트
+  updateExternalDiameter();
+}
+
+// 외경 자동 계산 및 표시 업데이트
+function updateExternalDiameter() {
+  const type = document.getElementById("type").value;
+  const size = document.getElementById("size").value;
+  const core = document.getElementById("core").value;
+  const customDiaInput = document.getElementById("customDia");
+  
+  // 해당하는 외경 정보가 있으면 표시
+  const diameter = cableDiameters[type]?.[size]?.[core] || 0;
+  if (diameter > 0) {
+    customDiaInput.placeholder = `${diameter}mm (자동계산)`;
+  } else {
+    customDiaInput.placeholder = "자동 또는 수동 입력";
+  }
+}
+
+// 전선관 종류에 따른 사이즈 옵션 업데이트
+function updateConduitSizes() {
+  const type = document.getElementById("pipeType").value;
+  const sizeSelect = document.getElementById("pipeSize");
+  sizeSelect.innerHTML = '<option value="">자동 추천</option>';
+  
+  if (type === 'TRAY') {
+    // 케이블 트레이인 경우 폭 옵션 추가
+    trayWidths.forEach(w => {
+      sizeSelect.innerHTML += `<option value="${w}">${w}mm</option>`;
+    });
+  } else if (type) {
+    // 일반 전선관인 경우 규격 옵션 추가
+    const list = type === 'ELP' ? elpConduits : generalConduits[type] || [];
+    list.forEach(c => {
+      sizeSelect.innerHTML += `<option value="${c.area}">${c.name} (내경 ${c.innerDia}mm)</option>`;
+    });
+  }
+}
+
+// 케이블 추가
+function addCable() {
+  const type = document.getElementById("type").value;
+  const size = document.getElementById("size").value;
+  const core = document.getElementById("core").value;
+  const count = parseInt(document.getElementById("count").value) || 1;
+  const customDia = parseFloat(document.getElementById("customDia").value);
+  
+  // 유효성 검사
+  if (count <= 0) {
+    showNotification('회로 수는 1 이상이어야 합니다.');
+    return;
+  }
+  
+  // 외경 계산 또는 직접 입력값 사용
+  const dia = customDia || (cableDiameters[type]?.[size]?.[core] || 0);
+  if (!dia) {
+    showNotification('외경 정보를 입력하거나 자동 계산 가능한 값을 선택해주세요.');
+    return;
+  }
+  
+  // 단면적 계산: π × (지름/2)² × 회로 수
+  const area = Math.PI * Math.pow(dia / 2, 2) * count;
+  
+  // 케이블 정보 저장
+  cables.push({ 
+    id: Date.now(), // 고유 ID
+    type, 
+    size, 
+    core, 
+    count, 
+    dia, 
+    area 
+  });
+  
+  // UI 업데이트
+  updateCableList();
+  
+  // 입력 폼 초기화
+  document.getElementById("count").value = 1;
+  document.getElementById("customDia").value = "";
+  
+  showNotification('케이블이 추가되었습니다.');
+}
+
+// 케이블 목록 UI 업데이트
+function updateCableList() {
+  const cableList = document.getElementById("cable-list");
+  const cableCount = document.getElementById("cable-count");
+  
+  // 케이블 개수 업데이트
+  cableCount.textContent = cables.length;
+  
+  // 목록이 비어있는 경우
+  if (cables.length === 0) {
+    cableList.innerHTML = '<div class="text-center">추가된 케이블이 없습니다.</div>';
+    return;
+  }
+  
+  // 케이블 목록 생성
+  cableList.innerHTML = '';
+  cables.forEach((cable, index) => {
+    const element = document.createElement('div');
+    element.className = 'cable-item';
+    element.innerHTML = `
+      <div class="cable-info">
+        <strong>${cable.type} ${cable.size}㎟ ${cable.core}C × ${cable.count}회로</strong><br>
+        <small>외경: ${cable.dia.toFixed(1)}mm | 단면적: ${cable.area.toFixed(1)}㎟</small>
+      </div>
+      <div class="cable-actions">
+        <button class="icon-button danger" onclick="removeCable(${index})">
+          <svg class="icon" viewBox="0 0 24 24">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    `;
+    cableList.appendChild(element);
+  });
+}
+
+// 케이블 삭제
+function removeCable(index) {
+  cables.splice(index, 1);
+  updateCableList();
+  showNotification('케이블이 삭제되었습니다.');
+}
+
+// 전체 초기화
+function clearAll() {
+  cables = [];
+  updateCableList();
+  document.getElementById("result").innerHTML = "";
+  document.getElementById("count").value = 1;
+  document.getElementById("customDia").value = "";
+  document.getElementById("pipeType").value = "";
+  document.getElementById("pipeSize").innerHTML = '<option value="">먼저 전선관 종류를 선택하세요</option>';
+  updateExternalDiameter(); // 외경 정보 갱신
+  showNotification('모든 데이터가 초기화되었습니다.');
+}
+
+// 계산 결과 저장
+function saveCalculation() {
+  if (cables.length === 0) {
+    showNotification('저장할 케이블 정보가 없습니다.');
+    return;
+  }
+  
+  const pipeType = document.getElementById("pipeType").value;
+  if (!pipeType) {
+    showNotification('전선관 종류를 선택해주세요.');
+    return;
+  }
+  
+  // 계산 결과 HTML 가져오기
+  const resultHTML = document.getElementById("result").innerHTML;
+  if (!resultHTML) {
+    showNotification('먼저 계산을 실행해주세요.');
+    return;
+  }
+  
+  // 계산 정보 저장
+  const calculation = {
+    id: Date.now(),
+    date: new Date().toLocaleString(),
+    cables: JSON.parse(JSON.stringify(cables)),
+    pipeType: pipeType,
+    pipeSize: document.getElementById("pipeSize").value,
+    resultHTML: resultHTML
+  };
+  
+  // 히스토리에 추가
+  savedCalculations.unshift(calculation);
+  
+  // 최대 20개만 유지
+  if (savedCalculations.length > 20) {
+    savedCalculations = savedCalculations.slice(0, 20);
+  }
+  
+  // 로컬 스토리지에 저장
+  saveToLocalStorage();
+  
+  // 히스토리 업데이트
+  updateHistoryList();
+  
+  showNotification('계산 결과가 저장되었습니다.');
+}
+
+// 히스토리 목록 업데이트
+function updateHistoryList() {
+  const historyList = document.getElementById("history-list");
+  
+  if (savedCalculations.length === 0) {
+    historyList.innerHTML = '<div class="text-center">저장된 계산 기록이 없습니다.</div>';
+    return;
+  }
+  
+  historyList.innerHTML = '';
+  
+  savedCalculations.forEach((calc, index) => {
+    const item = document.createElement('div');
+    item.className = 'history-item';
     
-    // 고급 설정 토글
-    function toggleAdvancedOptions() {
-      const toggleBtn = document.querySelector('.toggle-advanced');
-      const content = document.querySelector('.advanced-content');
-      const icon = toggleBtn.querySelector('i');
-      
-      toggleBtn.classList.toggle('open');
-      
-      if (content.classList.contains('open')) {
-        content.classList.remove('open');
-        content.style.maxHeight = '0';
-      } else {
-        content.classList.add('open');
-        content.style.maxHeight = content.scrollHeight + 'px';
-        
-        // 내용이 변경되면 maxHeight 업데이트
-        setTimeout(() => {
-          content.style.maxHeight = content.scrollHeight + 'px';
-        }, 300);
+    // 케이블 정보 요약
+    let summary = '';
+    calc.cables.forEach(c => {
+      summary += `${c.type} ${c.size}㎟ ${c.core}C × ${c.count}회로, `;
+    });
+    summary = summary.slice(0, -2); // 마지막 쉼표 제거
+    
+    // 전선관 정보
+    let conduitInfo = `${calc.pipeType} 전선관`;
+    if (calc.pipeSize) {
+      const conduitList = calc.pipeType === 'ELP' ? elpConduits : generalConduits[calc.pipeType] || [];
+      const selected = conduitList.find(c => c.area == calc.pipeSize);
+      if (selected) {
+        conduitInfo += ` ${selected.name}`;
+      } else if (calc.pipeType === 'TRAY') {
+        conduitInfo += ` ${calc.pipeSize}mm`;
       }
+    } else {
+      conduitInfo += ` (자동 추천)`;
     }
     
-    // 접지선 굵기 계산
-    function getGroundSize(sizeStr) {
-      const size = parseFloat(sizeStr);
-      let result;
-      
-      if (size <= 16) {
-        result = size;
-      } else if (size <= 35) {
-        result = 16;
-      } else {
-        result = size / 2;
-      }
-      
-      // 가장 가까운 표준 사이즈 찾기
-      return `${groundSizes.find(s => s >= result)} ㎟`;
-    }
+    item.innerHTML = `
+      <div class="history-title">
+        <span>${conduitInfo}</span>
+        <span class="history-date">${calc.date}</span>
+      </div>
+      <div class="history-details">
+        ${summary}
+      </div>
+      <div style="display: flex; gap: 8px; margin-top: 10px;">
+        <button onclick="loadCalculation(${index})" class="primary" style="flex: 1;">불러오기</button>
+        <button onclick="deleteCalculation(${index})" class="danger" style="flex: 0 0 60px;">삭제</button>
+      </div>
+    `;
     
-    // 온도 보정 계수 계산 (가장 가까운 값 사용)
-    function getTemperatureFactor(temp) {
-      const tempKeys = Object.keys(temperatureFactor).map(Number).sort((a, b) => a - b);
-      
-      // 정확한 온도가 있는 경우
-      if (temperatureFactor[temp] !== undefined) {
-        return temperatureFactor[temp];
-      }
-      
-      // 온도가 범위를 벗어나는 경우
-      if (temp < tempKeys[0]) {
-        return temperatureFactor[tempKeys[0]];
-      }
-      if (temp > tempKeys[tempKeys.length - 1]) {
-        return temperatureFactor[tempKeys[tempKeys.length - 1]];
-      }
-      
-      // 가장 가까운 온도 값 찾기
-      for (let i = 0; i < tempKeys.length - 1; i++) {
-        if (temp > tempKeys[i] && temp < tempKeys[i + 1]) {
-          // 선형 보간법
-          const t1 = tempKeys[i];
-          const t2 = tempKeys[i + 1];
-          const f1 = temperatureFactor[t1];
-          const f2 = temperatureFactor[t2];
-          
-          return f1 + (f2 - f1) * (temp - t1) / (t2 - t1);
-        }
-      }
-      
-      return 1.0; // 기본값
+    historyList.appendChild(item);
+  });
+}
+
+// 저장된 계산 불러오기
+function loadCalculation(index) {
+  const calc = savedCalculations[index];
+  if (!calc) return;
+  
+  // 현재 데이터 초기화
+  cables = JSON.parse(JSON.stringify(calc.cables));
+  
+  // UI 업데이트
+  updateCableList();
+  
+  // 전선관 정보 설정
+  document.getElementById("pipeType").value = calc.pipeType;
+  updateConduitSizes();
+  document.getElementById("pipeSize").value = calc.pipeSize;
+  
+  // 결과 표시
+  document.getElementById("result").innerHTML = calc.resultHTML;
+  
+  // 계산기 탭으로 전환
+  document.querySelector('.tab[data-tab="calculator"]').click();
+  
+  showNotification('저장된 계산이 불러와졌습니다.');
+}
+
+// 저장된 계산 삭제
+function deleteCalculation(index) {
+  if (confirm('정말 이 계산 기록을 삭제하시겠습니까?')) {
+    savedCalculations.splice(index, 1);
+    saveToLocalStorage();
+    updateHistoryList();
+    showNotification('계산 기록이 삭제되었습니다.');
+  }
+}
+
+// 균등한 조합 찾기
+function findBalancedCombo(values, required) {
+  // 1개만으로 만족하는 경우 찾기
+  for (let i = 0; i < values.length; i++) {
+    if (values[i] >= required) {
+      return [values[i]];
     }
+  }
+  
+  // 2개 이상의 조합이 필요한 경우
+  // 최대 조합 수 제한 (최대 4개까지만 조합)
+  for (let count = 2; count <= 4; count++) {
+    // 모든 가능한 조합 생성
+    const combos = getCombinations(values, count);
     
-    // 기본 계산 실행
-    function calculateResults() {
-      // 계산 시작할 때 스크롤을 결과 영역으로 부드럽게 이동 (모바일 최적화)
-      const resultElement = document.getElementById('result');
-      resultElement.innerHTML = `<div style="text-align:center"><div class="loading"></div> 계산 중...</div>`;
-      
-      // 데이터 로딩 애니메이션을 위한 지연
-      setTimeout(() => {
-        // 입력값 가져오기
-        const type = document.getElementById('cableType').value;
-        const size = document.getElementById('cableSize').value;
-        const method = document.getElementById('installMethod').value;
-        const voltage = document.getElementById('voltageType').value;
-        const cores = document.getElementById('coreCount').value;
-        const loadInput = document.getElementById('load');
-        const loadUnit = document.getElementById('loadUnit').value;
-        
-        // 고급 설정 값
-        const temperature = parseFloat(document.getElementById('temperature').value) || 30;
-        const parallelCount = document.getElementById('parallelCount').value;
-        const groupingFactor = parseFloat(document.getElementById('groupingFactor').value) || 1.0;
-        const soilResistivity = parseFloat(document.getElementById('soilResistivity').value) || 1.5;
-        
-        // 필수 값 확인
-        if (!size || !method || !cores || !voltage || !type) {
-          document.getElementById('result').innerHTML = "<div class='warning'>모든 필수 항목을 선택해주세요.</div>";
-          return;
-        }
-        
-        // 기본 허용 전류
-        const baseCurrent = cableData[type][size];
-        
-        // 보정 계수 적용
-        const installCoef = installFactor[method];
-        const coreCoef = coreFactor[cores];
-        const tempCoef = getTemperatureFactor(temperature);
-        const parallelCoef = parallelFactor[parallelCount];
-        
-        // 토양 열저항에 따른 보정 (지중 매설인 경우만)
-        let soilCoef = 1.0;
-        if (method === "지중") {
-          soilCoef = soilResistivity <= 1.0 ? 1.18 : 
-                    soilResistivity <= 1.5 ? 1.0 : 
-                    soilResistivity <= 2.0 ? 0.88 : 
-                    soilResistivity <= 2.5 ? 0.8 : 0.75;
-        }
-        
-        // 모든 보정 계수 적용
-        const correctedCurrent = Math.round(baseCurrent * installCoef * coreCoef * tempCoef * parallelCoef * groupingFactor * soilCoef * 10) / 10;
-        
-        // 부하 값 처리 (전력 단위 입력이면 전류로 변환)
-        let actualLoad;
-        let originalInputValue = '';
-        
-        if (loadInput.value) {
-          if (loadUnit === 'kW') {
-            const powerValue = parseFloat(loadInput.value);
-            actualLoad = convertPowerToCurrent(powerValue, voltage);
-            originalInputValue = powerValue + ' kW';
-          } else {
-            actualLoad = parseFloat(loadInput.value);
-            originalInputValue = actualLoad + ' A';
-          }
-        } else {
-          // 값이 없는 경우 보정된 전류의 80% 사용
-          actualLoad = Math.round(correctedCurrent * 0.8 * 10) / 10;
-        }
-        
-        // 부하 전류가 허용 전류 초과 시 경고 및 추천
-        let loadWarning = '';
-        if (actualLoad > correctedCurrent) {
-          // 적합한 케이블 크기 찾기
-          const recommendations = [];
-          const sizes = Object.keys(cableData[type]).map(Number).sort((a, b) => a - b);
-          
-          for (const s of sizes) {
-            const base = cableData[type][s];
-            const corrected = base * installCoef * coreCoef * tempCoef * parallelCoef * groupingFactor * soilCoef;
-            if (corrected >= actualLoad) {
-              recommendations.push({
-                size: s,
-                current: corrected
-              });
-              if (recommendations.length >= 3) break;
-            }
-          }
-          
-          loadWarning = `
-            <div class="result-row">
-              <div class="result-label">⚠️ 경고:</div>
-              <div class="result-value danger">
-                부하 전류(${actualLoad.toFixed(1)}A) > 허용 전류(${correctedCurrent}A)
-              </div>
-            </div>
-            <div class="result-row">
-              <div class="result-label">추천 케이블:</div>
-              <div class="result-value">
-                ${recommendations.map(r => `${type} ${r.size}㎟ (${r.current.toFixed(1)}A)`).join('<br>')}
-              </div>
-            </div>
-          `;
-        }
-        
-        // 차단기 계산
-        let breakerText;
-        if (actualLoad > correctedCurrent) {
-          breakerText = `<span class="danger">부하 전류 초과 - 케이블 업사이징 필요</span>`;
-        } else {
-          const minRange = Math.ceil(actualLoad);
-          const maxBreaker = Math.floor(correctedCurrent * 1.25);
-          const idealBreaker = Math.ceil(actualLoad * 1.25); // 부하 전류의 125%
-          
-          let validBreakers = breakerSizes.filter(a => a >= actualLoad && a <= maxBreaker);
-          let breakerRangeText = `<div class="sub">- 추천 전류 범위: ${minRange}A ~ ${maxBreaker}A</div>`;
-          
-          if (validBreakers.length > 0) {
-            // 이상적인 차단기와 가장 가까운 것 찾기
-            const idealBreakers = validBreakers.filter(b => b >= idealBreaker).slice(0, 3);
-            
-            if (idealBreakers.length > 0) {
-              breakerText = `<span class="success">${idealBreakers.join(" / ")} A</span>` + breakerRangeText;
-            } else {
-              breakerText = `<span>${validBreakers.slice(0, 3).join(" / ")} A</span>` + breakerRangeText;
-            }
-          } else {
-            const fallback = breakerSizes.filter(a => a <= maxBreaker).pop();
-            if (fallback) {
-              breakerText = `<span class="warning">${fallback} A (권장 최대값)</span>
-                <div class="sub">- 부하 전류보다 작지만, 권장 가능한 최대값</div>
-                ${breakerRangeText}`;
-            } else {
-              breakerText = `<span class="danger">적정 차단기 없음 – 전선 굵기를 상향하세요</span>`;
-            }
-          }
-        }
-        
-        // 전압 값
-        const voltageVal = voltage === "단상" ? 220 : voltage === "삼상" ? 380 : 110;
-        
-        // 전력량 계산
-        const contractPower = convertCurrentToPower(actualLoad, voltage);
-        
-        // 접지선 굵기
-        const groundSize = getGroundSize(size);
-        
-        // 날짜 정보
-        const today = new Date();
-        const dateString = `${today.getFullYear()}년 ${today.getMonth() + 1}월 ${today.getDate()}일`;
-        
-        // 결과 출력
-        document.getElementById('result').innerHTML = `
-          <div class="print-only">
-            <h1>케이블 계산 결과</h1>
-            <p>계산 일시: ${dateString}</p>
-          </div>
-          
-          <div class="result-section">
-            <h2>입력 정보</h2>
-            <div class="result-row">
-              <div class="result-label">케이블 종류:</div>
-              <div class="result-value">${type} 케이블</div>
-            </div>
-            <div class="result-row">
-              <div class="result-label">굵기:</div>
-              <div class="result-value">${size} ㎟</div>
-            </div>
-            <div class="result-row">
-              <div class="result-label">설치 방법:</div>
-              <div class="result-value">${method}</div>
-            </div>
-            <div class="result-row">
-              <div class="result-label">전원 종류:</div>
-              <div class="result-value">${voltage} (${voltageVal}V)</div>
-            </div>
-            <div class="result-row">
-              <div class="result-label">Core 수:</div>
-              <div class="result-value">${cores}C</div>
-            </div>
-            
-            <!-- 고급 설정 정보 표시 -->
-            <div class="result-row">
-              <div class="result-label">주변 온도:</div>
-              <div class="result-value">${temperature}°C (보정계수: ${tempCoef.toFixed(2)})</div>
-            </div>
-            ${parallelCount > 1 ? `
-              <div class="result-row">
-                <div class="result-label">병렬 회로 수:</div>
-                <div class="result-value">${parallelCount}개 (보정계수: ${parallelCoef.toFixed(2)})</div>
-              </div>
-            ` : ''}
-            ${groupingFactor < 1.0 ? `
-              <div class="result-row">
-                <div class="result-label">그룹화 보정계수:</div>
-                <div class="result-value">${groupingFactor.toFixed(2)}</div>
-              </div>
-            ` : ''}
-            ${method === '지중' ? `
-              <div class="result-row">
-                <div class="result-label">토양 열저항:</div>
-                <div class="result-value">${soilResistivity} K·m/W (보정계수: ${soilCoef.toFixed(2)})</div>
-              </div>
-            ` : ''}
-          </div>
-          
-          ${loadWarning}
-          
-          <div class="result-section">
-            <h2>계산 결과</h2>
-            <div class="result-row">
-              <div class="result-label">① 기본 허용 전류:</div>
-              <div class="result-value"><span class="highlight">${baseCurrent} A</span>
-                <div class="sub">기준: KEC 2021 표 3.2.1</div>
-              </div>
-            </div>
-          
-            <div class="result-row">
-              <div class="result-label">② 보정 후 허용 전류:</div>
-              <div class="result-value"><span class="highlight">${correctedCurrent} A</span>
-                <div class="sub">
-                  계산식: ${baseCurrent} × ${installCoef}(${method}) × ${coreCoef}(${cores}C) × ${tempCoef.toFixed(2)}(온도) 
-                  ${parallelCount > 1 ? `× ${parallelCoef.toFixed(2)}(병렬)` : ''} 
-                  ${groupingFactor < 1.0 ? `× ${groupingFactor.toFixed(2)}(그룹)` : ''} 
-                  ${method === '지중' ? `× ${soilCoef.toFixed(2)}(토양)` : ''}
-                </div>
-              </div>
-            </div>
-            
-            <div class="result-row">
-              <div class="result-label">③ ${loadInput.value ? '입력된' : '예상'} 부하:</div>
-              <div class="result-value">
-                <span class="highlight">${actualLoad.toFixed(1)} A</span>
-                ${loadInput.value && loadUnit === 'kW' ? 
-                  `<div class="sub">입력값: ${originalInputValue}</div>` : ''}
-                ${!loadInput.value ? `<div class="sub">보정 후 허용 전류의 80%로 자동 계산됨</div>` : ''}
-              </div>
-            </div>
-            
-            <div class="result-row">
-              <div class="result-label">④ 추천 차단기:</div>
-              <div class="result-value">${breakerText}
-                <div class="sub">조건: 부하 전류 이상, 허용 전류의 125% 이내</div>
-              </div>
-            </div>
-            
-            <div class="result-row">
-              <div class="result-label">⑤ 가능 전력량:</div>
-              <div class="result-value"><span class="highlight">${contractPower.toFixed(1)} kW</span>
-                <div class="sub">
-                  계산식: ${
-                    voltage === "단상"
-                      ? `${voltageVal}V × ${actualLoad.toFixed(1)}A = ${(voltageVal * actualLoad).toFixed(1)}W`
-                      : voltage === "삼상"
-                      ? `√3 × ${voltageVal}V × ${actualLoad.toFixed(1)}A = ${(Math.sqrt(3) * voltageVal * actualLoad).toFixed(1)}W`
-                      : `${voltageVal}V × ${actualLoad.toFixed(1)}A = ${(voltageVal * actualLoad).toFixed(1)}W`
-                  }
-                </div>
-              </div>
-            </div>
-            
-            <div class="result-row">
-              <div class="result-label">⑥ 접지선 굵기:</div>
-              <div class="result-value"><span class="highlight">${groundSize}</span>
-                <div class="sub">기준: 16㎟ 이하 동일, 16~35㎟는 16㎟, 35㎟ 초과는 1/2</div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="reference">
-            <strong>[KEC 기준 참고]</strong><br>
-            - 허용 전류: KEC 2021 표 3.2.1 기준<br>
-            - 접지선 산정: 16㎟ 이하 동일, 16~35㎟는 16㎟, 35㎟ 초과는 1/2<br>
-            - 차단기: 전선 기준 허용 전류의 125% 이하<br>
-            ${method === '지중' ? '- 지중 설치: 토양 열저항에 따른 보정 계수 적용' : ''}
-          </div>
-        `;
-        
-        // 결과 영역으로 스크롤
-        setTimeout(() => {
-          resultElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
-      }, 300); // 약간의 지연으로 로딩 애니메이션 표시
-    }
+    // 요구사항을 만족하는 조합 필터링
+    const validCombos = combos.filter(c => c.reduce((a, b) => a + b, 0) >= required);
     
-    // 전압 강하 계산
-    function calculateVoltageDrop() {
-      // 계산 시작 로딩 표시
-      const resultElement = document.getElementById('voltageDropResult');
-      resultElement.innerHTML = `<div style="text-align:center"><div class="loading"></div> 계산 중...</div>`;
-      
-      setTimeout(() => {
-        // 입력값 가져오기
-        const cableType = document.getElementById('vdCableType').value;
-        const cableSize = document.getElementById('vdCableSize').value;
-        const voltageType = document.getElementById('vdVoltageType').value;
-        const loadInput = document.getElementById('vdCurrent');
-        const loadUnit = document.getElementById('vdLoadUnit').value;
-        const length = parseFloat(document.getElementById('vdLength').value);
-        const powerFactor = parseFloat(document.getElementById('vdPowerFactor').value) || 0.9;
+    if (validCombos.length > 0) {
+      // 균등성 기준으로 정렬 (균등한 조합 선호)
+      validCombos.sort((a, b) => {
+        // 최대값과 최소값의 차이로 균등성 측정
+        const uniformityA = Math.max(...a) - Math.min(...a);
+        const uniformityB = Math.max(...b) - Math.min(...b);
         
-        // 유효성 검사
-        if (!cableType || !cableSize || !voltageType || !loadInput.value || isNaN(length)) {
-          document.getElementById('voltageDropResult').innerHTML = "<div class='warning'>모든 필수 항목을 입력해주세요.</div>";
-          return;
+        // 균등성이 같으면 총합이 작은 것 선호
+        if (uniformityA === uniformityB) {
+          return a.reduce((x, y) => x + y, 0) - b.reduce((x, y) => x + y, 0);
         }
         
-        // 부하 입력값을 전류로 변환 (kW 입력인 경우)
-        let current, originalInputValue;
-        if (loadUnit === 'kW') {
-          const powerValue = parseFloat(loadInput.value);
-          current = convertPowerToCurrent(powerValue, voltageType);
-          originalInputValue = powerValue + ' kW';
-        } else {
-          current = parseFloat(loadInput.value);
-          originalInputValue = current + ' A';
-        }
-        
-        // 케이블 저항값 (Ohm/km)
-        const resistance = {
-          HFIX: {
-            "1.5": 12.1, "2.5": 7.41, "4": 4.61, "6": 3.08, "10": 1.83, "16": 1.15, "25": 0.727,
-            "35": 0.524, "50": 0.387, "70": 0.268, "95": 0.193, "120": 0.153
-          },
-          HIV: {
-            "1.5": 12.1, "2.5": 7.41, "4": 4.61, "6": 3.08, "10": 1.83, "16": 1.15, "25": 0.727,
-            "35": 0.524, "50": 0.387, "70": 0.268, "95": 0.193, "120": 0.153, "150": 0.124
-          },
-          "TFR-CV": {
-            "1.5": 12.1, "2.5": 7.41, "4": 4.61, "6": 3.08, "10": 1.83, "16": 1.15, "25": 0.727,
-            "35": 0.524, "50": 0.387, "70": 0.268, "95": 0.193, "120": 0.153, "150": 0.124,
-            "185": 0.0991, "240": 0.0754, "300": 0.0601, "400": 0.0470, "500": 0.0366, "600": 0.0283
-          },
-          XLPE: {
-            "1.5": 12.1, "2.5": 7.41, "4": 4.61, "6": 3.08, "10": 1.83, "16": 1.15, "25": 0.727,
-            "35": 0.524, "50": 0.387, "70": 0.268, "95": 0.193, "120": 0.153, "150": 0.124,
-            "185": 0.0991, "240": 0.0754
-          }
-        };
-        
-        // 리액턴스 값 (Ohm/km) - 근사값
-        const reactance = {
-          "1.5": 0.107, "2.5": 0.0986, "4": 0.0941, "6": 0.0912, "10": 0.0843, "16": 0.0795,
-          "25": 0.0787, "35": 0.0766, "50": 0.0752, "70": 0.0725, "95": 0.0714, "120": 0.0696,
-          "150": 0.0685, "185": 0.0674, "240": 0.0662, "300": 0.0651, "400": 0.0643, "500": 0.0632, "600": 0.0626
-        };
-        
-        // 기준 전압
-        const voltageValue = voltageType === "단상" ? 220 : voltageType === "삼상" ? 380 : 110;
-        
-        // 전압 강하 계산 (V)
-        const R = resistance[cableType][cableSize]; // Ohm/km
-        const X = reactance[cableSize]; // Ohm/km
-        const sinPhi = Math.sqrt(1 - powerFactor * powerFactor);
-        
-        let voltageDrop;
-        if (voltageType === "직류") {
-          voltageDrop = 2 * current * length * R / 1000;
-        } else if (voltageType === "단상") {
-          voltageDrop = 2 * current * length * (R * powerFactor + X * sinPhi) / 1000;
-        } else { // 삼상
-          voltageDrop = Math.sqrt(3) * current * length * (R * powerFactor + X * sinPhi) / 1000;
-        }
-        
-        // 전압 강하율 (%)
-        const voltageDropPercent = (voltageDrop / voltageValue) * 100;
-        
-        // 전압 강하 상태 평가
-        let statusClass, statusText;
-        if (voltageDropPercent <= 2) {
-          statusClass = "success";
-          statusText = "양호";
-        } else if (voltageDropPercent <= 3.5) {
-          statusClass = "warning";
-          statusText = "허용 가능";
-        } else {
-          statusClass = "danger";
-          statusText = "과도함";
-        }
-        
-        // 결과 출력
-        document.getElementById('voltageDropResult').innerHTML = `
-          <div class="result-section">
-            <h2>전압 강하 계산 결과</h2>
-            
-            <div class="result-row">
-              <div class="result-label">케이블 정보:</div>
-              <div class="result-value">${cableType} ${cableSize}㎟, ${length}m</div>
-            </div>
-            
-            <div class="result-row">
-              <div class="result-label">부하:</div>
-              <div class="result-value">
-                ${current.toFixed(1)} A
-                ${loadUnit === 'kW' ? `<div class="sub">입력값: ${originalInputValue}</div>` : ''}
-              </div>
-            </div>
-            
-            <div class="result-row">
-              <div class="result-label">전선 저항 (R):</div>
-              <div class="result-value">${R.toFixed(4)} Ω/km</div>
-            </div>
-            
-            <div class="result-row">
-              <div class="result-label">전선 리액턴스 (X):</div>
-              <div class="result-value">${X.toFixed(4)} Ω/km</div>
-            </div>
-            
-            <div class="result-row">
-              <div class="result-label">전압 강하:</div>
-              <div class="result-value"><span class="highlight">${voltageDrop.toFixed(2)} V</span></div>
-            </div>
-            
-            <div class="result-row">
-              <div class="result-label">전압 강하율:</div>
-              <div class="result-value"><span class="${statusClass}">${voltageDropPercent.toFixed(2)}% (${statusText})</span>
-                <div class="sub">
-                  기준: 2% 이하 양호, 3.5% 이하 허용 가능, 3.5% 초과 과도함
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="reference">
-            <strong>[전압 강하 계산식]</strong><br>
-            ${voltageType === "직류" ? 
-              `- 직류: ΔV = 2 × I × L × R / 1000` : 
-              voltageType === "단상" ? 
-              `- 단상: ΔV = 2 × I × L × (R × cosφ + X × sinφ) / 1000` : 
-              `- 삼상: ΔV = √3 × I × L × (R × cosφ + X × sinφ) / 1000`
-            }<br>
-            - 여기서 I=전류(A), L=길이(m), R=저항(Ω/km), X=리액턴스(Ω/km), cosφ=역률<br>
-            - 전압 강하율(%) = (전압 강하 / 공급 전압) × 100
-          </div>
-        `;
-        
-        // 결과로 스크롤
-        setTimeout(() => {
-          resultElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
-        
-        // 다른 굵기의 케이블로 전압 강하 비교 (차트 준비)
-        prepareVoltageDropChart(cableType, voltageType, current, length, powerFactor, cableSize);
-      }, 300);
-    }
-    
-    // 전압 강하 차트 준비 함수 (모바일에서는 테이블 형태로 표시)
-    function prepareVoltageDropChart(cableType, voltageType, current, length, powerFactor, selectedSize) {
-      const chartContainer = document.getElementById('voltageDropChart');
-      
-      // 케이블 저항값 (Ohm/km)
-      const resistance = {
-        HFIX: {
-          "1.5": 12.1, "2.5": 7.41, "4": 4.61, "6": 3.08, "10": 1.83, "16": 1.15, "25": 0.727,
-          "35": 0.524, "50": 0.387, "70": 0.268, "95": 0.193, "120": 0.153
-        },
-        HIV: {
-          "1.5": 12.1, "2.5": 7.41, "4": 4.61, "6": 3.08, "10": 1.83, "16": 1.15, "25": 0.727,
-          "35": 0.524, "50": 0.387, "70": 0.268, "95": 0.193, "120": 0.153, "150": 0.124
-        },
-        "TFR-CV": {
-          "1.5": 12.1, "2.5": 7.41, "4": 4.61, "6": 3.08, "10": 1.83, "16": 1.15, "25": 0.727,
-          "35": 0.524, "50": 0.387, "70": 0.268, "95": 0.193, "120": 0.153, "150": 0.124,
-          "185": 0.0991, "240": 0.0754, "300": 0.0601, "400": 0.0470, "500": 0.0366, "600": 0.0283
-        },
-        XLPE: {
-          "1.5": 12.1, "2.5": 7.41, "4": 4.61, "6": 3.08, "10": 1.83, "16": 1.15, "25": 0.727,
-          "35": 0.524, "50": 0.387, "70": 0.268, "95": 0.193, "120": 0.153, "150": 0.124,
-          "185": 0.0991, "240": 0.0754
-        }
-};
-      
-      // 리액턴스 값 (Ohm/km)
-      const reactance = {
-        "1.5": 0.107, "2.5": 0.0986, "4": 0.0941, "6": 0.0912, "10": 0.0843, "16": 0.0795,
-        "25": 0.0787, "35": 0.0766, "50": 0.0752, "70": 0.0725, "95": 0.0714, "120": 0.0696,
-        "150": 0.0685, "185": 0.0674, "240": 0.0662, "300": 0.0651, "400": 0.0643, "500": 0.0632, "600": 0.0626
-      };
-      
-      // 기준 전압
-      const voltageValue = voltageType === "단상" ? 220 : voltageType === "삼상" ? 380 : 110;
-      const sinPhi = Math.sqrt(1 - powerFactor * powerFactor);
-      
-      // 비교할 대표적인 케이블 굵기들
-      const displaySizes = ["1.5", "2.5", "4", "6", "10", "16", "25", "35", "50", "70", "95", "120", "150", "185", "240", "300", "400", "500", "600"];
-const availableSizes = Object.keys(resistance[cableType])
-  .filter(s => displaySizes.includes(s))
-  .sort((a, b) => parseFloat(a) - parseFloat(b)); // 숫자 오름차순 정렬
-      
-      // 테이블 형태의 HTML 생성
-      let tableRows = '';
-      availableSizes.forEach(size => {
-        // 전압 강하 계산
-        const R = resistance[cableType][size];
-        const X = reactance[size];
-        
-        let voltageDrop;
-        if (voltageType === "직류") {
-          voltageDrop = 2 * current * length * R / 1000;
-        } else if (voltageType === "단상") {
-          voltageDrop = 2 * current * length * (R * powerFactor + X * sinPhi) / 1000;
-        } else { // 삼상
-          voltageDrop = Math.sqrt(3) * current * length * (R * powerFactor + X * sinPhi) / 1000;
-        }
-        
-        // 전압 강하율 (%)
-        const voltageDropPercent = (voltageDrop / voltageValue) * 100;
-        
-        // 상태에 따른 색상
-        let statusColor;
-        if (voltageDropPercent <= 2) {
-          statusColor = "#198754"; // success
-        } else if (voltageDropPercent <= 3.5) {
-          statusColor = "#fd7e14"; // warning
-        } else {
-          statusColor = "#dc3545"; // danger
-        }
-        
-        // 선택된 사이즈 하이라이트
-        const isSelected = size === selectedSize;
-        const rowStyle = isSelected ? 'background-color: #e0f0ff; font-weight: bold;' : '';
-        
-        tableRows += `
-          <tr style="${rowStyle}">
-            <td style="padding: 8px; text-align: center;">${size}</td>
-            <td style="padding: 8px; text-align: center;">${voltageDrop.toFixed(2)}V</td>
-            <td style="padding: 8px; text-align: center; color: ${statusColor};">${voltageDropPercent.toFixed(2)}%</td>
-          </tr>
-        `;
+        return uniformityA - uniformityB;
       });
       
-      chartContainer.innerHTML = `
-        <div style="padding: 15px; text-align: center; background: #f5f5f5; border-radius: 8px;">
-          <strong>다양한 케이블 굵기별 전압 강하 비교</strong>
-          <p style="font-size: 0.9em; margin-top: 5px;">
-            ${cableType} 케이블 기준, ${length}m 길이에서 ${current.toFixed(1)}A 부하 시
-            <br>굵기가 클수록 전압 강하가 적습니다
-          </p>
-          <div class="comparison-table-wrapper" style="margin-top: 10px;">
-            <table style="width: 100%; border-collapse: collapse; margin: 0 auto; font-size: 0.85em;">
-              <thead>
-                <tr style="border-bottom: 1px solid #ddd; font-weight: bold;">
-                  <th style="padding: 8px; text-align: center;">굵기 (㎟)</th>
-                  <th style="padding: 8px; text-align: center;">전압 강하 (V)</th>
-                  <th style="padding: 8px; text-align: center;">강하율 (%)</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${tableRows}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      `;
+      return validCombos[0];
+    }
+  }
+  
+  // 요구사항을 만족하는 조합이 없는 경우
+  return null;
+}
+
+// 모든 가능한 조합 생성
+function getCombinations(arr, len) {
+  if (len === 1) return arr.map(v => [v]);
+  
+  const result = [];
+  for (let i = 0; i <= arr.length - len; i++) {
+    const rest = getCombinations(arr.slice(i + 1), len - 1);
+    rest.forEach(r => result.push([arr[i], ...r]));
+  }
+  
+  return result;
+}
+
+// 동일 전선관 묶기
+function groupByName(arr) {
+  const map = {};
+  arr.forEach(item => {
+    map[item.name] = map[item.name]
+      ? { ...item, count: map[item.name].count + 1 }
+      : { ...item, count: 1 };
+  });
+  return Object.values(map);
+}
+
+// 채움률에 따른 색상 반환 함수
+function getFillColor(fillPercent, limit) {
+  if (fillPercent <= limit) {
+    return "#4caf50"; // 녹색 - 기준 이내
+  } else if (fillPercent <= 60) {
+    return "#ff9800"; // 노란색 - 기준 초과 ~ 60%
+  } else {
+    return "#e53935"; // 붉은색 - 60% 초과
+  }
+}
+
+// 채움률 상태 CSS 클래스 반환 함수
+function getFillStatusClass(fillPercent, limit) {
+  if (fillPercent <= limit) {
+    return ""; // 기준 이내
+  } else if (fillPercent <= 60) {
+    return "result-warning"; // 기준 초과 ~ 60%
+  } else {
+    return "result-error"; // 60% 초과
+  }
+}
+
+// 채움률 상태 메시지 반환 함수
+function getFillStatusMessage(fillPercent, limit) {
+  if (fillPercent <= limit) {
+    return "적합";
+  } else if (fillPercent <= 60) {
+    return "초과 (주의 필요)";
+  } else {
+    return "부적합 (매우 위험)";
+  }
+}
+
+// 단면도 시각화 함수 - 업데이트된 버전
+function generateCrossSectionSVG(pipeType, innerDia, cables, totalArea, usedArea, fillPercent, limit) {
+  // SVG 기본 설정
+  const svgSize = 300;
+  const padding = 20;
+  const centerX = svgSize / 2;
+  const centerY = svgSize / 2;
+  
+  // 채움률에 따른 색상 결정
+  const fillColor = getFillColor(fillPercent, limit);
+  
+  let svg = '';
+  
+  // 전선관인 경우 (원형)
+  if (pipeType !== 'TRAY') {
+    const radius = (svgSize - (padding * 2)) / 2;
+    const actualRadius = radius * 0.8; // SVG에서의 전선관 크기
+    
+    // 전선관 외곽 그리기
+    svg = `<svg width="${svgSize}" height="${svgSize}" viewBox="0 0 ${svgSize} ${svgSize}">
+      <defs>
+        <pattern id="diagonalHatch" patternUnits="userSpaceOnUse" width="4" height="4">
+          <path d="M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2" style="stroke:${fillColor}; stroke-width:0.5" />
+        </pattern>
+      </defs>
       
-      // 차트 영역으로 스크롤
-      setTimeout(() => {
-        chartContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }, 100);
+      <!-- 전선관 외곽 -->
+      <circle cx="${centerX}" cy="${centerY}" r="${actualRadius}" 
+        fill="white" stroke="#333" stroke-width="2" />
+      
+      <!-- 전선관 내부 유효면적 표시 -->
+      <circle cx="${centerX}" cy="${centerY}" r="${actualRadius * 0.9}" 
+        fill="none" stroke="#1a73e8" stroke-width="1" stroke-dasharray="5,2" />
+      
+      <!-- 한계선 표시 -->
+      <circle cx="${centerX}" cy="${centerY}" r="${actualRadius * Math.sqrt(limit / 100)}" 
+        fill="none" stroke="#1a73e8" stroke-width="1" stroke-dasharray="3,3" />`;
+    
+    // 케이블 영역 (채워진 부분) - 실제 채움률에 맞게 면적 조정
+    const filledRadius = actualRadius * Math.sqrt(Math.min(fillPercent, 100) / 100);
+    
+    svg += `<!-- 케이블 영역 -->
+      <circle cx="${centerX}" cy="${centerY}" r="${filledRadius}" 
+        fill="url(#diagonalHatch)" stroke="${fillColor}" stroke-width="2" />
+        
+      <!-- 내경 치수선 -->
+      <line x1="${centerX - actualRadius}" y1="${centerY + actualRadius + 15}" 
+        x2="${centerX + actualRadius}" y2="${centerY + actualRadius + 15}" 
+        stroke="#333" stroke-width="1" />
+      <line x1="${centerX - actualRadius}" y1="${centerY + actualRadius + 10}" 
+        x2="${centerX - actualRadius}" y2="${centerY + actualRadius + 20}" 
+        stroke="#333" stroke-width="1" />
+      <line x1="${centerX + actualRadius}" y1="${centerY + actualRadius + 10}" 
+        x2="${centerX + actualRadius}" y2="${centerY + actualRadius + 20}" 
+        stroke="#333" stroke-width="1" />
+      <text x="${centerX}" y="${centerY + actualRadius + 30}" 
+        text-anchor="middle" font-size="12">내경 ${innerDia}mm</text>
+        
+      <!-- 채움률 정보 -->
+      <text x="${centerX}" y="${centerY}" 
+        text-anchor="middle" font-size="14" font-weight="bold" fill="#333">
+        채움률: ${fillPercent.toFixed(1)}%${fillPercent > limit ? ' (기준 초과)' : ''}
+      </text>
+      <text x="${centerX}" y="${centerY + 20}" 
+        text-anchor="middle" font-size="12" fill="#555">
+        ${usedArea.toFixed(1)}㎟ / ${totalArea.toFixed(1)}㎟
+      </text>
+      
+      <!-- 한계선 표시 레이블 -->
+      <text x="${centerX}" y="${centerY - actualRadius * Math.sqrt(limit / 100) - 5}" 
+        text-anchor="middle" font-size="10" fill="#1a73e8">
+        ${limit}% 한계선
+      </text>
+    </svg>`;
+  } 
+  // 트레이인 경우 (직사각형)
+  else {
+    const trayWidth = innerDia; // 트레이 폭
+    const trayHeight = 100; // 고정 높이
+    
+    // 트레이 크기를 SVG 영역에 맞게 조정
+    const scale = (svgSize - (padding * 2)) / Math.max(trayWidth, trayHeight);
+    const scaledWidth = trayWidth * scale;
+    const scaledHeight = trayHeight * scale;
+    
+    // 트레이 위치 계산
+    const trayX = (svgSize - scaledWidth) / 2;
+    const trayY = (svgSize - scaledHeight) / 2;
+    
+    // 케이블 사용 너비 (채움률에 따라)
+    const usedWidth = scaledWidth * Math.min(fillPercent, 100) / 100;
+    // 한계선 위치
+    const limitX = trayX + (scaledWidth * limit / 100);
+    
+    svg = `<svg width="${svgSize}" height="${svgSize}" viewBox="0 0 ${svgSize} ${svgSize}">
+      <defs>
+        <pattern id="diagonalHatch" patternUnits="userSpaceOnUse" width="4" height="4">
+          <path d="M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2" style="stroke:${fillColor}; stroke-width:0.5" />
+        </pattern>
+      </defs>
+      
+      <!-- 트레이 외곽 -->
+      <rect x="${trayX}" y="${trayY}" width="${scaledWidth}" height="${scaledHeight}" 
+        fill="white" stroke="#333" stroke-width="2" />
+      
+      <!-- 케이블 영역 (채워진 부분) -->
+      <rect x="${trayX}" y="${trayY}" width="${usedWidth}" height="${scaledHeight}" 
+        fill="url(#diagonalHatch)" stroke="${fillColor}" stroke-width="1" />
+      
+      <!-- 한계선 표시 -->
+      <line x1="${limitX}" y1="${trayY}" x2="${limitX}" y2="${trayY + scaledHeight}" 
+        stroke="#1a73e8" stroke-width="1" stroke-dasharray="5,2" />
+      <text x="${limitX}" y="${trayY - 5}" 
+        text-anchor="middle" font-size="10" fill="#1a73e8">
+        ${limit}% 한계선
+      </text>
+        
+      <!-- 트레이 폭 치수선 -->
+      <line x1="${trayX}" y1="${trayY + scaledHeight + 15}" 
+        x2="${trayX + scaledWidth}" y2="${trayY + scaledHeight + 15}" 
+        stroke="#333" stroke-width="1" />
+      <line x1="${trayX}" y1="${trayY + scaledHeight + 10}" 
+        x2="${trayX}" y2="${trayY + scaledHeight + 20}" 
+        stroke="#333" stroke-width="1" />
+      <line x1="${trayX + scaledWidth}" y1="${trayY + scaledHeight + 10}" 
+        x2="${trayX + scaledWidth}" y2="${trayY + scaledHeight + 20}" 
+        stroke="#333" stroke-width="1" />
+      <text x="${trayX + scaledWidth/2}" y="${trayY + scaledHeight + 30}" 
+        text-anchor="middle" font-size="12">트레이 폭 ${trayWidth}mm</text>
+        
+      <!-- 채움률 정보 -->
+      <text x="${trayX + scaledWidth/2}" y="${trayY + scaledHeight/2}" 
+        text-anchor="middle" font-size="14" font-weight="bold" fill="#333">
+        채움률: ${fillPercent.toFixed(1)}%${fillPercent > limit ? ' (기준 초과)' : ''}
+      </text>
+      <text x="${trayX + scaledWidth/2}" y="${trayY + scaledHeight/2 + 20}" 
+        text-anchor="middle" font-size="12" fill="#555">
+        ${(cables.reduce((sum, c) => sum + c.dia * c.count, 0)).toFixed(1)}mm / ${trayWidth.toFixed(1)}mm
+      </text>
+    </svg>`;
+  }
+  
+  return svg;
+}
+
+// 계산 실행
+function calculate() {
+  // 로딩 표시
+  document.getElementById("loading").style.display = "flex";
+  
+  // 비동기로 계산 실행 (UI 블로킹 방지)
+  setTimeout(() => {
+    try {
+      performCalculation();
+    } catch (e) {
+      console.error('계산 오류:', e);
+      showNotification('계산 중 오류가 발생했습니다.', 3000);
+    } finally {
+      // 로딩 숨김
+      document.getElementById("loading").style.display = "none";
+    }
+  }, 100);
+}
+
+// 실제 계산 수행
+function performCalculation() {
+  if (cables.length === 0) {
+    showNotification('먼저 전선을 추가해주세요.');
+    return;
+  }
+  
+  const pipeType = document.getElementById("pipeType").value;
+  if (!pipeType) {
+    showNotification('전선관 종류를 선택해주세요.');
+    return;
+  }
+  
+  const selectedVal = parseFloat(document.getElementById("pipeSize").value) || 0;
+  
+  // 종류별 보정 계수
+  const correction = pipeType === 'ELP' ? 0.7 :
+                   pipeType === 'CD_PE' ? 0.6 :
+                   pipeType === 'HI' ? 0.65 :
+                   pipeType === 'STEEL' ? 0.75 : 1.0;
+  
+  let totalArea = 0, totalWidth = 0, rows = "";
+  
+  // 각 케이블 정보 테이블 생성
+  cables.forEach(c => {
+    totalArea += c.area;
+    totalWidth += c.dia * c.count;
+    rows += `<tr>
+      <td>${c.type}</td>
+      <td>${c.size || '직접 입력'}SQ</td>
+      <td>${c.core}C</td>
+      <td>${c.count}</td>
+      <td>${c.dia.toFixed(1)}</td>
+      <td>${(c.area).toFixed(1)}</td>
+    </tr>`;
+  });
+  
+  // 결과 HTML 시작
+  let resultHTML = `<div class="card">
+    <h2>계산 결과</h2>
+    <div class="table-container">
+      <table class="result-table"><thead><tr>
+        <th>전선</th><th>굵기</th><th>Core</th><th>회로</th><th>외경(mm)</th><th>총 단면적</th>
+      </tr></thead><tbody>${rows}</tbody></table>
+    </div>`;
+  
+  // 채움률 제한
+  const limit = fillLimit[pipeType];
+
+// 케이블 트레이인 경우
+  if (pipeType === "TRAY") {
+    let trayWidth = selectedVal;
+    
+    // 자동 추천 (사이즈 선택 안된 경우)
+    if (!trayWidth) {
+      // 필요한 최소 폭을 찾음 (채움률 만족하는 가장 작은 트레이)
+      const required = totalWidth / (limit / 100);
+      
+      // 각 트레이 폭에 대해 채움률 계산 후 적합한 가장 작은 폭 선택
+      for (let i = 0; i < trayWidths.length; i++) {
+        const width = trayWidths[i];
+        const fill = (totalWidth / width) * 100;
+        if (fill <= limit) {
+          trayWidth = width;
+          break;
+        }
+      }
+      
+      // 적합한 트레이를 못 찾은 경우 가장 큰 트레이 선택
+      if (!trayWidth) {
+        trayWidth = trayWidths[trayWidths.length-1];
+      }
     }
     
-    // 케이블 비교 옵션 계산
-    function compareOptions() {
-      // 계산 시작 로딩 표시
-      const compareBtn = document.getElementById('compareBtn');
-      const originalBtnText = compareBtn.textContent;
-      compareBtn.innerHTML = `<div class="loading"></div> 계산 중...`;
-      compareBtn.disabled = true;
+    const fill = (totalWidth / trayWidth) * 100;
+    const statusClass = getFillStatusClass(fill, limit);
+    const statusMessage = getFillStatusMessage(fill, limit);
+    
+    resultHTML += `<div class="table-container">
+      <table class="result-table"><thead><tr>
+        <th>트레이 폭(mm)</th><th>총 케이블 폭(mm)</th><th>채움률(%)</th>
+      </tr></thead><tbody>
+      <tr>
+        <td class="bold-text">${trayWidth}</td>
+        <td class="bold-text">${totalWidth.toFixed(1)}</td>
+        <td class="bold-text ${fill > limit ? (fill > 60 ? 'red' : 'yellow') : ''}">${fill.toFixed(1)}%</td>
+      </tr></tbody></table>
+    </div>`;
+    
+    // 항상 결과 표시 (상태에 따라 CSS 클래스 변경)
+    resultHTML += `<div class="result-highlight ${statusClass}">※ 결과: <strong>${statusMessage}</strong> (채움률 ${fill.toFixed(1)}% ${fill > limit ? '&gt;' : '≤'} ${limit}%)</div>`;
+    
+    // 항상 단면도 추가
+    resultHTML += `<div class="cross-section-container">
+      <h3>트레이 단면도</h3>
+      ${generateCrossSectionSVG('TRAY', trayWidth, cables, trayWidth, totalWidth, fill, limit)}
+    </div>`;
+    
+    // 기준 초과시 추천 조합 표시
+    if (fill > limit) {
+      // 여러 트레이 조합 추천 (비슷한 사이즈의 조합 우선)
+      const required = totalWidth / (limit / 100);
+      const combo = findBalancedCombo(trayWidths, required);
       
-      setTimeout(() => {
-        // 입력값 가져오기
-        const voltageType = document.getElementById('compareVoltageType').value;
-        const installMethod = document.getElementById('compareInstallMethod').value;
-        const loadInput = document.getElementById('compareCurrentNeeded');
-        const loadUnit = document.getElementById('compareLoadUnit').value;
-        const length = parseFloat(document.getElementById('compareLength').value);
-        const powerFactor = 0.9; // 기본 역률 값
+      if (combo) {
+        const sum = combo.reduce((a, b) => a + b, 0);
+        const fill2 = (totalWidth / sum) * 100;
         
-        // 유효성 검사
-        if (!loadInput.value || isNaN(length)) {
-          document.getElementById('compareResult').style.display = 'block';
-          document.getElementById('compareResult').innerHTML = "<div class='warning' style='padding: 15px;'>필요 부하와 케이블 길이를 입력해주세요.</div>";
-          
-          // 버튼 원상 복구
-          compareBtn.innerHTML = originalBtnText;
-          compareBtn.disabled = false;
-          return;
+        resultHTML += `<div class="recommend-box"><h3>※ 추천 조합</h3>
+          <div class="table-container">
+            <table class="result-table"><thead><tr><th>트레이 폭 조합</th><th>총 폭</th><th>채움률</th></tr></thead><tbody>
+            <tr><td class="bold-text">${combo.join(" + ")}</td><td>${sum}</td><td class="${fill2 > limit ? (fill2 > 60 ? 'red' : 'yellow') : ''}">${fill2.toFixed(1)}%</td></tr>
+          </tbody></table>
+          </div>
+        </div>`;
+      }
+    }
+  }
+
+// 일반 전선관인 경우
+  else {
+    // 일반 전선관인 경우
+    const conduitList = (pipeType === 'ELP') ? elpConduits : generalConduits[pipeType] || [];
+    let selected = null;
+    
+    // 수동 선택한 경우
+    if (selectedVal) {
+      selected = conduitList.find(c => c.area === selectedVal);
+    } 
+    // 자동 추천인 경우
+    else {
+      // 채움률을 만족하는 가장 작은 전선관 찾기
+      const required = totalArea / (limit / 100 * correction);
+      for (let i = 0; i < conduitList.length; i++) {
+        if (conduitList[i].area >= required) {
+          selected = conduitList[i];
+          break;
         }
+      }
+      
+      // 적합한 전선관을 못 찾은 경우 가장 큰 전선관 선택
+      if (!selected && conduitList.length > 0) {
+        selected = conduitList[conduitList.length-1];
+      }
+    }
+    
+    // 선택된 전선관이 있는 경우
+    if (selected) {
+      const fullArea = selected.area;
+      const innerDia = selected.innerDia;
+      const eff = fullArea * correction;
+      const fill = (totalArea / eff) * 100;
+      const statusClass = getFillStatusClass(fill, limit);
+      const statusMessage = getFillStatusMessage(fill, limit);
+      
+      resultHTML += `<div class="table-container">
+        <table class="result-table"><thead><tr>
+          <th>전선관</th><th>내경(mm)</th><th>단면적(㎟)</th><th>유효면적(㎟)</th><th>채움률(%)</th>
+        </tr></thead><tbody>
+        <tr>
+          <td class="bold-text">${selected.name}</td>
+          <td>${innerDia}</td>
+          <td>${fullArea.toLocaleString()}</td>
+          <td>${eff.toFixed(1)}</td>
+          <td class="bold-text ${fill > limit ? (fill > 60 ? 'red' : 'yellow') : ''}">${fill.toFixed(1)}%</td>
+        </tr></tbody></table>
+      </div>`;
+      
+      // 항상 결과 표시 (상태에 따라 CSS 클래스 변경)
+      resultHTML += `<div class="result-highlight ${statusClass}">※ 결과: <strong>${statusMessage}</strong> (채움률 ${fill.toFixed(1)}% ${fill > limit ? '&gt;' : '≤'} ${limit}%)</div>`;
+      
+      // 항상 단면도 추가
+      resultHTML += `<div class="cross-section-container">
+        <h3>전선관 단면도</h3>
+        ${generateCrossSectionSVG(pipeType, innerDia, cables, eff, totalArea, fill, limit)}
+      </div>`;
+      
+      // 기준 초과 시 추천 조합 표시
+      if (fill > limit) {
+        // 여러 전선관 조합 추천
+        const required = totalArea / (limit / 100 * correction);
+        const combo = findBalancedCombo(conduitList.map(c => c.area), required);
         
-        // 부하 입력값을 전류로 변환 (kW 입력인 경우)
-        let currentNeeded, originalInputValue;
-        if (loadUnit === 'kW') {
-          const powerValue = parseFloat(loadInput.value);
-          currentNeeded = convertPowerToCurrent(powerValue, voltageType);
-          originalInputValue = powerValue + ' kW';
-        } else {
-          currentNeeded = parseFloat(loadInput.value);
-          originalInputValue = currentNeeded + ' A';
-        }
-
-        // 전압 강하 기준치 (3.5% 이하 허용)
-        const MAX_VOLTAGE_DROP_PERCENT = 3.5;
-        
-        // 비교 결과 표시
-        document.getElementById('compareResult').style.display = 'block';
-        
-        // 비교 테이블 준비
-        const tableBody = document.getElementById('comparisonTableBody');
-        tableBody.innerHTML = '';
-        
-        // 전압 값
-        const voltageVal = voltageType === "단상" ? 220 : 380;
-        const sinPhi = Math.sqrt(1 - powerFactor * powerFactor);
-
-        // 케이블 저항값 (Ohm/km)
-        const resistance = {
-          HFIX: {
-            "1.5": 12.1, "2.5": 7.41, "4": 4.61, "6": 3.08, "10": 1.83, "16": 1.15, "25": 0.727,
-            "35": 0.524, "50": 0.387, "70": 0.268, "95": 0.193, "120": 0.153
-          },
-          HIV: {
-            "1.5": 12.1, "2.5": 7.41, "4": 4.61, "6": 3.08, "10": 1.83, "16": 1.15, "25": 0.727,
-            "35": 0.524, "50": 0.387, "70": 0.268, "95": 0.193, "120": 0.153, "150": 0.124
-          },
-          "TFR-CV": {
-            "1.5": 12.1, "2.5": 7.41, "4": 4.61, "6": 3.08, "10": 1.83, "16": 1.15, "25": 0.727,
-            "35": 0.524, "50": 0.387, "70": 0.268, "95": 0.193, "120": 0.153, "150": 0.124,
-            "185": 0.0991, "240": 0.0754, "300": 0.0601, "400": 0.0470, "500": 0.0366, "600": 0.0283
-          },
-          XLPE: {
-            "1.5": 12.1, "2.5": 7.41, "4": 4.61, "6": 3.08, "10": 1.83, "16": 1.15, "25": 0.727,
-            "35": 0.524, "50": 0.387, "70": 0.268, "95": 0.193, "120": 0.153, "150": 0.124,
-            "185": 0.0991, "240": 0.0754
-          }
-        };
-
-        // 리액턴스 값 (Ohm/km)
-        const reactance = {
-          "1.5": 0.107, "2.5": 0.0986, "4": 0.0941, "6": 0.0912, "10": 0.0843, "16": 0.0795,
-          "25": 0.0787, "35": 0.0766, "50": 0.0752, "70": 0.0725, "95": 0.0714, "120": 0.0696,
-          "150": 0.0685, "185": 0.0674, "240": 0.0662, "300": 0.0651, "400": 0.0643, "500": 0.0632, "600": 0.0626
-        };
-
-        // 결과 데이터 저장 객체
-        const results = {
-          currentBased: {},    // 허용 전류 기준 결과
-          voltageDropBased: {} // 전압 강하 기준 결과
-        };
-
-        // 각 케이블 타입별 분석
-        for (const type in cableData) {
-          const sizes = Object.keys(cableData[type]).map(Number).sort((a, b) => a - b);
+        if (combo) {
+          const comboDetails = combo.map(area => conduitList.find(c => c.area === area));
+          const totalComboArea = combo.reduce((a, b) => a + b, 0);
+          const effArea = totalComboArea * correction;
+          const fill2 = (totalArea / effArea) * 100;
           
-          // 1. 허용 전류 기준 최소 사이즈 찾기
-          for (const size of sizes) {
-            const baseCurrent = cableData[type][size];
-            const correctedCurrent = baseCurrent * installFactor[installMethod];
-            
-            if (correctedCurrent >= currentNeeded) {
-              // 전압 강하 계산 (표시용)
-              const R = resistance[type][size];
-              const X = reactance[size];
-              let voltageDrop, voltageDropPercent;
-              
-              if (voltageType === "단상") {
-                voltageDrop = 2 * currentNeeded * length * (R * powerFactor + X * sinPhi) / 1000;
-              } else {
-                voltageDrop = Math.sqrt(3) * currentNeeded * length * (R * powerFactor + X * sinPhi) / 1000;
-              }
-              voltageDropPercent = (voltageDrop / voltageVal) * 100;
-              
-              results.currentBased[type] = {
-                size: size,
-                current: correctedCurrent,
-                voltageDropPercent: voltageDropPercent
-              };
-              break;
-            }
-          }
+          resultHTML += `<div class="recommend-box"><h3>※ 추천 조합</h3>
+            <div class="table-container">
+              <table class="result-table"><thead><tr><th>전선관</th><th>내경(mm)</th><th>단면적(㎟)</th></tr></thead><tbody>`;
           
-          // 2. 전압 강하 기준 최소 사이즈 찾기
-          for (const size of sizes) {
-            const baseCurrent = cableData[type][size];
-            const correctedCurrent = baseCurrent * installFactor[installMethod];
-            
-            if (correctedCurrent >= currentNeeded) {
-              // 전압 강하 계산
-              const R = resistance[type][size];
-              const X = reactance[size];
-              let voltageDrop, voltageDropPercent;
-              
-              if (voltageType === "단상") {
-                voltageDrop = 2 * currentNeeded * length * (R * powerFactor + X * sinPhi) / 1000;
-              } else {
-                voltageDrop = Math.sqrt(3) * currentNeeded * length * (R * powerFactor + X * sinPhi) / 1000;
-              }
-              voltageDropPercent = (voltageDrop / voltageVal) * 100;
-              
-              if (voltageDropPercent <= MAX_VOLTAGE_DROP_PERCENT) {
-                results.voltageDropBased[type] = {
-                  size: size,
-                  current: correctedCurrent,
-                  voltageDropPercent: voltageDropPercent
-                };
-                break;
-              }
-            }
-          }
-        }
-
-        // 비교 테이블 헤더 업데이트 (입력 단위 표시)
-        let inputValueDisplay = '';
-        if (loadUnit === 'kW') {
-          inputValueDisplay = `<div class="sub">입력값: ${originalInputValue} (= ${currentNeeded.toFixed(1)}A)</div>`;
-        }
-
-        // 테이블 생성 함수
-        const createComparisonTable = (title, data, showVoltageDrop) => {
-          const container = document.createElement('div');
-          container.className = 'table-container';
+          const grouped = groupByName(comboDetails);
+          grouped.forEach(c => {
+            resultHTML += `<tr><td class="bold-text">${c.count > 1 ? `${c.name} x ${c.count}` : c.name}</td><td>${c.innerDia}</td><td>${c.area}</td></tr>`;
+          });
           
-          const titleEl = document.createElement('h3');
-          titleEl.textContent = title;
-          container.appendChild(titleEl);
-          
-          // 입력 단위 표시 추가
-          if (inputValueDisplay) {
-            const inputInfoEl = document.createElement('div');
-            inputInfoEl.innerHTML = inputValueDisplay;
-            container.appendChild(inputInfoEl);
-          }
-          
-          // 테이블 래퍼 (모바일에서 가로 스크롤 가능하도록)
-          const tableWrapper = document.createElement('div');
-          tableWrapper.className = 'comparison-table-wrapper';
-          
-          const table = document.createElement('table');
-          table.className = 'comparison-table';
-          
-          // 테이블 헤더
-          const thead = document.createElement('thead');
-          thead.innerHTML = `
-            <tr>
-              <th>케이블 유형</th>
-              <th>굵기 (㎟)</th>
-              <th>허용 전류 (A)</th>
-              ${showVoltageDrop ? '<th>전압 강하 (%)</th>' : ''}
-              <th>추천 차단기 (A)</th>
-              <th>전력 용량 (kW)</th>
-            </tr>
-          `;
-          table.appendChild(thead);
-          
-          // 테이블 바디
-          const tbody = document.createElement('tbody');
-          
-          for (const type in data) {
-            const item = data[type];
-            const maxBreaker = Math.floor(item.current * 1.25);
-            const recommendedBreaker = breakerSizes.find(a => a >= currentNeeded && a <= maxBreaker) || '-';
-            
-            // 전력 용량 계산
-            const powerCapacity = convertCurrentToPower(item.current, voltageType);
-            
-            const row = document.createElement('tr');
-            row.className = 'comparison-row';
-            
-            // 전압 강하가 기준 이내인 경우 강조
-            if (showVoltageDrop && item.voltageDropPercent <= 2) {
-              row.classList.add('selected');
-            }
-            
-            row.innerHTML = `
-              <td>${type}</td>
-              <td>${item.size}</td>
-              <td>${item.current.toFixed(1)}</td>
-              ${showVoltageDrop ? 
-                `<td class="${item.voltageDropPercent <= 2 ? 'success' : 
-                            item.voltageDropPercent <= MAX_VOLTAGE_DROP_PERCENT ? 'warning' : 'danger'}">
-                  ${item.voltageDropPercent.toFixed(2)}
-                </td>` : ''}
-              <td>${recommendedBreaker}</td>
-              <td>${powerCapacity.toFixed(1)}</td>
-            `;
-            
-            tbody.appendChild(row);
-          }
-          
-          table.appendChild(tbody);
-          tableWrapper.appendChild(table);
-          container.appendChild(tableWrapper);
-          return container;
-        };
-
-        // 결과 컨테이너 생성
-        const resultsContainer = document.createElement('div');
-        resultsContainer.className = 'results-container';
-        
-        // 1. 허용 전류 기준 테이블 추가
-        if (Object.keys(results.currentBased).length > 0) {
-          resultsContainer.appendChild(
-            createComparisonTable(
-              "허용 전류 기준 최소 케이블 사이즈",
-              results.currentBased,
-              true // 전압 강하율 표시 (경고용)
-            )
-          );
-        }
-        
-        // 2. 전압 강하 기준 테이블 추가
-        if (Object.keys(results.voltageDropBased).length > 0) {
-          resultsContainer.appendChild(
-            createComparisonTable(
-              "전압 강하 기준 최소 케이블 사이즈 (3.5% 이하)",
-              results.voltageDropBased,
-              true
-            )
-          );
-        }
-        
-        // 결과가 없는 경우
-        if (Object.keys(results.currentBased).length === 0 && 
-            Object.keys(results.voltageDropBased).length === 0) {
-          resultsContainer.innerHTML = `
-            <div class="no-results">
-              <p>조건을 만족하는 케이블이 없습니다.</p>
-              <ul>
-                <li>필요 전류: ${currentNeeded.toFixed(1)}A 이상 ${loadUnit === 'kW' ? `(입력값: ${originalInputValue})` : ''}</li>
-                <li>전압 강하: ${MAX_VOLTAGE_DROP_PERCENT}% 이하</li>
-              </ul>
-              <p>더 큰 케이블 크기를 사용하거나 케이블 길이를 줄이세요.</p>
+          resultHTML += `</tbody></table>
             </div>
-          `;
+            <p style="margin-top: 10px;">
+              <strong>총 단면적:</strong> ${totalComboArea.toLocaleString()}㎟<br>
+              <strong>유효 면적:</strong> ${totalComboArea} × ${correction} = ${effArea.toFixed(1)}㎟<br>
+              <strong>채움률:</strong> ${fill2.toFixed(1)}%
+            </p>
+          </div>`;
         }
-        
-        tableBody.innerHTML = '';
-        tableBody.appendChild(resultsContainer);
-        
-        // 버튼 원상 복구
-        compareBtn.innerHTML = originalBtnText;
-        compareBtn.disabled = false;
-        
-        // 결과 영역으로 스크롤
-        setTimeout(() => {
-          document.getElementById('compareResult').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
-      }, 500);
-    }
-    
-    // 현재 설정 저장
-    function saveCurrentConfig() {
-      // 저장할 설정 데이터 가져오기
-      const config = {
-        id: Date.now(),
-        date: new Date().toLocaleString(),
-        cableType: document.getElementById('cableType').value,
-        cableSize: document.getElementById('cableSize').value,
-        installMethod: document.getElementById('installMethod').value,
-        voltageType: document.getElementById('voltageType').value,
-        coreCount: document.getElementById('coreCount').value,
-        load: document.getElementById('load').value || '',
-        loadUnit: document.getElementById('loadUnit').value,
-        temperature: document.getElementById('temperature').value,
-        parallelCount: document.getElementById('parallelCount').value,
-        groupingFactor: document.getElementById('groupingFactor').value,
-        soilResistivity: document.getElementById('soilResistivity').value
-      };
-      
-      // 이름 입력 받기
-      const configName = prompt('저장할 설정의 이름을 입력하세요:', 
-        `${config.cableType} ${config.cableSize}㎟ (${config.voltageType})`);
-      
-      if (!configName) return;
-      
-      config.name = configName;
-      
-      // 저장된 설정 가져오기
-      let savedConfigs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      
-      // 새 설정 추가
-      savedConfigs.push(config);
-      
-      // 저장
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(savedConfigs));
-      
-      // 토스트 메시지로 알림
-      showToast('설정이 저장되었습니다.', 'success');
-      
-      // 저장된 설정 탭으로 전환
-      document.querySelector('.tab[data-tab="saved"]').click();
-    }
-    
-    // 저장된 설정 로드
-    function loadSavedConfigs() {
-      const configList = document.getElementById('savedConfigList');
-      
-      // 저장된 설정 가져오기
-      const savedConfigs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      
-      // 목록 초기화
-      configList.innerHTML = '';
-      
-      // 저장된 설정이 없는 경우
-      if (savedConfigs.length === 0) {
-        configList.innerHTML = `
-          <div style="padding: 15px; text-align: center; color: #777;">
-            저장된 설정이 없습니다.
-          </div>
-        `;
-        return;
       }
-      
-      // 저장된 설정 목록 생성 (최신 순으로 정렬)
-      savedConfigs.sort((a, b) => b.id - a.id).forEach(config => {
-        const item = document.createElement('div');
-        item.className = 'saved-config-item';
-        item.dataset.id = config.id;
-        
-        // 부하 정보 포맷팅
-        let loadInfo = '';
-        if (config.load) {
-          loadInfo = config.loadUnit ? `${config.load} ${config.loadUnit}` : `${config.load} A`;
-        } else {
-          loadInfo = '자동 계산';
-        }
-        
-        item.innerHTML = `
-          <div class="config-title">${config.name}</div>
-          <div class="config-details">
-            ${config.cableType} ${config.cableSize}㎟, ${config.installMethod}, ${config.voltageType}, ${config.coreCount}C
-            <br>부하: ${loadInfo}, 저장: ${new Date(config.id).toLocaleDateString()}
-          </div>
-        `;
-        
-        // 클릭 이벤트 - 설정 불러오기
-        item.addEventListener('click', () => loadConfig(config));
-        
-        // 길게 누르기 이벤트 (모바일에서 삭제 기능)
-        let pressTimer;
-        item.addEventListener('touchstart', function() {
-          pressTimer = setTimeout(function() {
-            if (confirm(`'${config.name}' 설정을 삭제하시겠습니까?`)) {
-              deleteConfig(config.id);
-            }
-          }, 800);
-          return false;
-        });
-        
-        item.addEventListener('touchend', function() {
-          clearTimeout(pressTimer);
-        });
-        
-        item.addEventListener('touchmove', function() {
-          clearTimeout(pressTimer);
-        });
-        
-        configList.appendChild(item);
-      });
+    } else {
+      // 전선관을 선택할 수 없는 경우 (데이터가 없는 경우)
+      resultHTML += `<div class="result-highlight result-error">※ 오류: 전선관 정보를 찾을 수 없습니다.</div>`;
     }
-    
-    // 설정 삭제
-    function deleteConfig(id) {
-      let savedConfigs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      const beforeCount = savedConfigs.length;
-      savedConfigs = savedConfigs.filter(config => config.id != id);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(savedConfigs));
-      
-      if (beforeCount > savedConfigs.length) {
-        showToast('설정이 삭제되었습니다.', 'warning');
-      }
-      
-      loadSavedConfigs();
-    }
-    
-    // 설정 불러오기
-    function loadConfig(config) {
-      // 기본 탭으로 전환
-      document.querySelector('.tab[data-tab="basic"]').click();
-      
-      // 기본 설정 적용
-      document.getElementById('cableType').value = config.cableType;
-      
-      // 케이블 옵션 업데이트
-      updateCableOptions('cableType', 'cableSize');
-      updateCoreOptions('cableType', 'coreCount');
-      
-      // 나머지 설정 적용
-      document.getElementById('cableSize').value = config.cableSize;
-      document.getElementById('installMethod').value = config.installMethod;
-      document.getElementById('voltageType').value = config.voltageType;
-      document.getElementById('coreCount').value = config.coreCount;
-      document.getElementById('load').value = config.load;
-      
-      // 부하 단위 설정 (신규 필드)
-      if (config.loadUnit) {
-        document.getElementById('loadUnit').value = config.loadUnit;
-      }
-      
-      // 고급 설정 적용
-      document.getElementById('temperature').value = config.temperature;
-      document.getElementById('parallelCount').value = config.parallelCount;
-      document.getElementById('groupingFactor').value = config.groupingFactor;
-      document.getElementById('soilResistivity').value = config.soilResistivity;
-      
-      // 고급 설정 부분이 닫혀있다면 열기
-      const advancedContent = document.querySelector('.advanced-content');
-      if (!advancedContent.classList.contains('open')) {
-        document.querySelector('.toggle-advanced').click();
-      }
-      
-      // 결과 계산
-      calculateWithLoading();
-      
-      // 토스트 메시지로 알림
-      showToast(`'${config.name}' 설정을 불러왔습니다.`, 'success');
-    }
-    
-    // 모든 저장된 설정 삭제
-    function clearSavedConfigs() {
-      if (confirm('모든 저장된 설정을 삭제하시겠습니까?')) {
-        localStorage.removeItem(STORAGE_KEY);
-        loadSavedConfigs();
-        showToast('모든 설정이 삭제되었습니다.', 'warning');
-      }
-    }
-    
-    // 설정 내보내기
-    function exportConfigs() {
-      const savedConfigs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      
-      if (savedConfigs.length === 0) {
-        showToast('내보낼 설정이 없습니다.', 'warning');
-        return;
-      }
-      
-      // 모바일에서는 텍스트로 보여주고 복사 기능 제공
-      if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-        const jsonStr = JSON.stringify(savedConfigs, null, 2);
-        
-        // 모달 창 생성
-        const modal = document.createElement('div');
-        modal.style.cssText = `
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0,0,0,0.7);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 1000;
-        `;
-        
-        const content = document.createElement('div');
-        content.style.cssText = `
-          background: white;
-          width: 90%;
-          max-width: 500px;
-          max-height: 80%;
-          border-radius: 10px;
-          padding: 20px;
-          overflow: auto;
-          display: flex;
-          flex-direction: column;
-        `;
-        
-        content.innerHTML = `
-          <h3 style="margin-top: 0;">설정 내보내기</h3>
-          <p>아래 텍스트를 복사하여 저장하거나 다른 기기로 전송하세요.</p>
-          <textarea style="flex: 1; min-height: 200px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 15px; font-size: 12px;">${jsonStr}</textarea>
-          <div style="display: flex; gap: 10px;">
-            <button id="modal-copy" style="flex: 1; padding: 10px; background: #007bff; color: white; border: none; border-radius: 5px;">복사하기</button>
-            <button id="modal-close" style="flex: 1; padding: 10px; background: #6c757d; color: white; border: none; border-radius: 5px;">닫기</button>
-          </div>
-        `;
-        
-        modal.appendChild(content);
-        document.body.appendChild(modal);
-        
-        // 버튼 이벤트 등록
-        document.getElementById('modal-copy').addEventListener('click', () => {
-          const textarea = content.querySelector('textarea');
-          textarea.select();
-          document.execCommand('copy');
-          showToast('클립보드에 복사되었습니다.', 'success');
-        });
-        
-        document.getElementById('modal-close').addEventListener('click', () => {
-          document.body.removeChild(modal);
-        });
-      } else {
-        // 데스크톱에서는 파일 다운로드
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(savedConfigs));
-        const downloadAnchorNode = document.createElement('a');
-        downloadAnchorNode.setAttribute("href", dataStr);
-        downloadAnchorNode.setAttribute("download", "cable_calculator_configs.json");
-        document.body.appendChild(downloadAnchorNode);
-        downloadAnchorNode.click();
-        downloadAnchorNode.remove();
-        
-        showToast('설정 파일이 다운로드 되었습니다.', 'success');
-      }
-    }
-    
-    // 설정 가져오기
-    function importConfigs(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const configs = JSON.parse(e.target.result);
-          
-          if (!Array.isArray(configs)) {
-            throw new Error('유효하지 않은 설정 파일입니다.');
-          }
-          
-          // 기존 설정과 병합
-          const existingConfigs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-          const mergedConfigs = [...existingConfigs, ...configs];
-          
-          // 중복 제거 (ID 기준)
-          const uniqueConfigs = mergedConfigs.filter((config, index, self) =>
-            index === self.findIndex(c => c.id === config.id)
-          );
-          
-          // 저장
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(uniqueConfigs));
-          
-          // 목록 새로고침
-          loadSavedConfigs();
-          
-          showToast(`${configs.length}개의 설정을 가져왔습니다.`, 'success');
-        } catch (err) {
-          showToast('설정 파일을 가져오는 중 오류가 발생했습니다.', 'danger');
-          console.error(err);
-        }
-      };
-      reader.readAsText(file);
-      
-      // 파일 입력 초기화
-      event.target.value = '';
-    }
-    
-    // 결과 인쇄
-    function printResults() {
-      window.print();
-    }
-    
-    // PDF로 내보내기 (모바일 환경에서는 다른 안내 제공)
-    function exportToPdf() {
-      if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-        showToast('모바일 기기에서는 브라우저의 "페이지 저장" 기능을 사용하여 PDF로 저장할 수 있습니다.', 'info');
-      } else {
-        showToast('PDF 내보내기 기능을 사용하려면 PDF 변환 라이브러리가 필요합니다.', 'info');
-      }
-    }
-  </script>
+  }
+
+// KEC 권장 채움률 정보
+  resultHTML += `<p style="margin-top: 16px; color: #666; font-size: 0.9rem;">
+    ※ KEC 권장 채움률: ELP 40%, CD/PE 40%, HI 45%, 스틸 50%, 트레이 50%</p>
+  </div>`;
+  
+  // 결과 표시
+  document.getElementById("result").innerHTML = resultHTML;
+  
+  // 결과 영역으로 스크롤
+  document.getElementById("result").scrollIntoView({ behavior: 'smooth' });
+}
+</script>
 </body>
 </html>
