@@ -1304,6 +1304,11 @@ function getFillStatusMessage(fillPercent, limit) {
 }
 
 // 단면도 시각화 함수 - 업데이트된 버전
+// 단면도 시각화 함수 - 정확한 단면적 비율로 표현
+
+// 단면도 시각화 함수 - 정확한 단면적 비율로 표현
+
+// 단면도 시각화 함수 - 정확한 단면적 비율로 표현
 function generateCrossSectionSVG(pipeType, innerDia, cables, totalArea, usedArea, fillPercent, limit) {
   // SVG 기본 설정
   const svgSize = 300;
@@ -1318,10 +1323,67 @@ function generateCrossSectionSVG(pipeType, innerDia, cables, totalArea, usedArea
   
   // 전선관인 경우 (원형)
   if (pipeType !== 'TRAY') {
-    const radius = (svgSize - (padding * 2)) / 2;
-    const actualRadius = radius * 0.8; // SVG에서의 전선관 크기
+    // SVG에서 표현할 전선관 반지름
+    const containerSvgRadius = (svgSize - (padding * 2)) / 2 * 0.8;
     
-    // 전선관 외곽 그리기
+    // 실제 전선관의 내부 단면적 (mm²)
+    const conduitArea = totalArea;
+    
+    // 실제 전선관의 반지름 (mm)
+    const conduitRealRadius = Math.sqrt(conduitArea / Math.PI);
+    
+    // 스케일 계산 (SVG 픽셀 / 실제 mm)
+    const scale = containerSvgRadius / conduitRealRadius;
+    
+    // 한계선 반지름 (SVG 픽셀)
+    const limitRadius = containerSvgRadius * Math.sqrt(limit / 100);
+    
+    // 케이블 계산 준비
+    const cableDetails = [];
+    
+    // 각 케이블 및 회로를 개별적으로 추가 (모든 회로를 별도의 객체로)
+    cables.forEach((cable, cableIndex) => {
+      // 케이블 타입 식별자
+      const cableTypeId = `${cable.type}-${cable.size}-${cable.core}`;
+      
+      // 단일 회로의 면적 (mm²)
+      const singleCircuitArea = cable.area / cable.count;
+      // 실제 면적에 맞는 반지름 계산 (mm)
+      const radius = Math.sqrt(singleCircuitArea / Math.PI);
+      // SVG 반지름으로 변환 (픽셀)
+      const svgRadius = radius * scale;
+      
+      // 각 회로마다 개별 객체 생성
+      for (let i = 0; i < cable.count; i++) {
+        cableDetails.push({
+          id: `${cableTypeId}-${cableIndex}-${i}`, // 고유 ID (케이블 타입-케이블 인덱스-회로 인덱스)
+          type: cable.type,
+          size: cable.size,
+          core: cable.core,
+          radius: svgRadius, // SVG 픽셀 단위
+          realRadius: radius, // 실제 mm 단위
+          circuitIndex: i, // 회로 인덱스
+          cableIndex: cableIndex, // 원래 케이블 배열의 인덱스
+          originalCable: cable // 원본 케이블 참조
+        });
+      }
+    });
+    
+    // 전선관 외곽 그리기 (채움률에 따른 배경색 적용)
+    // 채움률에 따른 배경색 결정
+    let conduitBgColor = "#4caf50"; // 초록색 (적합)
+    let conduitBgOpacity = 0.1;
+    
+    if (fillPercent > limit && fillPercent <= 60) {
+      // 기준 초과 ~ 60% - 노란색 경고
+      conduitBgColor = "#ff9800"; // 노란색
+      conduitBgOpacity = 0.15;
+    } else if (fillPercent > 60) {
+      // 60% 초과 - 붉은색 경고
+      conduitBgColor = "#e53935"; // 붉은색
+      conduitBgOpacity = 0.2;
+    }
+    
     svg = `<svg width="${svgSize}" height="${svgSize}" viewBox="0 0 ${svgSize} ${svgSize}">
       <defs>
         <pattern id="diagonalHatch" patternUnits="userSpaceOnUse" width="4" height="4">
@@ -1329,59 +1391,127 @@ function generateCrossSectionSVG(pipeType, innerDia, cables, totalArea, usedArea
         </pattern>
       </defs>
       
-      <!-- 전선관 외곽 -->
-      <circle cx="${centerX}" cy="${centerY}" r="${actualRadius}" 
-        fill="white" stroke="#333" stroke-width="2" />
+      <!-- 전선관 외곽 (채움률에 따른 배경색) -->
+      <circle cx="${centerX}" cy="${centerY}" r="${containerSvgRadius}" 
+        fill="${conduitBgColor}" fill-opacity="${conduitBgOpacity}" stroke="#333" stroke-width="2" />
       
-      <!-- 전선관 내부 유효면적 표시 -->
-      <circle cx="${centerX}" cy="${centerY}" r="${actualRadius * 0.9}" 
-        fill="none" stroke="#1a73e8" stroke-width="1" stroke-dasharray="5,2" />
-      
-      <!-- 한계선 표시 -->
-      <circle cx="${centerX}" cy="${centerY}" r="${actualRadius * Math.sqrt(limit / 100)}" 
+      <!-- 한계선 표시 (채움률 한계) -->
+      <circle cx="${centerX}" cy="${centerY}" r="${limitRadius}" 
         fill="none" stroke="#1a73e8" stroke-width="1" stroke-dasharray="3,3" />`;
     
-    // 케이블 영역 (채워진 부분) - 실제 채움률에 맞게 면적 조정
-    const filledRadius = actualRadius * Math.sqrt(Math.min(fillPercent, 100) / 100);
+    // 케이블 타입에 따른 색상 (색상 다양화)
+    const cableColors = ['#4caf50', '#2196f3', '#f44336', '#ff9800', '#9c27b0', '#00bcd4', '#ffeb3b'];
+    const typeToColor = {};
+    let colorIndex = 0;
     
-    svg += `<!-- 케이블 영역 -->
-      <circle cx="${centerX}" cy="${centerY}" r="${filledRadius}" 
-        fill="url(#diagonalHatch)" stroke="${fillColor}" stroke-width="2" />
+    // 각 케이블 유형에 색상 할당
+    cables.forEach(cable => {
+      const cableType = `${cable.type} ${cable.size}㎟ ${cable.core}C`;
+      if (!typeToColor[cableType]) {
+        typeToColor[cableType] = cableColors[colorIndex % cableColors.length];
+        colorIndex++;
+      }
+    });
+    
+    // 케이블 패킹 알고리즘으로 위치 결정 (겹치지 않게 최적화됨)
+    const packedCables = packCirclesWithExactSize(cableDetails, centerX, centerY, containerSvgRadius);
+    
+    // 각 케이블을 보기 좋게 정렬 (색상별로 정렬하여 같은 타입은 인접하게)
+    packedCables.sort((a, b) => {
+      const typeA = `${a.type} ${a.size}㎟ ${a.core}C`;
+      const typeB = `${b.type} ${b.size}㎟ ${b.core}C`;
+      if (typeA !== typeB) return typeA.localeCompare(typeB);
+      return a.cableIndex - b.cableIndex;
+    });
+    
+    // 각 케이블 기본 색상으로 그리기
+    packedCables.forEach((cable, index) => {
+      const cableType = `${cable.type} ${cable.size}㎟ ${cable.core}C`;
+      const baseColor = typeToColor[cableType] || '#888888';
+      
+      // 케이블 타입별로 동일한 색상 사용, 단 투명도만 약간 다르게
+      const opacity = 0.8 + ((cable.cableIndex * 0.05) % 0.2); // 같은 타입이라도 약간 다른 투명도
+      
+      // 각 케이블/회로별로 구분은 되지만 유사한 색상 적용
+      svg += `
+      <!-- 케이블 ${cable.type} ${cable.size}㎟ ${cable.core}C #${cable.cableIndex+1} (회로 ${cable.circuitIndex + 1}) -->
+      <circle
+        cx="${cable.x}" 
+        cy="${cable.y}" 
+        r="${cable.radius}" 
+        fill="${baseColor}" 
+        fill-opacity="${opacity}"
+        stroke="white" 
+        stroke-width="1.5"
+        stroke-opacity="0.95" />`;
+    });
+    
+    // 각 케이블 외곽선 추가 (명확한 구분을 위해)
+    packedCables.forEach((cable) => {
+      svg += `
+      <circle
+        cx="${cable.x}" 
+        cy="${cable.y}" 
+        r="${cable.radius}" 
+        fill="none" 
+        stroke="#333333" 
+        stroke-width="1.2"
+        stroke-opacity="0.9" />`;
+    });
         
-      <!-- 내경 치수선 -->
-      <line x1="${centerX - actualRadius}" y1="${centerY + actualRadius + 15}" 
-        x2="${centerX + actualRadius}" y2="${centerY + actualRadius + 15}" 
+    svg += `<!-- 내경 치수선 -->
+      <line x1="${centerX - containerSvgRadius}" y1="${centerY + containerSvgRadius + 15}" 
+        x2="${centerX + containerSvgRadius}" y2="${centerY + containerSvgRadius + 15}" 
         stroke="#333" stroke-width="1" />
-      <line x1="${centerX - actualRadius}" y1="${centerY + actualRadius + 10}" 
-        x2="${centerX - actualRadius}" y2="${centerY + actualRadius + 20}" 
+      <line x1="${centerX - containerSvgRadius}" y1="${centerY + containerSvgRadius + 10}" 
+        x2="${centerX - containerSvgRadius}" y2="${centerY + containerSvgRadius + 20}" 
         stroke="#333" stroke-width="1" />
-      <line x1="${centerX + actualRadius}" y1="${centerY + actualRadius + 10}" 
-        x2="${centerX + actualRadius}" y2="${centerY + actualRadius + 20}" 
+      <line x1="${centerX + containerSvgRadius}" y1="${centerY + containerSvgRadius + 10}" 
+        x2="${centerX + containerSvgRadius}" y2="${centerY + containerSvgRadius + 20}" 
         stroke="#333" stroke-width="1" />
-      <text x="${centerX}" y="${centerY + actualRadius + 30}" 
+      <text x="${centerX}" y="${centerY + containerSvgRadius + 30}" 
         text-anchor="middle" font-size="12">내경 ${innerDia}mm</text>
         
       <!-- 채움률 정보 -->
-      <text x="${centerX}" y="${centerY}" 
+      <text x="${centerX}" y="${padding / 2 + 5}" 
         text-anchor="middle" font-size="14" font-weight="bold" fill="#333">
         채움률: ${fillPercent.toFixed(1)}%${fillPercent > limit ? ' (기준 초과)' : ''}
       </text>
-      <text x="${centerX}" y="${centerY + 20}" 
+      <text x="${centerX}" y="${padding / 2 + 25}" 
         text-anchor="middle" font-size="12" fill="#555">
         ${usedArea.toFixed(1)}㎟ / ${totalArea.toFixed(1)}㎟
       </text>
       
       <!-- 한계선 표시 레이블 -->
-      <text x="${centerX}" y="${centerY - actualRadius * Math.sqrt(limit / 100) - 5}" 
+      <text x="${centerX}" y="${centerY - limitRadius - 5}" 
         text-anchor="middle" font-size="10" fill="#1a73e8">
         ${limit}% 한계선
-      </text>
+      </text>`;
+      
+    // 케이블 타입별 범례 추가
+    const uniqueCableTypes = [...new Set(packedCables.map(c => `${c.type} ${c.size}㎟ ${c.core}C`))];
+    const legendY = svgSize - 10;
+    const legendX = padding;
+    
+    svg += `<!-- 케이블 범례 -->
+      <g transform="translate(${legendX}, ${legendY - (uniqueCableTypes.length * 15)})">`;
+    
+    uniqueCableTypes.forEach((label, i) => {
+      const cableColor = typeToColor[label] || '#888888';
+      svg += `
+        <g transform="translate(0, ${i * 15})">
+          <circle cx="5" cy="5" r="5" fill="${cableColor}" fill-opacity="0.7" />
+          <text x="15" y="9" font-size="10">${label}</text>
+        </g>`;
+    });
+    
+    svg += `</g>
     </svg>`;
   } 
   // 트레이인 경우 (직사각형)
   else {
-    const trayWidth = innerDia; // 트레이 폭
-    const trayHeight = 100; // 고정 높이
+    const trayWidth = innerDia; // 트레이 폭 (mm)
+    const trayHeight = 100; // 고정 높이 (mm)
     
     // 트레이 크기를 SVG 영역에 맞게 조정
     const scale = (svgSize - (padding * 2)) / Math.max(trayWidth, trayHeight);
@@ -1392,9 +1522,21 @@ function generateCrossSectionSVG(pipeType, innerDia, cables, totalArea, usedArea
     const trayX = (svgSize - scaledWidth) / 2;
     const trayY = (svgSize - scaledHeight) / 2;
     
-    // 케이블 사용 너비 (채움률에 따라)
-    const usedWidth = scaledWidth * Math.min(fillPercent, 100) / 100;
-    // 한계선 위치
+    // 채움률에 따른 배경색 결정
+    let trayBgColor = "#4caf50"; // 초록색 (적합)
+    let trayBgOpacity = 0.1;
+    
+    if (fillPercent > limit && fillPercent <= 60) {
+      // 기준 초과 ~ 60% - 노란색 경고
+      trayBgColor = "#ff9800"; // 노란색
+      trayBgOpacity = 0.15;
+    } else if (fillPercent > 60) {
+      // 60% 초과 - 붉은색 경고
+      trayBgColor = "#e53935"; // 붉은색
+      trayBgOpacity = 0.2;
+    }
+    
+    // 한계선 위치 (트레이 폭의 limit% 위치)
     const limitX = trayX + (scaledWidth * limit / 100);
     
     svg = `<svg width="${svgSize}" height="${svgSize}" viewBox="0 0 ${svgSize} ${svgSize}">
@@ -1404,23 +1546,107 @@ function generateCrossSectionSVG(pipeType, innerDia, cables, totalArea, usedArea
         </pattern>
       </defs>
       
-      <!-- 트레이 외곽 -->
+      <!-- 트레이 외곽 (채움률에 따른 배경색) -->
       <rect x="${trayX}" y="${trayY}" width="${scaledWidth}" height="${scaledHeight}" 
-        fill="white" stroke="#333" stroke-width="2" />
-      
-      <!-- 케이블 영역 (채워진 부분) -->
-      <rect x="${trayX}" y="${trayY}" width="${usedWidth}" height="${scaledHeight}" 
-        fill="url(#diagonalHatch)" stroke="${fillColor}" stroke-width="1" />
-      
+        fill="${trayBgColor}" fill-opacity="${trayBgOpacity}" stroke="#333" stroke-width="2" />
+        
       <!-- 한계선 표시 -->
       <line x1="${limitX}" y1="${trayY}" x2="${limitX}" y2="${trayY + scaledHeight}" 
-        stroke="#1a73e8" stroke-width="1" stroke-dasharray="5,2" />
-      <text x="${limitX}" y="${trayY - 5}" 
-        text-anchor="middle" font-size="10" fill="#1a73e8">
-        ${limit}% 한계선
-      </text>
+        stroke="#1a73e8" stroke-width="1" stroke-dasharray="5,2" />`;
+    
+    // 채움률에 따른 케이블 배치 (실제 폭 비율 유지)
+    const cableColors = ['#4caf50', '#2196f3', '#f44336', '#ff9800', '#9c27b0', '#00bcd4', '#ffeb3b'];
+    const typeToColor = {};
+    let colorIndex = 0;
+    
+    // 각 케이블 유형에 색상 할당
+    cables.forEach(cable => {
+      const cableType = `${cable.type} ${cable.size}㎟ ${cable.core}C`;
+      if (!typeToColor[cableType]) {
+        typeToColor[cableType] = cableColors[colorIndex % cableColors.length];
+        colorIndex++;
+      }
+    });
+    
+    // 실제 채움률에 맞는 케이블 배치
+    // 트레이의 경우 케이블 직경의 합계가 채움률을 결정
+    const totalCableDiameter = cables.reduce((sum, cable) => sum + (cable.dia * cable.count), 0);
+    
+    // 채움률이 100%가 넘는지 확인
+    const isOverfilled = fillPercent > 100;
+    
+    // 직경 비율을 유지하여 그리기
+    let usedWidthMM = (trayWidth * fillPercent) / 100;
+    if (totalCableDiameter > 0) {
+      // 채움률에 맞게 케이블 직경 스케일링
+      const diameterScale = isOverfilled ? 
+        // 100% 초과: 전체 너비를 케이블 직경 총합으로 나눔 (겹치게 됨)
+        (trayWidth / totalCableDiameter) : 
+        // 100% 이하: 사용된 너비를 케이블 직경 총합으로 나눔 (겹치지 않음)
+        (usedWidthMM / totalCableDiameter);
+      
+      let currentX = trayX + 5; // 시작 위치에 약간의 패딩 추가
+      
+      // 케이블 그리기
+      cables.forEach(cable => {
+        const cableType = `${cable.type} ${cable.size}㎟ ${cable.core}C`;
+        const cableColor = typeToColor[cableType] || '#888888';
         
-      <!-- 트레이 폭 치수선 -->
+        // 채움률에 따라 스케일링된 케이블 직경
+        const scaledDiameter = cable.dia * diameterScale * scale;
+        
+        // 각 회로마다 별도의 원 생성
+        for (let i = 0; i < cable.count; i++) {
+          // 각 케이블 원 그리기 - 트레이 바닥에 위치
+          // y 위치: 트레이 하단 - 케이블 반지름 (바닥에 닿는 위치)
+          const cableY = (trayY + scaledHeight) - (scaledDiameter/2);
+          
+          // 케이블 타입별 색상 사용
+          const cableType = `${cable.type} ${cable.size}㎟ ${cable.core}C`;
+          let baseColor = cableColor;
+          
+          // 케이블 인덱스에 따라 약간의 투명도 변화만 줌
+          const opacity = 0.8 + ((cables.indexOf(cable) * 0.05) % 0.2);
+          
+          svg += `
+          <!-- 케이블 ${cable.type} ${cable.size}㎟ ${cable.core}C #${cables.indexOf(cable)+1} (회로 ${i+1}/${cable.count}) -->
+          <circle 
+            cx="${currentX + (scaledDiameter/2)}" 
+            cy="${cableY}" 
+            r="${scaledDiameter/2}" 
+            fill="${baseColor}" 
+            fill-opacity="${opacity}"
+            stroke="white" 
+            stroke-width="1.5"
+            stroke-opacity="0.95" />`;
+            
+          // 테두리 추가로 그려서 구분 명확하게
+          svg += `
+          <circle 
+            cx="${currentX + (scaledDiameter/2)}" 
+            cy="${cableY}" 
+            r="${scaledDiameter/2}" 
+            fill="none" 
+            stroke="#333333" 
+            stroke-width="1.2"
+            stroke-opacity="0.9" />`;
+          
+          // 의도적으로 더 많이 겹치게 설정 - 교집합 효과가 뚜렷하게 보이도록
+          currentX += scaledDiameter * (isOverfilled ? 0.7 : 1.0);
+        }
+      });
+    }
+    
+    // 채움률 영역 표시 (채움률이 100%를 넘을 경우 트레이 전체 너비로 제한)
+    const fillWidth = Math.min(scaledWidth * fillPercent / 100, scaledWidth);
+    
+    // 채움률 영역에 반투명 색상 표시
+    svg += `
+      <!-- 채움률 영역 표시 -->
+      <rect x="${trayX}" y="${trayY}" width="${fillWidth}" height="${scaledHeight}" 
+        fill="url(#diagonalHatch)" fill-opacity="0.3" stroke="none" />`;
+      
+    svg += `<!-- 트레이 폭 치수선 -->
       <line x1="${trayX}" y1="${trayY + scaledHeight + 15}" 
         x2="${trayX + scaledWidth}" y2="${trayY + scaledHeight + 15}" 
         stroke="#333" stroke-width="1" />
@@ -1434,19 +1660,191 @@ function generateCrossSectionSVG(pipeType, innerDia, cables, totalArea, usedArea
         text-anchor="middle" font-size="12">트레이 폭 ${trayWidth}mm</text>
         
       <!-- 채움률 정보 -->
-      <text x="${trayX + scaledWidth/2}" y="${trayY + scaledHeight/2}" 
+      <text x="${trayX + scaledWidth/2}" y="${trayY - 10}" 
         text-anchor="middle" font-size="14" font-weight="bold" fill="#333">
         채움률: ${fillPercent.toFixed(1)}%${fillPercent > limit ? ' (기준 초과)' : ''}
       </text>
-      <text x="${trayX + scaledWidth/2}" y="${trayY + scaledHeight/2 + 20}" 
+      <text x="${trayX + scaledWidth/2}" y="${trayY - 30}" 
         text-anchor="middle" font-size="12" fill="#555">
         ${(cables.reduce((sum, c) => sum + c.dia * c.count, 0)).toFixed(1)}mm / ${trayWidth.toFixed(1)}mm
       </text>
-    </svg>`;
+      
+      <!-- 한계선 표시 레이블 -->
+      <text x="${limitX}" y="${trayY - 5}" 
+        text-anchor="middle" font-size="10" fill="#1a73e8">
+        ${limit}% 한계선
+      </text>`;
+    
+    // 케이블 타입별 범례 추가
+    const uniqueCableTypes = [...new Set(cables.map(c => `${c.type} ${c.size}㎟ ${c.core}C`))];
+    
+    if (uniqueCableTypes.length > 0) {
+      const legendY = trayY + scaledHeight + 60;
+      const legendX = trayX;
+      
+      svg += `<!-- 케이블 범례 -->
+        <g transform="translate(${legendX}, ${legendY})">`;
+      
+      uniqueCableTypes.forEach((label, i) => {
+        const cableColor = typeToColor[label] || '#888888';
+        svg += `
+          <g transform="translate(${i * 80}, 0)">
+            <circle cx="5" cy="5" r="5" fill="${cableColor}" fill-opacity="0.7" />
+            <text x="15" y="9" font-size="10">${label}</text>
+          </g>`;
+      });
+      
+      svg += `</g>`;
+    }
+    
+    svg += `</svg>`;
   }
   
   return svg;
 }
+
+// 원형 패킹 알고리즘 - 정확한 크기로 케이블 배치 (최종 개선 버전)
+function packCirclesWithExactSize(circles, centerX, centerY, containerRadius) {
+  const packedCircles = JSON.parse(JSON.stringify(circles)); // 깊은 복사
+  
+  // 원들을 크기가 큰 순서로 정렬 (큰 원부터 배치)
+  packedCircles.sort((a, b) => b.radius - a.radius);
+  
+  // 모든 원 배치
+  const placedCircles = [];
+  
+  // 총 원의 면적과 컨테이너 면적 계산
+  const totalCircleArea = packedCircles.reduce((sum, circle) => sum + Math.PI * Math.pow(circle.radius, 2), 0);
+  const containerArea = Math.PI * Math.pow(containerRadius, 2);
+  
+  // 실제 채움률 계산
+  const actualFillRatio = totalCircleArea / containerArea;
+  
+  // 절대 겹침 금지 모드 - 채움률이 90% 미만일 때는 절대 겹치지 않도록 설정
+  const noOverlapMode = actualFillRatio < 0.9;
+  
+  for (let i = 0; i < packedCircles.length; i++) {
+    const circle = packedCircles[i];
+    
+    // 기본값으로 중앙에 배치
+    let bestX = centerX;
+    let bestY = centerY;
+    let bestScore = Infinity;
+    let bestCollides = true; // 최선의 위치가 다른 원과 겹치는지 여부
+    
+    // 고정된 간격으로 가능한 위치 모두 탐색
+    const searchStep = circle.radius * 0.15; // 더 세밀한 탐색
+    const maxRadius = containerRadius - circle.radius; // 최대 가능 거리
+    
+    // 전체 탐색 - 공간을 더 넓게 활용
+    for (let r = 0; r <= maxRadius; r += searchStep) {
+      // 반지름 r에서 둘레 지점 수 계산 (더 많은 점 탐색)
+      const circumferencePoints = Math.max(24, Math.floor(2 * Math.PI * r / searchStep));
+      
+      let foundNonCollidingPosition = false;
+      
+      for (let p = 0; p < circumferencePoints; p++) {
+        const angle = (p / circumferencePoints) * 2 * Math.PI + (r * 0.1); // 각도 약간 변화 추가
+        const testX = centerX + r * Math.cos(angle);
+        const testY = centerY + r * Math.sin(angle);
+        
+        // 컨테이너를 벗어나는지 확인
+        const distToCenter = Math.sqrt(Math.pow(testX - centerX, 2) + Math.pow(testY - centerY, 2));
+        if (distToCenter + circle.radius > containerRadius) {
+          continue; // 컨테이너를 벗어나면 건너뜀
+        }
+        
+        // 다른 원들과 충돌 확인
+        let collides = false;
+        let minDistanceToOthers = Infinity;
+        let sumDistances = 0;
+        let contactCount = 0;
+        
+        for (const placedCircle of placedCircles) {
+          const dx = testX - placedCircle.x;
+          const dy = testY - placedCircle.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          const minAllowedDistance = (circle.radius + placedCircle.radius) * (noOverlapMode ? 1.001 : 0.95);
+          
+          // 테스트 중인 위치가 이미 배치된 원과 겹치는지 확인
+          if (distance < minAllowedDistance) {
+            collides = true;
+            break; // 겹칩이 금지 모드에서는 바로 중단
+          }
+          
+          // 다른 원과의 최소 거리 갱신
+          minDistanceToOthers = Math.min(minDistanceToOthers, distance - (circle.radius + placedCircle.radius));
+          
+          // 거의 닿는 경우 (+/- 2px) 접촉 포인트로 간주
+          if (Math.abs(distance - (circle.radius + placedCircle.radius)) < 2) {
+            contactCount++;
+          }
+          
+          // 다른 모든 원과의 거리 합산
+          sumDistances += distance;
+        }
+        
+        // 절대 겹침 금지 모드일 때는 충돌하는 위치는 무조건 건너뜀
+        if (noOverlapMode && collides) {
+          continue;
+        }
+        
+        // 점수 계산 (낮을수록 좋음)
+        // 1. 벽면과의 거리 (작을수록 좋음)
+        // 2. 다른 원들과의 거리 (접촉은 좋지만 겹치면 나쁨)
+        // 3. 접촉 포인트 수 (많을수록 좋음)
+        const wallDistanceFactor = (containerRadius - (distToCenter + circle.radius)) * 2;
+        const otherCirclesDistanceFactor = minDistanceToOthers < 0 ? Math.abs(minDistanceToOthers) * 100 : minDistanceToOthers * 0.5;
+        const contactBonus = -contactCount * 15; // 접촉이 많을수록 점수 감소
+        
+        // 최종 점수 - 적은 겹침, 벽면 근처, 많은 접촉점이 좋음
+        const score = wallDistanceFactor + otherCirclesDistanceFactor + contactBonus + (collides ? 1000 : 0);
+        
+        // 현재까지 최선의 위치보다 더 좋은 위치를 찾은 경우
+        if (score < bestScore) {
+          bestScore = score;
+          bestX = testX;
+          bestY = testY;
+          bestCollides = collides;
+          
+          // 충돌 없는 위치를 찾으면 기록
+          if (!collides) {
+            foundNonCollidingPosition = true;
+            
+            // 위치가 거의 완벽하다면 (벽면 근처 + 접촉 많음 + 충돌 없음) 즉시 채택
+            if (wallDistanceFactor < 10 && contactCount > 0) {
+              break;
+            }
+          }
+        }
+      }
+      
+      // 적절한 위치를 찾았으면 더 이상 탐색하지 않음
+      if ((foundNonCollidingPosition || bestScore < 50) && r > maxRadius * 0.5) {
+        break;
+      }
+    }
+    
+    // 위치 할당
+    circle.x = bestX;
+    circle.y = bestY;
+    placedCircles.push(circle);
+  }
+  
+  return packedCircles;
+}
+
+// 색상 반환 함수 (기존 함수 유지)
+function getFillColor(fillPercent, limit) {
+  if (fillPercent <= limit) {
+    return "#4caf50"; // 녹색 - 기준 이내
+  } else if (fillPercent <= 60) {
+    return "#ff9800"; // 노란색 - 기준 초과 ~ 60%
+  } else {
+    return "#e53935"; // 붉은색 - 60% 초과
+  }
+}
+
 
 // 계산 실행
 function calculate() {
