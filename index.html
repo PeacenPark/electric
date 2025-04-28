@@ -7,11 +7,12 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
-      --primary-color: #1a73e8;
-      --hover-color: #155ec2;
-      --text-color: #333;
-      --light-bg: #f6f9fc;
-      --shadow: 0 4px 12px rgba(0,0,0,0.1);
+      --primary-color: #4a90e2;
+      --hover-color: #3a7bd5;
+      --text-color: #f0f0f0;
+      --light-bg: #ebf5ff;
+      --card-bg: #1e3a5f;
+      --shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
     
     body {
@@ -19,13 +20,13 @@
       background: var(--light-bg);
       margin: 0;
       padding: 0;
-      color: var(--text-color);
+      color: #333;
     }
     
     /* 헤더 스타일 */
     .header {
       background-color: white;
-      box-shadow: var(--shadow);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
       padding: 15px 0;
       position: sticky;
       top: 0;
@@ -58,19 +59,13 @@
     
     .logo-text {
       font-weight: bold;
-      font-size: 24px;
+      font-size: 20px;
+      color: #1e3a5f;
     }
     
     /* 메인 컨텐츠 */
     .main-content {
-      padding: 40px 0;
-      text-align: center;
-    }
-    
-    h1 {
-      color: var(--primary-color);
-      margin-bottom: 40px;
-      font-size: 32px;
+      padding: 20px 0;
     }
     
     /* 계산기 그리드 */
@@ -80,209 +75,138 @@
       gap: 20px;
       max-width: 800px;
       margin: 0 auto;
+      padding: 15px;
     }
     
     @media (min-width: 768px) {
       .calculator-grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: 30px;
+        gap: 25px;
+        padding: 25px;
       }
     }
     
     @media (min-width: 992px) {
       .calculator-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, 1fr);
         gap: 30px;
+        padding: 30px;
       }
     }
     
     .calculator-card {
-      background: white;
-      border-radius: 12px;
+      background: #2b5596;
+      border-radius: 16px;
       box-shadow: var(--shadow);
-      padding: 25px 20px;
-      transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
-      height: 100%;
+      padding: 15px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
       display: flex;
-      flex-direction: column;
       cursor: pointer;
-      border: 3px solid #e0e5ec;
+      border: none;
       position: relative;
+      color: var(--text-color);
+      text-decoration: none;
+      margin-bottom: 0;
+      height: auto;
+      align-items: center;
     }
     
     .calculator-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 20px rgba(26, 115, 232, 0.2);
-      background-color: #f0f7ff;
-      border-color: var(--primary-color);
-    }
-    
-    .calculator-card::after {
-      content: "Click to Open";
-      position: absolute;
-      top: -12px;
-      right: 20px;
-      background-color: var(--primary-color);
-      color: white;
-      padding: 4px 10px;
-      border-radius: 4px;
-      font-size: 12px;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      font-weight: 500;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    
-    .calculator-card:hover::after {
-      opacity: 1;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+      background-color: #3466ad;
     }
     
     .calculator-icon {
-      font-size: 36px;
-      color: var(--primary-color);
-      margin-bottom: 15px;
-      transition: transform 0.3s ease;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 70px;
+      width: 50px;
+      height: 50px;
+      margin-right: 12px;
+      float: left;
     }
     
-    .calculator-card:hover .calculator-icon {
-      transform: scale(1.1);
+    .calculator-content {
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
     
     .dual-icon {
-      position: relative;
       display: flex;
-      justify-content: space-between;
-      width: 100%;
-      max-width: 100px;
-      margin: 0 auto;
+      justify-content: center;
+      width: 60px;
+      height: 60px;
     }
     
     .icon-left {
-      margin-right: 5px;
+      width: 30px;
+      height: 60px;
     }
     
     .icon-right {
-      margin-left: 5px;
+      width: 30px;
+      height: 60px;
     }
     
     .calculator-title {
-      font-size: 20px;
-      font-weight: 600;
-      margin-bottom: 10px;
-      color: var(--primary-color);
-      background-color: rgba(26, 115, 232, 0.08);
-      padding: 10px 12px;
-      border-radius: 6px;
-      transition: background-color 0.3s ease;
-      text-align: center;
-    }
-    
-    .calculator-card:hover .calculator-title {
-      background-color: rgba(26, 115, 232, 0.15);
+      font-size: 22px;
+      font-weight: 500;
+      margin-bottom: 4px;
+      color: white;
+      padding: 0;
+      border-radius: 0;
+      transition: none;
+      text-align: left;
     }
     
     .calculator-desc {
-      font-size: 15px;
-      color: #555;
-      margin-bottom: 5px;
-      line-height: 1.5;
-      flex-grow: 1;
-      background-color: rgba(0, 0, 0, 0.02);
-      padding: 12px;
-      border-radius: 6px;
-      transition: background-color 0.3s ease;
-    }
-    
-    .calculator-card:hover .calculator-desc {
-      background-color: rgba(0, 0, 0, 0.04);
-    }
-    
-    /* 최근 사용 섹션 */
-    .recent-section {
-      background-color: white;
-      padding: 25px;
-      margin-bottom: 40px;
-      border-radius: 12px;
-      box-shadow: var(--shadow);
-      max-width: 800px;
-      margin-left: auto;
-      margin-right: auto;
-      border: 2px solid #e0e5ec;
-    }
-    
-    .recent-title {
-      font-size: 20px;
-      color: var(--primary-color);
-      margin-bottom: 18px;
-      text-align: left;
-      font-weight: 600;
-      position: relative;
-      padding-left: 15px;
-    }
-    
-    .recent-title:before {
-      content: "";
-      position: absolute;
-      left: 0;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 5px;
-      height: 20px;
-      background-color: var(--primary-color);
-      border-radius: 3px;
-    }
-    
-    .recent-items {
-      display: flex;
-      gap: 15px;
-      overflow-x: auto;
-      padding-bottom: 10px;
-    }
-    
-    .recent-item {
-      background-color: #f0f4f8;
-      padding: 10px 15px;
-      border-radius: 20px;
       font-size: 14px;
-      white-space: nowrap;
-      color: var(--primary-color);
-      cursor: pointer;
-      transition: all 0.2s ease;
-      border: 2px solid transparent;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-      text-decoration: none;
-      display: inline-block;
+      color: #aad4ff;
+      margin-bottom: 0;
+      line-height: 1.3;
+      flex-grow: 1;
+      padding: 0;
+      background: none;
+      border-radius: 0;
     }
     
-    .recent-item:hover {
-      background-color: #e1eaf4;
-      border-color: var(--primary-color);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    .calculator-status {
+      margin-left: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 60px;
+    }
+    
+    .calculator-status-label {
+      font-size: 12px;
+      color: #aad4ff;
+      margin-bottom: 2px;
+    }
+    
+    .calculator-status-value {
+      font-size: 18px;
+      font-weight: 500;
+      color: #fff;
     }
     
     /* 노트 섹션 */
     .note {
       margin-top: 30px;
-      font-size: 15px;
-      color: #555;
-      line-height: 1.7;
+      font-size: 14px;
+      color: #aaa;
+      line-height: 1.6;
       max-width: 800px;
       margin-left: auto;
       margin-right: auto;
       background-color: rgba(26, 115, 232, 0.05);
       padding: 20px;
-      border-radius: 8px;
+      border-radius: 16px;
       border-left: 4px solid var(--primary-color);
     }
     
     /* 푸터 */
     .footer {
-      background-color: white;
+      background-color: #1e1e1e;
       padding: 30px 0;
       margin-top: 80px;
     }
@@ -313,7 +237,6 @@
     .social-link:hover {
       color: var(--primary-color);
     }
-    a { text-decoration: none; }
   </style>
 </head>
 <body>
@@ -332,8 +255,6 @@
   <!-- 메인 컨텐츠 -->
   <div class="main-content">
     <div class="container">
-      <h1>전문가를 위한 전기 계산기</h1>
-      
       <!-- 계산기 그리드 -->
       <div class="calculator-grid">
         <!-- 계산기 1 -->
@@ -341,10 +262,10 @@
           <div class="calculator-icon">
             <svg width="50" height="50" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
               <!-- 전선 케이블 - 간결하고 직관적인 디자인 -->
-              <path d="M150 200C150 150 200 100 250 100H550C600 100 650 150 650 200" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
-              <path d="M150 600C150 650 200 700 250 700H550C600 700 650 650 650 600" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
-              <path d="M150 200V600" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
-              <path d="M650 200V600" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
+              <path d="M150 200C150 150 200 100 250 100H550C600 100 650 150 650 200" stroke="#4a90e2" stroke-width="40" stroke-linecap="round"/>
+              <path d="M150 600C150 650 200 700 250 700H550C600 700 650 650 650 600" stroke="#4a90e2" stroke-width="40" stroke-linecap="round"/>
+              <path d="M150 200V600" stroke="#4a90e2" stroke-width="40" stroke-linecap="round"/>
+              <path d="M650 200V600" stroke="#4a90e2" stroke-width="40" stroke-linecap="round"/>
               
               <!-- 내부 전선 -->
               <path d="M250 100V700" stroke="#ed7d31" stroke-width="25" stroke-linecap="round"/>
@@ -353,49 +274,31 @@
               <path d="M550 100V700" stroke="#7030a0" stroke-width="25" stroke-linecap="round"/>
             </svg>
           </div>
-          <div class="calculator-title">케이블 계산기</div>
-          <div class="calculator-desc">
-            다양한 환경과 조건에서의 케이블 용량을 정밀하게 계산하여 최적의 케이블 및 차단기 선정, 전압강하 등을 도와드립니다.
+          <div class="calculator-content">
+            <div class="calculator-title">케이블 계산기</div>
+            <div class="calculator-desc">다양한 환경과 조건에서의 케이블/차단기 용량 및 전압강하를 계산합니다.</div>
           </div>
         </a>
         
         <!-- 계산기 2 -->
         <a href="conduit-size.html" class="calculator-card">
-          <div class="calculator-icon dual-icon">
-            <svg width="40" height="40" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-left">
+          <div class="calculator-icon">
+            <svg width="50" height="50" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
               <!-- 전선관 -->
-              <path d="M250 100V700" stroke="#1a73e8" stroke-width="60" stroke-linecap="round"/>
-              <path d="M550 100V700" stroke="#1a73e8" stroke-width="60" stroke-linecap="round"/>
-              <path d="M250 100C250 100 250 50 400 50C550 50 550 100 550 100" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
-              <path d="M250 700C250 700 250 750 400 750C550 750 550 700 550 700" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
+              <path d="M250 100V700" stroke="#4a90e2" stroke-width="60" stroke-linecap="round"/>
+              <path d="M550 100V700" stroke="#4a90e2" stroke-width="60" stroke-linecap="round"/>
+              <path d="M250 100C250 100 250 50 400 50C550 50 550 100 550 100" stroke="#4a90e2" stroke-width="40" stroke-linecap="round"/>
+              <path d="M250 700C250 700 250 750 400 750C550 750 550 700 550 700" stroke="#4a90e2" stroke-width="40" stroke-linecap="round"/>
               
               <!-- 내부 전선 -->
               <path d="M350 100V700" stroke="#f8d86a" stroke-width="20" stroke-linecap="round"/>
               <path d="M400 100V700" stroke="#ed7d31" stroke-width="20" stroke-linecap="round"/>
               <path d="M450 100V700" stroke="#00b050" stroke-width="20" stroke-linecap="round"/>
             </svg>
-            <svg width="40" height="40" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-right">
-              <!-- 트레이 사다리 -->
-              <path d="M150 100V700" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
-              <path d="M650 100V700" stroke="#1a73e8" stroke-width="40" stroke-linecap="round"/>
-              
-              <!-- 가로 단 -->
-              <path d="M150 150H650" stroke="#1a73e8" stroke-width="30" stroke-linecap="round"/>
-              <path d="M150 250H650" stroke="#1a73e8" stroke-width="30" stroke-linecap="round"/>
-              <path d="M150 350H650" stroke="#1a73e8" stroke-width="30" stroke-linecap="round"/>
-              <path d="M150 450H650" stroke="#1a73e8" stroke-width="30" stroke-linecap="round"/>
-              <path d="M150 550H650" stroke="#1a73e8" stroke-width="30" stroke-linecap="round"/>
-              <path d="M150 650H650" stroke="#1a73e8" stroke-width="30" stroke-linecap="round"/>
-              
-              <!-- 케이블 -->
-              <path d="M200 150C200 150 250 200 400 200C550 200 600 150 600 150" stroke="#f8d86a" stroke-width="10"/>
-              <path d="M200 350C200 350 250 400 400 400C550 400 600 350 600 350" stroke="#f8d86a" stroke-width="10"/>
-              <path d="M200 550C200 550 250 600 400 600C550 600 600 550 600 550" stroke="#f8d86a" stroke-width="10"/>
-            </svg>
           </div>
-          <div class="calculator-title">전선관(트레이) 계산기</div>
-          <div class="calculator-desc">
-            전선 수량과 규격에 따른 적정 전선관 크기와 케이블 트레이 규격을 계산하여 시공의 효율성과 안전성을 확보합니다.
+          <div class="calculator-content">
+            <div class="calculator-title">전선관(트레이) 계산기</div>
+            <div class="calculator-desc">전선 수량과 규격에 따른 적정 전선관 크기를 계산합니다.</div>
           </div>
         </a>
         
@@ -404,26 +307,23 @@
           <div class="calculator-icon">
             <svg width="50" height="50" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
               <!-- LED 평면도 -->
-              <rect x="250" y="150" width="300" height="300" rx="10" stroke="#1a73e8" stroke-width="30" fill="white"/>
+              <rect x="250" y="150" width="300" height="300" rx="10" stroke="#4a90e2" stroke-width="30" fill="none"/>
               
               <!-- LED 칩 -->
               <rect x="300" y="200" width="200" height="200" fill="#f8d86a"/>
-              <path d="M300 300H500" stroke="#1a73e8" stroke-width="20"/>
-              <path d="M400 200V400" stroke="#1a73e8" stroke-width="20"/>
+              <path d="M300 300H500" stroke="#4a90e2" stroke-width="20"/>
+              <path d="M400 200V400" stroke="#4a90e2" stroke-width="20"/>
               
               <!-- 전압강하 표시 -->
-              <path d="M400 450L400 550" stroke="#1a73e8" stroke-width="20" stroke-dasharray="10 10"/>
-              <path d="M350 550L450 550" stroke="#1a73e8" stroke-width="20"/>
-              <path d="M320 600L480 600" stroke="#1a73e8" stroke-width="20"/>
-              <path d="M300 650L500 650" stroke="#1a73e8" stroke-width="20"/>
-              
-              <!-- 화살표 -->
-              <path d="M350 500L400 550L450 500" stroke="#1a73e8" stroke-width="15" fill="none"/>
+              <path d="M400 450L400 550" stroke="#4a90e2" stroke-width="20" stroke-dasharray="10 10"/>
+              <path d="M350 550L450 550" stroke="#4a90e2" stroke-width="20"/>
+              <path d="M320 600L480 600" stroke="#4a90e2" stroke-width="20"/>
+              <path d="M300 650L500 650" stroke="#4a90e2" stroke-width="20"/>
             </svg>
           </div>
-          <div class="calculator-title">전압강하 계산기 (LED)</div>
-          <div class="calculator-desc">
-            LED 조명 시스템의 전압강하를 계산하여 안정적인 조명 설계를 지원합니다.
+          <div class="calculator-content">
+            <div class="calculator-title">전압강하 계산기 (LED)</div>
+            <div class="calculator-desc">LED 조명 시스템의 전압강하를 계산합니다.</div>
           </div>
         </a>
         
@@ -432,28 +332,23 @@
           <div class="calculator-icon">
             <svg width="50" height="50" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
               <!-- 충전재 통 -->
-              <path d="M250 250H550V650C550 650 550 700 400 700C250 700 250 650 250 650V250Z" stroke="#1a73e8" stroke-width="40" fill="white"/>
+              <path d="M250 250H550V650C550 650 550 700 400 700C250 700 250 650 250 650V250Z" stroke="#4a90e2" stroke-width="40" fill="none"/>
               
               <!-- 손잡이 -->
-              <path d="M300 250V150C300 150 300 100 400 100C500 100 500 150 500 150V250" stroke="#1a73e8" stroke-width="30"/>
+              <path d="M300 250V150C300 150 300 100 400 100C500 100 500 150 500 150V250" stroke="#4a90e2" stroke-width="30"/>
               
               <!-- 충전재 층 -->
               <rect x="270" y="350" width="260" height="60" fill="#a9d18e"/>
               <rect x="270" y="450" width="260" height="60" fill="#a9d18e"/>
               <rect x="270" y="550" width="260" height="60" fill="#a9d18e"/>
-              
-              <!-- 스푼 -->
-              <path d="M580 300C650 300 680 350 680 400C680 450 650 500 580 500" stroke="#1a73e8" stroke-width="15"/>
-              <path d="M580 310V490" stroke="#1a73e8" stroke-width="15"/>
             </svg>
           </div>
-          <div class="calculator-title">충전재 계산기</div>
-          <div class="calculator-desc">
-            몰탈, 아스콘 등 충전재의 필요 용량을 정확히 계산하여 자재 낭비를 방지합니다.
+          <div class="calculator-content">
+            <div class="calculator-title">충전재 계산기</div>
+            <div class="calculator-desc">몰탈, 아스콘 등 충전재의 필요 용량을 계산합니다.</div>
           </div>
-        </a>" height="60" fill="#a9d18e"/>
-              
-            
+        </a>
+      </div>
       
       <!-- 노트 섹션 -->
       <div class="note">
