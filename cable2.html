@@ -45,6 +45,9 @@
     .tab-container {
       margin-bottom: 20px;
     }
+    .headers {
+      font-size: 30px;
+    }
     .tabs {
       font-size: 20px;
       display: flex;
@@ -362,7 +365,7 @@
     .home-btn {
       width: auto;
       height: auto;
-      background: #1a73e8;
+      background: #var(--primary);
       color: white;
       border: none;
       padding: 8px 14px;
@@ -585,12 +588,11 @@
       </svg>
       홈으로
     </button>
-    <div style="font-size: 1em; font-weight: 500; color: var(--primary-color);">케이블 계산기</div>
+    <div class="headers" style=" font-weight: 500; color: var(--accent-color);">케이블 계산기</div>
   </div>
   
   <div class="container">
     <div class="calculator">
-      <h1>케이블 계산기(고급)</h1>
       
       <div class="tab-container">
         <div class="tabs">
