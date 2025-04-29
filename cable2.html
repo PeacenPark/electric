@@ -139,7 +139,7 @@
       cursor: pointer;
       font-size: 1em;
       font-weight: 500;
-      margin-top: 20px;
+      margin-top: 10px;
       width: 100%;
       transition: background 0.2s, transform 0.1s;
       -webkit-tap-highlight-color: transparent;
@@ -568,6 +568,18 @@
         padding: 6px 8px;
         font-size: 0.85em;
       }
+      .bottom{
+		margin-right: 20px;
+		margin-left: 20px;
+      position: fixed;
+      bottom: 0px;
+      left: 0;
+      right: 0;
+      display: flex;
+      gap: 8px;
+      padding: 0px
+      z-index: 1000;
+      }
     }
 
     /* 토스트 메시지 애니메이션 */
@@ -764,8 +776,9 @@
               </div>
             </div>
           </div>
-          
+          <div class="bottom">
           <button id="calculateBtn">계산하기</button>
+          </div>
           
           <div class="result" id="result">
             선택 정보를 바탕으로 결과가 표시됩니다.
@@ -2643,3 +2656,5 @@ const availableSizes = Object.keys(resistance[cableType])
   </script>
 </body>
 </html>
+
+
