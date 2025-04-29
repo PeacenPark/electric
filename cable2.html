@@ -20,6 +20,7 @@
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
       margin: 0;
       padding: 0;
+		padding-bottom: 80px;
       background: var(--background);
       color: var(--text);
       -webkit-text-size-adjust: 100%;
@@ -572,7 +573,7 @@
 		margin-right: 20px;
 		margin-left: 20px;
       position: fixed;
-      bottom: 0px;
+      bottom: 20px;
       left: 0;
       right: 0;
       display: flex;
@@ -862,7 +863,9 @@
             </div>
           </div>
           
+			<div class="bottom">
           <button id="calculateVoltageDropBtn">전압 강하 계산</button>
+			</div>
           
           <div class="result" id="voltageDropResult">
             케이블 길이와 부하 전류를 입력하면 전압 강하를 계산합니다.
@@ -927,8 +930,9 @@
               <input type="number" id="compareLength" inputmode="decimal" pattern="[0-9]*" placeholder="예: 100" min="1" step="1" required>
             </div>
           </div>
-          
+          <div class="bottom">
           <button id="compareBtn">케이블 선정</button>
+			 </div>
           
           <div class="result" id="compareResult" style="display: none;">
             <h2>케이블 선정 결과</h2>
