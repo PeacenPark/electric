@@ -651,12 +651,16 @@ function goBack() {
         wire1Select.add(option1);
         wire2Select.add(option2);
         
-        // 기본값 설정 (0.75㎟와 1.5㎟)
+        // 기본값 설정 (6.0㎟)
         if (opt.mm2 === 6.0) wire1Select.selectedIndex = index;
         if (opt.mm2 === 6.0) wire2Select.selectedIndex = index;
       });
       
       updateWireInfo();
+      
+      // 전선 선택 변경 시 이벤트 리스너 추가
+      wire1Select.addEventListener('change', updateWireInfo);
+      wire2Select.addEventListener('change', updateWireInfo);
     }
 
     // 입력 유효성 검사 함수
@@ -684,496 +688,500 @@ function goBack() {
     }
 
     // 계산 함수
-    function calculate() {
-      if (!validateInputs()) return;
-      
-      const smpsV = parseFloat(document.getElementById("smps_voltage").value);
-      const ledW = parseFloat(document.getElementById("led_power").value);
-      const count = parseInt(document.getElementById("led_count").value);
-      const firstDist = parseFloat(document.getElementById("first_distance").value);
-      const spacing = parseFloat(document.getElementById("spacing").value);
-      
-      const wire1Index = document.getElementById("wire1_select").selectedIndex;
-      const wire2Index = document.getElementById("wire2_select").selectedIndex;
-      const wire1 = wireOptions[wire1Index];
-      const wire2 = wireOptions[wire2Index];
-      
-      const currentPerLED = ledW / smpsV;
-      const totalCurrent = currentPerLED * count;
-      let remainingCurrent = totalCurrent;
-      let cumulativeDrop = 0;
-      
-      const tableBody = document.querySelector("#resultTable tbody");
-      const detailTableBody = document.querySelector("#detailTable tbody");
-      const fragment = document.createDocumentFragment();
-      const detailFragment = document.createDocumentFragment();
-      const warnings = [];
-      let overDropWarned = false;
-      
-      // 전류 초과 경고
-      if (totalCurrent > wire1.current) {
-        warnings.push(`⚠️ 1번 LED까지 전류 (${totalCurrent.toFixed(2)}A)가 허용전류 ${wire1.current}A를 초과합니다`);
-      }
-      
-      if (currentPerLED > wire2.current) {
-        warnings.push(`⚠️ 이후 LED당 전류 (${currentPerLED.toFixed(3)}A)가 허용전류 ${wire2.current}A를 초과합니다`);
-      }
-      
-      // 데이터 배열 초기화 (차트용)
-      const labels = [];
-      const voltageDropData = [];
-      const ledVoltageData = [];
-      const percentDropData = [];
-      
-      // 테이블 생성
-      for (let i = 1; i <= count; i++) {
-        if (remainingCurrent <= 0) break;
-        
-        const isFirst = i === 1;
-        const segmentLength = isFirst ? firstDist : spacing;
-        const resistance = isFirst ? wire1.resistance : wire2.resistance;
-        const wireLength = segmentLength * 2;
-        const voltageDrop = remainingCurrent * resistance * wireLength;
-        cumulativeDrop += voltageDrop;
-        const ledVoltage = smpsV - cumulativeDrop;
-        const percentDrop = (cumulativeDrop / smpsV) * 100;
-        const overLimit = percentDrop > 3;
-        
-        // 전압 강하 경고 (3% 초과 시)
-        if (overLimit && !overDropWarned) {
-          warnings.push(`⚠️ LED ${i}번 이후 전압강하가 ${percentDrop.toFixed(1)}% 발생했습니다 (3% 초과)`);
-          overDropWarned = true;
-        }
-        
-        // 일반 테이블에 데이터 추가
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${i}</td>
-          <td>${segmentLength.toFixed(2)}</td>
-          <td>${remainingCurrent.toFixed(3)}</td>
-          <td class="${overLimit ? "high-drop" : ""}">${cumulativeDrop.toFixed(3)}V (${percentDrop.toFixed(1)}%)</td>
-          <td>${ledVoltage.toFixed(3)}V</td>`;
-        fragment.appendChild(row);
-        
-        // 상세 테이블에 데이터 추가
-        const detailRow = document.createElement("tr");
-        detailRow.innerHTML = `
-          <td>${i}</td>
-          <td>${remainingCurrent.toFixed(3)} × ${resistance.toExponential(3)} × ${wireLength.toFixed(2)} = ${voltageDrop.toFixed(3)}V</td>
-          <td>${smpsV.toFixed(1)} - ${cumulativeDrop.toFixed(3)} = ${ledVoltage.toFixed(3)}V</td>`;
-        detailFragment.appendChild(detailRow);
-        
-        // 차트 데이터 추가
-        labels.push(`LED ${i}`);
-        voltageDropData.push(cumulativeDrop);
-        ledVoltageData.push(ledVoltage);
-        percentDropData.push(percentDrop);
-        
-        remainingCurrent -= currentPerLED;
-      }
-      
-      // 결과 업데이트
-      tableBody.innerHTML = "";
-      tableBody.appendChild(fragment);
-      
-      detailTableBody.innerHTML = "";
-      detailTableBody.appendChild(detailFragment);
-      
-      // 경고 메시지 표시
-      const warningsElement = document.getElementById("warnings");
-      if (warnings.length > 0) {
-        warningsElement.innerHTML = warnings.join("<br>");
-        warningsElement.style.display = "block";
-      } else {
-        warningsElement.style.display = "none";
-      }
-      
-      // 요약 정보 표시
-      const totalDistance = firstDist + spacing * (count - 1);
-      const totalCableLength = totalDistance * 2;
-      const percentDrop = (cumulativeDrop / smpsV) * 100;
-      const finalVoltage = smpsV - cumulativeDrop;
-      
-      document.getElementById("summaryContent").innerHTML = `
-        <div class="summary-item">
-          <span>총 거리:</span>
-          <span class="summary-value">${totalDistance.toFixed(2)}m</span>
-        </div>
-        <div class="summary-item">
-          <span>총 전선 길이 (왕복):</span>
-          <span class="summary-value">${totalCableLength.toFixed(2)}m</span>
-        </div>
-        <div class="summary-item">
-          <span>최종 누적 전압 강하:</span>
-          <span class="summary-value">${cumulativeDrop.toFixed(3)}V (${percentDrop.toFixed(1)}%)</span>
-        </div>
-        <div class="summary-item">
-          <span>최종 LED 전압:</span>
-          <span class="summary-value">${finalVoltage.toFixed(3)}V</span>
-        </div>
-      `;
-      
-      // 결과 섹션 표시
-      document.getElementById("resultSection").style.display = "block";
-      
-      // 차트 업데이트
-      updateChart(labels, voltageDropData, ledVoltageData, percentDropData);
-      
-      // 배선 다이어그램 업데이트
-      updateWiringDiagram(count, firstDist, spacing, wire1, wire2);
+function calculate() {
+  if (!validateInputs()) return;
+  
+  const smpsV = parseFloat(document.getElementById("smps_voltage").value);
+  const ledW = parseFloat(document.getElementById("led_power").value);
+  const count = parseInt(document.getElementById("led_count").value);
+  const firstDist = parseFloat(document.getElementById("first_distance").value);
+  const spacing = parseFloat(document.getElementById("spacing").value);
+  
+  const wire1Index = document.getElementById("wire1_select").selectedIndex;
+  const wire2Index = document.getElementById("wire2_select").selectedIndex;
+  const wire1 = wireOptions[wire1Index];
+  const wire2 = wireOptions[wire2Index];
+  
+  const currentPerLED = ledW / smpsV;
+  const totalCurrent = currentPerLED * count;
+  let remainingCurrent = totalCurrent;
+  let cumulativeDrop = 0;
+  
+  const tableBody = document.querySelector("#resultTable tbody");
+  const detailTableBody = document.querySelector("#detailTable tbody");
+  const fragment = document.createDocumentFragment();
+  const detailFragment = document.createDocumentFragment();
+  const warnings = [];
+  let overDropWarned = false;
+  
+  // 전류 초과 경고
+  if (totalCurrent > wire1.current) {
+    warnings.push(`⚠️ 1번 LED까지 전류 (${totalCurrent.toFixed(2)}A)가 허용전류 ${wire1.current}A를 초과합니다`);
+  }
+  
+  if (currentPerLED > wire2.current) {
+    warnings.push(`⚠️ 이후 LED당 전류 (${currentPerLED.toFixed(3)}A)가 허용전류 ${wire2.current}A를 초과합니다`);
+  }
+  
+  // 데이터 배열 초기화 (차트용)
+  const labels = [];
+  const voltageDropData = [];
+  const ledVoltageData = [];
+  const percentDropData = [];
+  
+  // 테이블 생성
+  for (let i = 1; i <= count; i++) {
+    if (remainingCurrent <= 0) break;
+    
+    const isFirst = i === 1;
+    const segmentLength = isFirst ? firstDist : spacing;
+    const resistance = isFirst ? wire1.resistance : wire2.resistance;
+    const wireLength = segmentLength * 2;
+    const voltageDrop = remainingCurrent * resistance * wireLength;
+    cumulativeDrop += voltageDrop;
+    const ledVoltage = smpsV - cumulativeDrop;
+    const percentDrop = (cumulativeDrop / smpsV) * 100;
+    const overLimit = percentDrop > 3;
+    
+    // 전압 강하 경고 (3% 초과 시)
+    if (overLimit && !overDropWarned) {
+      warnings.push(`⚠️ LED ${i}번 이후 전압강하가 ${percentDrop.toFixed(1)}% 발생했습니다 (3% 초과)`);
+      overDropWarned = true;
     }
+    
+    // 일반 테이블에 데이터 추가
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${i}</td>
+      <td>${segmentLength.toFixed(2)}</td>
+      <td>${remainingCurrent.toFixed(3)}</td>
+      <td class="${overLimit ? "high-drop" : ""}">${cumulativeDrop.toFixed(3)}V (${percentDrop.toFixed(1)}%)</td>
+      <td>${ledVoltage.toFixed(3)}V</td>`;
+    fragment.appendChild(row);
+    
+    // 상세 테이블에 데이터 추가
+    const detailRow = document.createElement("tr");
+    detailRow.innerHTML = `
+      <td>${i}</td>
+      <td>${remainingCurrent.toFixed(3)} × ${resistance.toExponential(3)} × ${wireLength.toFixed(2)} = ${voltageDrop.toFixed(3)}V</td>
+      <td>${smpsV.toFixed(1)} - ${cumulativeDrop.toFixed(3)} = ${ledVoltage.toFixed(3)}V</td>`;
+    detailFragment.appendChild(detailRow);
+    
+    // 차트 데이터 추가
+    labels.push(`LED ${i}`);
+    voltageDropData.push(cumulativeDrop);
+    ledVoltageData.push(ledVoltage);
+    percentDropData.push(percentDrop);
+    
+    remainingCurrent -= currentPerLED;
+  }
+  
+  // 결과 업데이트
+  tableBody.innerHTML = "";
+  tableBody.appendChild(fragment);
+  
+  detailTableBody.innerHTML = "";
+  detailTableBody.appendChild(detailFragment);
+  
+  // 경고 메시지 표시
+  const warningsElement = document.getElementById("warnings");
+  if (warnings.length > 0) {
+    warningsElement.innerHTML = warnings.join("<br>");
+    warningsElement.style.display = "block";
+  } else {
+    warningsElement.style.display = "none";
+  }
+  
+  // 요약 정보 표시
+  const totalDistance = firstDist + spacing * (count - 1);
+  const totalCableLength = totalDistance * 2;
+  const percentDrop = (cumulativeDrop / smpsV) * 100;
+  const finalVoltage = smpsV - cumulativeDrop;
+  
+  document.getElementById("summaryContent").innerHTML = `
+    <div class="summary-item">
+      <span>총 거리:</span>
+      <span class="summary-value">${totalDistance.toFixed(2)}m</span>
+    </div>
+    <div class="summary-item">
+      <span>총 전선 길이 (왕복):</span>
+      <span class="summary-value">${totalCableLength.toFixed(2)}m</span>
+    </div>
+    <div class="summary-item">
+      <span>최종 누적 전압 강하:</span>
+      <span class="summary-value">${cumulativeDrop.toFixed(3)}V (${percentDrop.toFixed(1)}%)</span>
+    </div>
+    <div class="summary-item">
+      <span>최종 LED 전압:</span>
+      <span class="summary-value">${finalVoltage.toFixed(3)}V</span>
+    </div>
+  `;
+  
+  // 결과 섹션 표시
+  document.getElementById("resultSection").style.display = "block";
+  
+  // 차트 업데이트
+  updateChart(labels, voltageDropData, ledVoltageData, percentDropData);
+  
+  // 배선 다이어그램 업데이트
+  updateWiringDiagram(count, firstDist, spacing, wire1, wire2);
+}
 
-    // 탭 변경 함수
-    function changeTab(tabName) {
-      // 모든 탭 비활성화
-      document.querySelectorAll('.tab').forEach(tab => {
-        tab.classList.remove('active');
-      });
-      
-      document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.remove('active');
-      });
-      
-      // 선택한 탭 활성화
-      document.querySelector(`.tab[onclick="changeTab('${tabName}')"]`).classList.add('active');
-      document.getElementById(`${tabName}Tab`).classList.add('active');
-    }
+// 탭 변경 함수
+function changeTab(tabName) {
+  // 모든 탭 비활성화
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.classList.remove('active');
+  });
+  
+  document.querySelectorAll('.tab-content').forEach(content => {
+    content.classList.remove('active');
+  });
+  
+  // 선택한 탭 활성화
+  document.querySelector(`.tab[onclick="changeTab('${tabName}')"]`).classList.add('active');
+  document.getElementById(`${tabName}Tab`).classList.add('active');
+}
 
-    // 상세 정보 토글 함수
-    function toggleDetails() {
-      const detailsContainer = document.getElementById('detailsContainer');
-      const detailToggle = document.getElementById('detailToggle');
-      
-      detailsContainer.classList.toggle('expanded');
-      detailToggle.classList.toggle('active');
-      
-      if (detailsContainer.classList.contains('expanded')) {
-        detailToggle.textContent = '상세 계산식 숨기기';
-      } else {
-        detailToggle.textContent = '상세 계산식 보기';
-      }
-    }
+// 상세 정보 토글 함수
+function toggleDetails() {
+  const detailsContainer = document.getElementById('detailsContainer');
+  const detailToggle = document.getElementById('detailToggle');
+  
+  detailsContainer.classList.toggle('expanded');
+  detailToggle.classList.toggle('active');
+  
+  if (detailsContainer.classList.contains('expanded')) {
+    detailToggle.textContent = '상세 계산식 숨기기';
+  } else {
+    detailToggle.textContent = '상세 계산식 보기';
+  }
+}
 
-    // 차트 업데이트 함수
-    function updateChart(labels, voltageDropData, ledVoltageData, percentDropData) {
-      const ctx = document.getElementById('voltageDropChart').getContext('2d');
-      
-      // 이전 차트가 있으면 제거
-      if (voltageChart) {
-        voltageChart.destroy();
-      }
-      
-      // 새 차트 생성
-      voltageChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [
-            {
-              label: '전압 강하 (V)',
-              data: voltageDropData,
-              borderColor: '#ff5a5f',
-              backgroundColor: 'rgba(255, 90, 95, 0.1)',
-              borderWidth: 2,
-              tension: 0.2,
-              fill: true
-            },
-            {
-              label: 'LED 전압 (V)',
-              data: ledVoltageData,
-              borderColor: '#4361ee',
-              backgroundColor: 'rgba(67, 97, 238, 0.1)',
-              borderWidth: 2,
-              tension: 0.2,
-              yAxisID: 'y1'
-            },
-            {
-              label: '전압 강하 (%)',
-              data: percentDropData,
-              borderColor: '#2ecc71',
-              backgroundColor: 'rgba(46, 204, 113, 0.1)',
-              borderWidth: 2,
-              tension: 0.2,
-              yAxisID: 'y2',
-              hidden: true
-            }
-          ]
+// 차트 업데이트 함수
+function updateChart(labels, voltageDropData, ledVoltageData, percentDropData) {
+  const ctx = document.getElementById('voltageDropChart').getContext('2d');
+  
+  // 이전 차트가 있으면 제거
+  if (voltageChart) {
+    voltageChart.destroy();
+  }
+  
+  // 새 차트 생성
+  voltageChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: '전압 강하 (V)',
+          data: voltageDropData,
+          borderColor: '#ff5a5f',
+          backgroundColor: 'rgba(255, 90, 95, 0.1)',
+          borderWidth: 2,
+          tension: 0.2,
+          fill: true
         },
-        options: {
-          responsive: true,
-          interaction: {
-            mode: 'index',
-            intersect: false,
-          },
-          plugins: {
-            legend: {
-              position: 'top',
-              labels: {
-                boxWidth: 12,
-                font: {
-                  size: 11
-                }
-              }
-            },
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  let label = context.dataset.label || '';
-                  if (label) {
-                    label += ': ';
-                  }
-                  if (context.parsed.y !== null) {
-                    label += context.parsed.y.toFixed(3);
-                    if (context.dataset.label.includes('%')) {
-                      label += '%';
-                    } else {
-                      label += 'V';
-                    }
-                  }
-                  return label;
-                }
-              }
+        {
+          label: 'LED 전압 (V)',
+          data: ledVoltageData,
+          borderColor: '#4361ee',
+          backgroundColor: 'rgba(67, 97, 238, 0.1)',
+          borderWidth: 2,
+          tension: 0.2,
+          yAxisID: 'y1'
+        },
+        {
+          label: '전압 강하 (%)',
+          data: percentDropData,
+          borderColor: '#2ecc71',
+          backgroundColor: 'rgba(46, 204, 113, 0.1)',
+          borderWidth: 2,
+          tension: 0.2,
+          yAxisID: 'y2',
+          hidden: true
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      interaction: {
+        mode: 'index',
+        intersect: false,
+      },
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: {
+            boxWidth: 12,
+            font: {
+              size: 11
             }
-          },
-          scales: {
-            x: {
-              grid: {
-                display: false
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              let label = context.dataset.label || '';
+              if (label) {
+                label += ': ';
               }
-            },
-            y: {
-              beginAtZero: true,
-              title: {
-                display: true,
-                text: '전압 강하 (V)'
+              if (context.parsed.y !== null) {
+                label += context.parsed.y.toFixed(3);
+                if (context.dataset.label.includes('%')) {
+                  label += '%';
+                } else {
+                  label += 'V';
+                }
               }
-            },
-            y1: {
-              position: 'right',
-              beginAtZero: false,
-              title: {
-                display: true,
-                text: 'LED 전압 (V)'
-              },
-              grid: {
-                drawOnChartArea: false
-              }
-            },
-            y2: {
-              position: 'right',
-              beginAtZero: true,
-              title: {
-                display: true,
-                text: '전압 강하 (%)'
-              },
-              grid: {
-                drawOnChartArea: false
-              },
-              display: false
+              return label;
             }
           }
         }
-      });
-    }
-
-    // 배선 다이어그램 업데이트 함수
-    function updateWiringDiagram(count, firstDist, spacing, wire1, wire2) {
-      const svg = document.getElementById('wiringSvg');
-      const width = 600;
-      const height = 300;
-      const padding = 40;
-      
-      // SVG 초기화
-      svg.innerHTML = '';
-      
-      // 최대 표시할 LED 수 (가독성을 위해)
-      const maxDisplay = Math.min(count, 15);
-      
-      // 스케일 계산
-      const totalDist = firstDist + spacing * (count - 1);
-      const scale = (width - padding * 2) / totalDist;
-      
-      // 시작 위치 설정
-      const startX = padding;
-      const centerY = height / 2;
-      
-      // 전원 위치 표시 (SMPS는 표시하지 않고 시작점만 표시)
-      const powerPoint = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      powerPoint.setAttribute('cx', startX);
-      powerPoint.setAttribute('cy', centerY);
-      powerPoint.setAttribute('r', 6);
-      powerPoint.setAttribute('fill', '#4361ee');
-      svg.appendChild(powerPoint);
-      
-      // 전원 텍스트
-      const powerText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      powerText.setAttribute('x', startX);
-      powerText.setAttribute('y', centerY - 15);
-      powerText.setAttribute('text-anchor', 'middle');
-      powerText.setAttribute('fill', '#4361ee');
-      powerText.setAttribute('font-size', '12');
-      powerText.setAttribute('font-weight', 'bold');
-      powerText.textContent = '전원';
-      svg.appendChild(powerText);
-      
-      // 첫 번째 전선 (전원에서 첫 번째 LED까지)
-      const firstWire = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-      firstWire.setAttribute('x1', startX);
-      firstWire.setAttribute('y1', centerY);
-      firstWire.setAttribute('x2', startX + firstDist * scale);
-      firstWire.setAttribute('y2', centerY);
-      firstWire.setAttribute('stroke', '#ff5a5f');
-      firstWire.setAttribute('stroke-width', 3);
-      svg.appendChild(firstWire);
-      
-      // 첫 번째 전선 텍스트
-      const firstWireText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      firstWireText.setAttribute('x', startX + (firstDist * scale) / 2);
-      firstWireText.setAttribute('y', centerY - 15);
-      firstWireText.setAttribute('text-anchor', 'middle');
-      firstWireText.setAttribute('fill', '#333');
-      firstWireText.setAttribute('font-size', '11');
-      firstWireText.textContent = `${firstDist}m (${wire1.label})`;
-      svg.appendChild(firstWireText);
-      
-      // LED와 나머지 전선 그리기
-      for (let i = 0; i < maxDisplay; i++) {
-        const isLast = i === maxDisplay - 1 && maxDisplay < count;
-        const x = startX + firstDist * scale + i * spacing * scale;
-        
-        // LED 전구 그리기 (원 대신 전구 모양으로 표현)
-        const bulbColor = '#ffeb3b'; // 노란색 전구
-        const ledBulbOuter = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        ledBulbOuter.setAttribute('cx', x);
-        ledBulbOuter.setAttribute('cy', centerY);
-        ledBulbOuter.setAttribute('r', 8);
-        ledBulbOuter.setAttribute('fill', bulbColor);
-        ledBulbOuter.setAttribute('stroke', '#e6d537');
-        ledBulbOuter.setAttribute('stroke-width', '1');
-        svg.appendChild(ledBulbOuter);
-        
-        // 전구 빛 효과
-        const ledGlow = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        ledGlow.setAttribute('cx', x);
-        ledGlow.setAttribute('cy', centerY);
-        ledGlow.setAttribute('r', 12);
-        ledGlow.setAttribute('fill', 'rgba(255, 235, 59, 0.2)');
-        svg.insertBefore(ledGlow, ledBulbOuter);
-        
-        // LED 번호
-        const ledNum = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        ledNum.setAttribute('x', x);
-        ledNum.setAttribute('y', centerY + 20);
-        ledNum.setAttribute('text-anchor', 'middle');
-        ledNum.setAttribute('fill', '#333');
-        ledNum.setAttribute('font-size', '10');
-        ledNum.textContent = isLast ? '...' : `${i+1}번`;
-        svg.appendChild(ledNum);
-        
-        // LED 전압 표시 (첫 번째, 중간, 마지막 LED만)
-        if (i === 0 || i === Math.floor(maxDisplay/2) || i === maxDisplay-1) {
-          const voltageInfo = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-          voltageInfo.setAttribute('x', x);
-          voltageInfo.setAttribute('y', centerY - 20);
-          voltageInfo.setAttribute('text-anchor', 'middle');
-          voltageInfo.setAttribute('fill', '#4361ee');
-          voltageInfo.setAttribute('font-size', '10');
-          
-          if (i === 0) {
-            voltageInfo.textContent = '최대 전압';
-          } else if (i === maxDisplay-1 && isLast) {
-            voltageInfo.textContent = '최소 전압';
-          } else if (i === Math.floor(maxDisplay/2)) {
-            voltageInfo.textContent = '중간 전압';
+      },
+      scales: {
+        x: {
+          grid: {
+            display: false
           }
-          
-          svg.appendChild(voltageInfo);
-        }
-        
-        // 다음 LED까지 전선 그리기 (마지막 LED 제외)
-        if (i < maxDisplay - 1) {
-          const nextWire = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-          nextWire.setAttribute('x1', x);
-          nextWire.setAttribute('y1', centerY);
-          nextWire.setAttribute('x2', x + spacing * scale);
-          nextWire.setAttribute('y2', centerY);
-          nextWire.setAttribute('stroke', '#ff5a5f');
-          nextWire.setAttribute('stroke-width', 2);
-          svg.appendChild(nextWire);
-          
-          // 간격 표시 (일부만 표시해서 가독성 높임)
-          if (i % 3 === 0 && i !== 0) {
-            const spacingText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            spacingText.setAttribute('x', x + (spacing * scale) / 2);
-            spacingText.setAttribute('y', centerY + 15);
-            spacingText.setAttribute('text-anchor', 'middle');
-            spacingText.setAttribute('fill', '#777');
-            spacingText.setAttribute('font-size', '9');
-            spacingText.textContent = `${spacing}m`;
-            svg.appendChild(spacingText);
+        },
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: '전압 강하 (V)'
           }
+        },
+        y1: {
+          position: 'right',
+          beginAtZero: false,
+          title: {
+            display: true,
+            text: 'LED 전압 (V)'
+          },
+          grid: {
+            drawOnChartArea: false
+          }
+        },
+        y2: {
+          position: 'right',
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: '전압 강하 (%)'
+          },
+          grid: {
+            drawOnChartArea: false
+          },
+          display: false
         }
       }
+    }
+  });
+}
+
+// 배선 다이어그램 업데이트 함수
+function updateWiringDiagram(count, firstDist, spacing, wire1, wire2) {
+  const svg = document.getElementById('wiringSvg');
+  const width = 600;
+  const height = 300;
+  const padding = 40;
+  
+  // SVG 초기화
+  svg.innerHTML = '';
+  
+  // 최대 표시할 LED 수 (가독성을 위해)
+  const maxDisplay = Math.min(count, 15);
+  
+  // 스케일 계산
+  const totalDist = firstDist + spacing * (count - 1);
+  const scale = (width - padding * 2) / totalDist;
+  
+  // 시작 위치 설정
+  const startX = padding;
+  const centerY = height / 2;
+  
+  // 전원 위치 표시 (SMPS는 표시하지 않고 시작점만 표시)
+  const powerPoint = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  powerPoint.setAttribute('cx', startX);
+  powerPoint.setAttribute('cy', centerY);
+  powerPoint.setAttribute('r', 6);
+  powerPoint.setAttribute('fill', '#4361ee');
+  svg.appendChild(powerPoint);
+  
+  // 전원 텍스트
+  const powerText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  powerText.setAttribute('x', startX);
+  powerText.setAttribute('y', centerY - 15);
+  powerText.setAttribute('text-anchor', 'middle');
+  powerText.setAttribute('fill', '#4361ee');
+  powerText.setAttribute('font-size', '12');
+  powerText.setAttribute('font-weight', 'bold');
+  powerText.textContent = '전원';
+  svg.appendChild(powerText);
+  
+  // 첫 번째 전선 (전원에서 첫 번째 LED까지)
+  const firstWire = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  firstWire.setAttribute('x1', startX);
+  firstWire.setAttribute('y1', centerY);
+  firstWire.setAttribute('x2', startX + firstDist * scale);
+  firstWire.setAttribute('y2', centerY);
+  firstWire.setAttribute('stroke', '#ff5a5f');
+  firstWire.setAttribute('stroke-width', 3);
+  svg.appendChild(firstWire);
+  
+  // 첫 번째 전선 텍스트
+  const firstWireText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  firstWireText.setAttribute('x', startX + (firstDist * scale) / 2);
+  firstWireText.setAttribute('y', centerY - 15);
+  firstWireText.setAttribute('text-anchor', 'middle');
+  firstWireText.setAttribute('fill', '#333');
+  firstWireText.setAttribute('font-size', '11');
+  firstWireText.textContent = `${firstDist}m (${wire1.label})`;
+  svg.appendChild(firstWireText);
+  
+  // LED와 나머지 전선 그리기
+  for (let i = 0; i < maxDisplay; i++) {
+    const isLast = i === maxDisplay - 1 && maxDisplay < count;
+    const x = startX + firstDist * scale + i * spacing * scale;
+    
+    // LED 전구 그리기 (원 대신 전구 모양으로 표현)
+    const bulbColor = '#ffeb3b'; // 노란색 전구
+    const ledBulbOuter = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    ledBulbOuter.setAttribute('cx', x);
+    ledBulbOuter.setAttribute('cy', centerY);
+    ledBulbOuter.setAttribute('r', 8);
+    ledBulbOuter.setAttribute('fill', bulbColor);
+    ledBulbOuter.setAttribute('stroke', '#e6d537');
+    ledBulbOuter.setAttribute('stroke-width', '1');
+    svg.appendChild(ledBulbOuter);
+    
+    // 전구 빛 효과
+    const ledGlow = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    ledGlow.setAttribute('cx', x);
+    ledGlow.setAttribute('cy', centerY);
+    ledGlow.setAttribute('r', 12);
+    ledGlow.setAttribute('fill', 'rgba(255, 235, 59, 0.2)');
+    svg.insertBefore(ledGlow, ledBulbOuter);
+    
+    // LED 번호
+    const ledNum = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    ledNum.setAttribute('x', x);
+    ledNum.setAttribute('y', centerY + 20);
+    ledNum.setAttribute('text-anchor', 'middle');
+    ledNum.setAttribute('fill', '#333');
+    ledNum.setAttribute('font-size', '10');
+    ledNum.textContent = isLast ? '...' : `${i+1}번`;
+    svg.appendChild(ledNum);
+    
+    // LED 전압 표시 (첫 번째, 중간, 마지막 LED만)
+    if (i === 0 || i === Math.floor(maxDisplay/2) || i === maxDisplay-1) {
+      const voltageInfo = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      voltageInfo.setAttribute('x', x);
+      voltageInfo.setAttribute('y', centerY - 20);
+      voltageInfo.setAttribute('text-anchor', 'middle');
+      voltageInfo.setAttribute('fill', '#4361ee');
+      voltageInfo.setAttribute('font-size', '10');
       
-      // 범례 박스 그리기
-      const legendBox = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-      legendBox.setAttribute('x', padding);
-      legendBox.setAttribute('y', height - 50);
-      legendBox.setAttribute('width', 240);
-      legendBox.setAttribute('height', 40);
-      legendBox.setAttribute('rx', 5);
-      legendBox.setAttribute('fill', 'rgba(255, 255, 255, 0.9)');
-      legendBox.setAttribute('stroke', '#e2e8f0');
-      legendBox.setAttribute('stroke-width', '1');
-      svg.appendChild(legendBox);
+      if (i === 0) {
+        voltageInfo.textContent = '최대 전압';
+      } else if (i === maxDisplay-1 && isLast) {
+        voltageInfo.textContent = '최소 전압';
+      } else if (i === Math.floor(maxDisplay/2)) {
+        voltageInfo.textContent = '중간 전압';
+      }
       
-      // 전선 유형 범례
-      const legend1 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      legend1.setAttribute('x', padding + 10);
-      legend1.setAttribute('y', height - 35);
-      legend1.setAttribute('fill', '#333');
-      legend1.setAttribute('font-size', '11');
-      legend1.textContent = `전원 → 1번 LED: ${wire1.label}`;
-      svg.appendChild(legend1);
+      svg.appendChild(voltageInfo);
+    }
+    
+    // 다음 LED까지 전선 그리기 (마지막 LED 제외)
+    if (i < maxDisplay - 1) {
+      const nextWire = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      nextWire.setAttribute('x1', x);
+      nextWire.setAttribute('y1', centerY);
+      nextWire.setAttribute('x2', x + spacing * scale);
+      nextWire.setAttribute('y2', centerY);
+      nextWire.setAttribute('stroke', '#ff5a5f');
+      nextWire.setAttribute('stroke-width', 2);
+      svg.appendChild(nextWire);
       
-      const legend2 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      legend2.setAttribute('x', padding + 10);
-      legend2.setAttribute('y', height - 20);
-      legend2.setAttribute('fill', '#333');
-      legend2.setAttribute('font-size', '11');
-      legend2.textContent = `LED 간 연결선: ${wire2.label}`;
-      svg.appendChild(legend2);
-      
-      // 축척 정보 (크기가 압축되어 있음을 표시)
-      if (count > maxDisplay) {
-        const scaleInfo = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        scaleInfo.setAttribute('x', width - padding);
-        scaleInfo.setAttribute('y', height - 30);
-        scaleInfo.setAttribute('text-anchor', 'end');
-        scaleInfo.setAttribute('fill', '#666');
-        scaleInfo.setAttribute('font-size', '11');
-        scaleInfo.textContent = `* 표시: ${maxDisplay}개 (총 ${count}개 중)`;
-        svg.appendChild(scaleInfo);
+      // 간격 표시 (일부만 표시해서 가독성 높임)
+      if (i % 3 === 0 && i !== 0) {
+        const spacingText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        spacingText.setAttribute('x', x + (spacing * scale) / 2);
+        spacingText.setAttribute('y', centerY + 15);
+        spacingText.setAttribute('text-anchor', 'middle');
+        spacingText.setAttribute('fill', '#777');
+        spacingText.setAttribute('font-size', '9');
+        spacingText.textContent = `${spacing}m`;
+        svg.appendChild(spacingText);
       }
     }
+  }
+  
+  // 범례 박스 그리기
+  const legendBox = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  legendBox.setAttribute('x', padding);
+  legendBox.setAttribute('y', height - 50);
+  legendBox.setAttribute('width', 240);
+  legendBox.setAttribute('height', 40);
+  legendBox.setAttribute('rx', 5);
+  legendBox.setAttribute('fill', 'rgba(255, 255, 255, 0.9)');
+  legendBox.setAttribute('stroke', '#e2e8f0');
+  legendBox.setAttribute('stroke-width', '1');
+  svg.appendChild(legendBox);
+  
+  // 전선 유형 범례
+  const legend1 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  legend1.setAttribute('x', padding + 10);
+  legend1.setAttribute('y', height - 35);
+  legend1.setAttribute('fill', '#333');
+  legend1.setAttribute('font-size', '11');
+  legend1.textContent = `전원 → 1번 LED: ${wire1.label}`;
+  svg.appendChild(legend1);
+  
+  const legend2 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  legend2.setAttribute('x', padding + 10);
+  legend2.setAttribute('y', height - 20);
+  legend2.setAttribute('fill', '#333');
+  legend2.setAttribute('font-size', '11');
+  legend2.textContent = `LED 간 연결선: ${wire2.label}`;
+  svg.appendChild(legend2);
+  
+  // 축척 정보 (크기가 압축되어 있음을 표시)
+  if (count > maxDisplay) {
+    const scaleInfo = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    scaleInfo.setAttribute('x', width - padding);
+    scaleInfo.setAttribute('y', height - 30);
+    scaleInfo.setAttribute('text-anchor', 'end');
+    scaleInfo.setAttribute('fill', '#666');
+    scaleInfo.setAttribute('font-size', '11');
+    scaleInfo.textContent = `* 표시: ${maxDisplay}개 (총 ${count}개 중)`;
+    svg.appendChild(scaleInfo);
+  }
+}
 
-    // 초기화
-    window.addEventListener("DOMContentLoaded", () => {
-      populateWireOptions();
-      
-      // 폼 제출 방지
-      document.getElementById("calcForm").addEventListener("submit", (e) => {
-        e.preventDefault();
-        calculate();
-      });
-      
-      // 계산 버튼에 키보드 접근성 추가
-      document.getElementById("calculateBtn").addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          calculate();
-        }
-      });
-    });
+// 초기화
+window.addEventListener("DOMContentLoaded", () => {
+  populateWireOptions();
+  
+  // 폼 제출 방지
+  document.getElementById("calcForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    calculate();
+  });
+  
+  // 전선 선택 변경 시 이벤트 리스너 추가
+  document.getElementById("wire1_select").addEventListener("change", updateWireInfo);
+  document.getElementById("wire2_select").addEventListener("change", updateWireInfo);
+  
+  // 계산 버튼에 키보드 접근성 추가
+  document.getElementById("calculateBtn").addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      calculate();
+    }
+  });
+});
   </script>
 </body>
 </html>
