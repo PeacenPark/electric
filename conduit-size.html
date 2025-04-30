@@ -55,7 +55,6 @@
     }
     
     h1 {
-    
       text-align: center;
       color: var(--primary-color);
       margin: 10px 0 20px;
@@ -146,7 +145,6 @@
       display: flex;
       gap: 8px;
       padding: 12px;
-      
       z-index: 1000;
     }
     
@@ -224,7 +222,7 @@
       z-index: 10;
     }
 
-.cable-list {
+    .cable-list {
       max-height: 250px;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
@@ -394,7 +392,7 @@
       100% { transform: rotate(360deg); }
     }
     
-   .sticky-header {
+    .sticky-header {
       position: sticky;
       top: 0;
       background: #fff;
@@ -405,6 +403,7 @@
       align-items: center;
       justify-content: space-between;
     }
+    
     .home-btn {
       width: auto;
       height: auto;
@@ -421,10 +420,14 @@
       align-items: center;
       margin: 0;
     }
+    
     .home-btn svg {
       margin-right: 5px;
     }
-    .home-btn:hover { background: #155ec2; }
+    
+    .home-btn:hover { 
+      background: #155ec2; 
+    }
     
     /* 도움말 스타일 */
     .help-icon {
@@ -538,8 +541,7 @@
 </head>
 
 <body>
-
-   <div class="sticky-header">
+  <div class="sticky-header">
     <button class="home-btn" onclick="goBack()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
@@ -547,10 +549,10 @@
       </svg>
       홈으로
     </button>
-    <div class="headers" style=" font-size: 30px; font-weight: bold; color: var(--primary-color);">전선관 계산기</div>
+    <div class="headers" style="font-size: 30px; font-weight: bold; color: var(--primary-color);">전선관 계산기</div>
   </div>
+  
   <div class="container">
-    
     <div class="tabs">
       <div class="tab active" data-tab="calculator">계산기</div>
       <div class="tab" data-tab="history">히스토리</div>
@@ -571,6 +573,7 @@
             <label>전선 종류</label>
             <select id="type" onchange="updateSizeOptions(); updateExternalDiameter();">
               <option value="CV">CV</option>
+              <option value="TFR-CV">TFR-CV (고압용)</option>
               <option value="HFIX">HFIX</option>
               <option value="CNCV">CNCV</option>
               <option value="GV">GV</option>
@@ -701,8 +704,8 @@
       
       <div class="card">
         <h2>앱 정보</h2>
-        <p>전선관 계산기 v2.0</p>
-        <p>최종 업데이트: 2025.04.25</p>
+        <p>전선관 계산기 v2.1</p>
+        <p>최종 업데이트: 2025.04.30</p>
         <p>이 앱은 한국 전기 설비 기술 기준에 따라 전선관 채움률을 계산합니다.</p>
       </div>
     </div>
@@ -720,7 +723,6 @@
   </div>
   
   <div class="notification" id="notification"></div>
-  
 
 <script>
 // 케이블 외경 데이터베이스
@@ -745,6 +747,19 @@ const cableDiameters = {
     '400': { '1': 35.0, '2': 65.0, '3': 75.0, '4': 80.0 },
     '500': { '1': 39.0, '2': 71.0, '3': 82.0, '4': 88.0 },
     '600': { '1': 42.0, '2': 76.0, '3': 88.0, '4': 94.0 }
+  },
+  'TFR-CV': {
+    '25': { '1': 22.0, '3': 48.0 },
+    '35': { '1': 24.0, '3': 51.0 },
+    '50': { '1': 26.0, '3': 54.0 },
+    '70': { '1': 28.0, '3': 58.0 },
+    '95': { '1': 31.0, '3': 62.0 },
+    '120': { '1': 33.0, '3': 65.0 },
+    '150': { '1': 35.0, '3': 68.0 },
+    '185': { '1': 37.0, '3': 72.0 },
+    '240': { '1': 40.0, '3': 77.0 },
+    '300': { '1': 43.0, '3': 81.0 },
+    '400': { '1': 46.0, '3': 86.0 }
   },
   'HFIX': {
     '1.5': { '1': 3.0 }, '2.5': { '1': 3.4 }, '4': { '1': 3.9 },
@@ -931,8 +946,13 @@ function updateSizeOptions() {
   const sizes = Object.keys(cableDiameters[type] || {}).sort((a, b) => parseFloat(a) - parseFloat(b));
   sizeSelect.innerHTML = sizes.map(s => `<option value="${s}">${s}㎟</option>`).join('');
   
+  // TFR-CV는 1C와 3C만 가능
+  if (type === "TFR-CV") {
+    coreSelect.innerHTML = `<option value="1">1C</option><option value="3">3C</option>`;
+    coreSelect.disabled = false;
+  }
   // HFIX, CNCV, GV는 Core가 항상 1C로 고정됨
-  if (type === "HFIX" || type === "CNCV" || type === "GV") {
+  else if (type === "HFIX" || type === "CNCV" || type === "GV") {
     coreSelect.innerHTML = `<option value="1">1C</option>`;
     coreSelect.disabled = true;
   } else {
@@ -1218,6 +1238,14 @@ function deleteCalculation(index) {
   }
 }
 
+
+
+
+
+
+
+
+
 // 균등한 조합 찾기
 function findBalancedCombo(values, required) {
   // 1개만으로 만족하는 경우 찾기
@@ -1420,7 +1448,6 @@ function generateCrossSectionSVG(pipeType, innerDia, cables, totalArea, usedArea
     });
     
     // 겹치지 않도록 배치하는 패킹 알고리즘
-    // 모든 케이블이 들어가지 않으면 자동으로 크기가 큰 것부터 우선 배치
     const packedResult = packCirclesWithoutOverlap(cableDetails, centerX, centerY, containerSvgRadius);
     const packedCables = packedResult.placedCircles;
     const allPlaced = packedResult.allPlaced;
@@ -1616,8 +1643,8 @@ function generateCrossSectionSVG(pipeType, innerDia, cables, totalArea, usedArea
     // 직경 비율을 유지하여 그리기
     if (displayCables.length > 0) {
       let currentX = trayX + 5; // 시작 위치에 약간의 패딩 추가
-      
-      // 개별 회로 케이블인 경우 (100% 초과)
+
+// 개별 회로 케이블인 경우 (100% 초과)
       if (isOverfilled) {
         // 각 케이블 그리기
         displayCables.forEach(cable => {
@@ -1904,60 +1931,8 @@ function packCirclesWithoutOverlap(circles, centerX, centerY, containerRadius) {
   };
 }
 
-// 채움률에 따른 색상 반환 함수
-function getFillColor(fillPercent, limit) {
-  if (fillPercent <= limit) {
-    return "#4caf50"; // 녹색 - 기준 이내
-  } else if (fillPercent <= 60) {
-    return "#ff9800"; // 노란색 - 기준 초과 ~ 60%
-  } else {
-    return "#e53935"; // 붉은색 - 60% 초과
-  }
-}
 
-// 채움률에 따른 색상 반환 함수
-function getFillColor(fillPercent, limit) {
-  if (fillPercent <= limit) {
-    return "#4caf50"; // 녹색 - 기준 이내
-  } else if (fillPercent <= 60) {
-    return "#ff9800"; // 노란색 - 기준 초과 ~ 60%
-  } else {
-    return "#e53935"; // 붉은색 - 60% 초과
-  }
-}
-
-// 색상 반환 함수
-function getFillColor(fillPercent, limit) {
-  if (fillPercent <= limit) {
-    return "#4caf50"; // 녹색 - 기준 이내
-  } else if (fillPercent <= 60) {
-    return "#ff9800"; // 노란색 - 기준 초과 ~ 60%
-  } else {
-    return "#e53935"; // 붉은색 - 60% 초과
-  }
-}
-
-// 함수를 performance.calculate에 연결하여 계산 시 사용하도록 설정
-function calculate() {
-  // 로딩 표시
-  document.getElementById("loading").style.display = "flex";
-  
-  // 비동기로 계산 실행 (UI 블로킹 방지)
-  setTimeout(() => {
-    try {
-      performCalculation();
-    } catch (e) {
-      console.error('계산 오류:', e);
-      showNotification('계산 중 오류가 발생했습니다.', 3000);
-    } finally {
-      // 로딩 숨김
-      document.getElementById("loading").style.display = "none";
-    }
-  }, 100);
-}
-
-
-// 계산 실행
+// 계산 함수
 function calculate() {
   // 로딩 표시
   document.getElementById("loading").style.display = "flex";
@@ -2034,7 +2009,7 @@ function performCalculation() {
       // 필요한 최소 폭을 찾음 (채움률 만족하는 가장 작은 트레이)
       const required = totalWidth / (limit / 100);
       
-      // 각 트레이 폭에 대해 채움률 계산 후 적합한 가장 작은 폭 선택
+      // 각 트레이 폭에 대해 채움률 계산 후, 적합한 가장 작은 폭 선택
       for (let i = 0; i < trayWidths.length; i++) {
         const width = trayWidths[i];
         const fill = (totalWidth / width) * 100;
