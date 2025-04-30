@@ -572,12 +572,12 @@
           <div class="field">
             <label>전선 종류</label>
             <select id="type" onchange="updateSizeOptions(); updateExternalDiameter();">
-              <option value="CV">CV</option>
-              <option value="TFR-CV">TFR-CV (고압용)</option>
-              <option value="HFIX">HFIX</option>
-              <option value="CNCV">CNCV</option>
-              <option value="GV">GV</option>
-            </select>
+  <option value="F-CV">F-CV</option>  <!-- CV → F-CV로 변경 -->
+  <option value="HFIX">HFIX</option>
+  <option value="GV">GV</option>
+  <option value="TFR-CV">TFR-CV (고압용)</option>
+  <option value="CNCV">CNCV (고압용)</option>
+</select>
           </div>
           <div class="field">
             <label>전선 굵기(㎟)</label>
@@ -727,7 +727,7 @@
 <script>
 // 케이블 외경 데이터베이스
 const cableDiameters = {
-  'CV': {
+  'F-CV': {
     '1.5': { '1': 6.3, '2': 11.0, '3': 12.1, '4': 13.0 },
     '2.5': { '1': 6.7, '2': 12.0, '3': 13.2, '4': 14.0 },
     '4': { '1': 7.2, '2': 13.0, '3': 14.5, '4': 15.5 },
