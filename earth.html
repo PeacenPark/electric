@@ -38,44 +38,29 @@ h3 {
     margin: 20px 0 10px;
     font-size: 18px;
 }
-.header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 20px;
-    background-color: white;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-}
-.header-content {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    max-width: 800px;
-    width: 100%;
-    margin: 0 auto;
-}
+
 .home-btn {
-    background-color: #3f51b5;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: bold;
-    text-decoration: none;
-    display: inline-block;
-    transition: background-color 0.3s;
-    white-space: nowrap;
-}
-.home-btn:hover {
-    background-color: #303f9f;
-}
+      flex: none;
+      width: auto;
+      height: auto;
+      background: #var(--primary);
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      z-index: 1000;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      display: inline-flex;
+      align-items: center;
+      margin: 0;
+    }
+    .home-btn svg {
+      margin-right: 5px;
+    }
+    .home-btn:hover { background: #155ec2; }
+
 .input-group {
     margin-bottom: 15px;
 }
@@ -317,7 +302,7 @@ tr:nth-child(even) {
         font-size: 18px;
     }
     body {
-        padding-top: 60px;
+        padding-top: 0px;
     }
     .rod-info {
         flex-direction: column;
@@ -449,18 +434,33 @@ tr:nth-child(even) {
     margin: 15px 0;
     font-size: 14px;
 }
+.sticky-header {
+      position: sticky;
+      top: 0;
+      background: #fff;
+      z-index: 100;
+      padding: 10px 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
 
 
     </style>
 </head>
 <body>
     <!-- 고정된 헤더 -->
-    <div class="header">
-        <div class="header-content">
-            <a href="index.html" class="home-btn">홈으로</a>
-            <h1>접지시스템 설계 계산기</h1>
-        </div>
-    </div>
+    <div class="sticky-header">
+    <button class="home-btn" onclick="goBack()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+      홈으로
+    </button>
+    <div class="headers" style="font-size: 30px; font-weight: bold; color: #45a049;">접지 시스템 계산기</div>
+  </div>
     
     <div class="calculator">
         <!-- 탭 메뉴 추가 -->
