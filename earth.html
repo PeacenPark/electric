@@ -1783,7 +1783,7 @@ function updateArrangementDiagram(arrangement, rodsCount, spacing) {
 
 
 // 접지 시스템 계산 함수
-    // 완전히 수정된 calculateGroundingSystem 함수
+    // 접지 시스템 계산 함수 - 완전히 수정된 버전
 function calculateGroundingSystem() {
     if (!soilResistivity || !targetResistance || !rodSpacing || !arrangementType || !resultSection) return;
     
@@ -1877,37 +1877,36 @@ function calculateGroundingSystem() {
     let mutualResistanceFactor = 1;
     
     if (totalRods > 1) {
-        // IEEE Standard 142 기반 수정된 계산식
-        let k = 0; // 상호 영향 계수
+        // IEEE Standard 142-2007 (Green Book) 기반 수정된 계산식
         
-        // 배치 패턴에 따른 상호 영향 계수 결정
+        // 배치 패턴에 따른 기본 상호 영향 계수 설정
+        let kBase = 0;
         if (arrangement === 'line') {
-            k = 0.85; // 직선 배열 - 상호 영향 높음
+            kBase = 0.85; // 직선 배열 - 상호 영향 높음
         } else if (arrangement === 'ring') {
-            k = 0.75; // 원형 배열 - 상호 영향 중간
+            kBase = 0.75; // 원형 배열 - 상호 영향 중간
         } else if (arrangement === 'grid') {
-            k = 0.65; // 그리드 배열 - 상호 영향 낮음
+            kBase = 0.65; // 그리드 배열 - 상호 영향 낮음
         }
         
-        // 수정된 상호 영향 계산식
-        // 접지봉 수가 증가할수록 저항은 반드시 감소하도록 구성
-        const rodSpacingFactor = Math.min(1, spacing / 10); // 간격 영향 (10m에서 최대)
-        const rodCountFactor = (totalRods - 1) / totalRods; // 개수 영향
+        // 간격을 적용한 수정된 상호 영향 계수 계산
+        // 간격이 작을수록 상호 영향이 커지도록 수정
+        const spacingFactor = Math.max(0.2, Math.min(1, spacing / 10)); // 0.2 ~ 1.0 사이 값
         
-        // 상호 영향 계수: 1.0(영향 없음)보다 항상 큰 값을 가짐
-        // 그러나 너무 크지 않도록 제한하여 저항값이 낮게 유지되도록 함
-        mutualResistanceFactor = 1 + (k * rodCountFactor * (1 - rodSpacingFactor));
+        // 간격이 작을 때 상호 영향이 커지도록 spacingFactor를 역수로 적용
+        // 접지봉 간격이 작을수록 mutualResistanceFactor가 커지도록 함
+        const intervalImpact = (1 / spacingFactor) * 0.5;
         
-        // 접지봉 개수가 증가할수록 저항이 낮아지도록 추가 보정
-        const countAdjustment = 1 - Math.min(0.5, (totalRods - 1) * 0.05);
-        mutualResistanceFactor *= countAdjustment;
+        // 접지봉 개수에 따른 영향 - 접지봉이 많을수록 상호 영향이 커짐
+        const countFactor = 1 + ((totalRods - 1) * 0.05);
         
-        // 오류 방지: 계수가 너무 크지 않도록 제한 (최대 1.5)
-        mutualResistanceFactor = Math.min(mutualResistanceFactor, 1.5);
-        // 또한 너무 작지 않도록 제한 (최소 1.0)
-        mutualResistanceFactor = Math.max(mutualResistanceFactor, 1.0);
+        // 최종 상호 영향 계수 계산 - 간격이 작을수록, 개수가 많을수록 높아짐
+        mutualResistanceFactor = 1 + (kBase * intervalImpact * countFactor);
         
-        console.log(`상호 영향 계수: ${mutualResistanceFactor.toFixed(3)} (k=${k}, 간격=${spacing}m, 개수=${totalRods})`);
+        // 상호 영향 계수가 너무 크거나 작아지지 않도록 제한
+        mutualResistanceFactor = Math.max(1.1, Math.min(mutualResistanceFactor, 2.0));
+        
+        console.log(`수정된 상호 영향 계수: ${mutualResistanceFactor.toFixed(3)} (kBase=${kBase}, spacingFactor=${spacingFactor.toFixed(2)}, intervalImpact=${intervalImpact.toFixed(2)}, 간격=${spacing}m, 개수=${totalRods})`);
     }
     
     // 최종 저항 계산 (상호 영향 고려)
