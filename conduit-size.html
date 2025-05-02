@@ -1344,7 +1344,7 @@ function getFillStatusMessage(fillPercent, limit) {
   }
 }
 
-// 단면도 시각화 함수 - 정확한 단면적 비율로 표현
+// 단면도 시각화 함수 수정 - 전선관 단면적 기준으로 케이블 배치
 function generateCrossSectionSVG(pipeType, innerDia, cables, totalArea, usedArea, fillPercent, limit, providedTypeToColor = null) {
   // SVG 기본 설정
   const svgSize = 300;
@@ -1378,17 +1378,27 @@ function generateCrossSectionSVG(pipeType, innerDia, cables, totalArea, usedArea
   
   // 전선관인 경우 (원형)
   if (pipeType !== 'TRAY') {
-    // SVG에서 표현할 전선관 반지름
-    const containerSvgRadius = (svgSize - (padding * 2)) / 2 * 0.8;
+    // SVG에서 표현할 전선관 반지름 (전선관 내경 기준)
+    const containerFullRadius = (svgSize - (padding * 2)) / 2 * 0.8;
     
     // 실제 전선관의 내부 단면적 (mm²)
     const conduitArea = totalArea;
     
-    // 실제 전선관의 반지름 (mm)
-    const conduitRealRadius = Math.sqrt(conduitArea / Math.PI);
+    // 실제 전선관의 반지름 (mm) - 내경 기준
+    const conduitRealRadius = innerDia / 2;
     
     // 스케일 계산 (SVG 픽셀 / 실제 mm)
-    const scale = containerSvgRadius / conduitRealRadius;
+    const scale = containerFullRadius / conduitRealRadius;
+    
+    // 유효면적 반지름 계산 (correction 계수 적용)
+    // 종류별 보정 계수
+    const correction = pipeType === 'ELP' ? 0.7 :
+                     pipeType === 'CD_PE' ? 0.6 :
+                     pipeType === 'HI' ? 0.65 :
+                     pipeType === 'STEEL' ? 0.75 : 1.0;
+    
+    // 유효면적 기준 반지름 (SVG 픽셀)
+    const effectiveRadius = containerFullRadius * Math.sqrt(correction);
     
     // 채움률에 따른 배경색 결정
     let conduitBgColor = "#4caf50"; // 초록색 (적합)
@@ -1411,9 +1421,13 @@ function generateCrossSectionSVG(pipeType, innerDia, cables, totalArea, usedArea
         </pattern>
       </defs>
       
-      <!-- 전선관 외곽 (채움률에 따른 배경색) -->
-      <circle cx="${centerX}" cy="${centerY}" r="${containerSvgRadius}" 
-        fill="${conduitBgColor}" fill-opacity="${conduitBgOpacity}" stroke="#333" stroke-width="2" />`;
+      <!-- 전선관 외곽 (전체 단면적) -->
+      <circle cx="${centerX}" cy="${centerY}" r="${containerFullRadius}" 
+        fill="${conduitBgColor}" fill-opacity="${conduitBgOpacity}" stroke="#333" stroke-width="2" />
+      
+      <!-- 유효면적 경계선 (점선으로 표시) -->
+      <circle cx="${centerX}" cy="${centerY}" r="${effectiveRadius}" 
+        fill="none" stroke="#1a73e8" stroke-width="1.5" stroke-dasharray="5,3" />`;
     
     // 케이블 계산 준비
     const cableDetails = [];
@@ -1447,8 +1461,8 @@ function generateCrossSectionSVG(pipeType, innerDia, cables, totalArea, usedArea
       }
     });
     
-    // 겹치지 않도록 배치하는 패킹 알고리즘
-    const packedResult = packCirclesWithoutOverlap(cableDetails, centerX, centerY, containerSvgRadius);
+    // 핵심 변경: 이제 전체 단면적 내에서 케이블을 배치 (containerFullRadius 사용)
+    const packedResult = packCirclesWithoutOverlap(cableDetails, centerX, centerY, containerFullRadius);
     const packedCables = packedResult.placedCircles;
     const allPlaced = packedResult.allPlaced;
     
@@ -1468,6 +1482,13 @@ function generateCrossSectionSVG(pipeType, innerDia, cables, totalArea, usedArea
       // 케이블 타입별로 동일한 색상 사용, 단 투명도만 약간 다르게
       const opacity = 0.8 + ((cable.cableIndex * 0.05) % 0.2); // 같은 타입이라도 약간 다른 투명도
       
+      // 케이블이 유효면적 내에 있는지 또는 외부에 있는지 확인
+      const distanceFromCenter = Math.sqrt(Math.pow(cable.x - centerX, 2) + Math.pow(cable.y - centerY, 2));
+      const isInsideEffectiveArea = distanceFromCenter + cable.radius <= effectiveRadius;
+      
+      // 유효면적을 벗어난 케이블은 20% 더 어둡게 표시 (더 명확한 시각적 구분)
+      const adjustedOpacity = isInsideEffectiveArea ? opacity : opacity * 0.8;
+      
       // 각 케이블/회로별로 구분은 되지만 유사한 색상 적용
       svg += `
       <!-- 케이블 ${cable.type} ${cable.size}㎟ ${cable.core}C #${cable.cableIndex+1} (회로 ${cable.circuitIndex + 1}) -->
@@ -1476,10 +1497,22 @@ function generateCrossSectionSVG(pipeType, innerDia, cables, totalArea, usedArea
         cy="${cable.y}" 
         r="${cable.radius}" 
         fill="${baseColor}" 
-        fill-opacity="${opacity}"
+        fill-opacity="${adjustedOpacity}"
         stroke="white" 
         stroke-width="1.5"
         stroke-opacity="0.95" />`;
+      
+      // 유효면적 외부의 케이블에는 패턴 추가 (시각적 구분)
+      if (!isInsideEffectiveArea) {
+        svg += `
+        <circle
+          cx="${cable.x}" 
+          cy="${cable.y}" 
+          r="${cable.radius}" 
+          fill="url(#diagonalHatch)" 
+          fill-opacity="0.2" 
+          stroke="none" />`;
+      }
     });
     
     // 각 케이블 외곽선 추가 (명확한 구분을 위해)
@@ -1506,17 +1539,23 @@ function generateCrossSectionSVG(pipeType, innerDia, cables, totalArea, usedArea
     }
     
     svg += `<!-- 내경 치수선 -->
-      <line x1="${centerX - containerSvgRadius}" y1="${centerY + containerSvgRadius + 15}" 
-        x2="${centerX + containerSvgRadius}" y2="${centerY + containerSvgRadius + 15}" 
+      <line x1="${centerX - containerFullRadius}" y1="${centerY + containerFullRadius + 15}" 
+        x2="${centerX + containerFullRadius}" y2="${centerY + containerFullRadius + 15}" 
         stroke="#333" stroke-width="1" />
-      <line x1="${centerX - containerSvgRadius}" y1="${centerY + containerSvgRadius + 10}" 
-        x2="${centerX - containerSvgRadius}" y2="${centerY + containerSvgRadius + 20}" 
+      <line x1="${centerX - containerFullRadius}" y1="${centerY + containerFullRadius + 10}" 
+        x2="${centerX - containerFullRadius}" y2="${centerY + containerFullRadius + 20}" 
         stroke="#333" stroke-width="1" />
-      <line x1="${centerX + containerSvgRadius}" y1="${centerY + containerSvgRadius + 10}" 
-        x2="${centerX + containerSvgRadius}" y2="${centerY + containerSvgRadius + 20}" 
+      <line x1="${centerX + containerFullRadius}" y1="${centerY + containerFullRadius + 10}" 
+        x2="${centerX + containerFullRadius}" y2="${centerY + containerFullRadius + 20}" 
         stroke="#333" stroke-width="1" />
-      <text x="${centerX}" y="${centerY + containerSvgRadius + 30}" 
+      <text x="${centerX}" y="${centerY + containerFullRadius + 30}" 
         text-anchor="middle" font-size="12">내경 ${innerDia}mm</text>
+      
+      <!-- 유효면적 레이블 -->
+      <text x="${centerX}" y="${centerY - effectiveRadius - 8}" 
+        text-anchor="middle" font-size="10" fill="#1a73e8">
+        유효면적 (${Math.round(correction * 100)}%)
+      </text>
         
       <!-- 채움률 정보 -->
       <text x="${centerX}" y="${padding / 2 + 5}" 
@@ -1547,9 +1586,19 @@ function generateCrossSectionSVG(pipeType, innerDia, cables, totalArea, usedArea
         </g>`;
     });
     
+    // 유효면적 경계에 대한 추가 설명
+    svg += `
+      <g transform="translate(0, ${displayedCableTypes.length * 15 + 10})">
+        <line x1="0" y1="5" x2="20" y2="5" stroke="#1a73e8" stroke-width="1.5" stroke-dasharray="5,3" />
+        <text x="25" y="9" font-size="10" fill="#1a73e8">유효면적 경계</text>
+      </g>`;
+    
     svg += `</g>
     </svg>`;
-  } 
+  }
+
+
+
   // 트레이인 경우 (직사각형)
   else {
     const trayWidth = innerDia; // 트레이 폭 (mm)
