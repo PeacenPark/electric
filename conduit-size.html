@@ -572,7 +572,7 @@
               <option value="HFIX">HFIX</option>
               <option value="GV">GV</option>
               <option value="TFR-CV">TFR-CV (고압용)</option>
-              <option value="CNCV">CNCV (고압용)</option>
+              <option value="CN/CV(CO)">CN/CV(CO) (고압용)</option>
             </select>
           </div>
           <div class="field">
@@ -754,7 +754,7 @@ const cableDiameters = {
     '1.5': { '1': 3.0 }, '2.5': { '1': 3.4 }, '4': { '1': 3.9 },
     '6': { '1': 4.5 }, '10': { '1': 5.5 }, '16': { '1': 6.8 }
   },
-  'CNCV': {
+  'CN/CV(CO)': {
     '38': { '1': 34.0 }, '60': { '1': 36.0 }, '100': { '1': 39.0 },
     '150': { '1': 43.0 }, '200': { '1': 45.0 }, '250': { '1': 48.0 },
     '325': { '1': 51.0 }, '400': { '1': 55.0 }, '500': { '1': 57.0 }, '600': { '1': 61.0 }
@@ -810,16 +810,16 @@ const ductSizes = [
 
 // ELP관 규격 정보
 const elpConduits = [
-  { name: '30mm', area: 600, innerDia: 27.6 },
-  { name: '40mm', area: 1100, innerDia: 36.6 },
-  { name: '50mm', area: 1700, innerDia: 46.6 },
-  { name: '65mm', area: 2800, innerDia: 59.8 },
-  { name: '80mm', area: 4200, innerDia: 73.4 },
-  { name: '100mm', area: 6700, innerDia: 92.4 },
-  { name: '125mm', area: 10500, innerDia: 115.8 },
-  { name: '150mm', area: 15000, innerDia: 138.0 },
-  { name: '175mm', area: 21000, innerDia: 164.0 },
-  { name: '200mm', area: 26000, innerDia: 182.0 }
+  { name: '30mm', area: 707, innerDia: 30.0 },
+  { name: '40mm', area: 1256, innerDia: 40.0 },
+  { name: '50mm', area: 1963, innerDia: 50.0 },
+  { name: '65mm', area: 3317, innerDia: 65.0 },
+  { name: '80mm', area: 5024, innerDia: 80.0 },
+  { name: '100mm', area: 7850, innerDia: 100.0 },
+  { name: '125mm', area: 12266, innerDia: 125.0 },
+  { name: '150mm', area: 17663, innerDia: 150.0 },
+  { name: '175mm', area: 24041, innerDia: 175.0 },
+  { name: '200mm', area: 31400, innerDia: 200.0 }
 ];
 
 // 일반 전선관 규격 정보
@@ -1055,8 +1055,8 @@ function updateSizeOptions() {
     coreSelect.innerHTML = `<option value="1">1C</option><option value="3">3C</option>`;
     coreSelect.disabled = false;
   }
-  // HFIX, CNCV, GV는 Core가 항상 1C로 고정됨
-  else if (type === "HFIX" || type === "CNCV" || type === "GV") {
+  // HFIX, CN/CV(CO), GV는 Core가 항상 1C로 고정됨
+  else if (type === "HFIX" || type === "CN/CV(CO)" || type === "GV") {
     coreSelect.innerHTML = `<option value="1">1C</option>`;
     coreSelect.disabled = true;
   } else {
