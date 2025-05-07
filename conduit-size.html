@@ -1644,9 +1644,12 @@ const containerFullRadius = (svgSize - (padding * 2)) / 2 * 0.8;
       <circle cx="${centerX}" cy="${centerY}" r="${containerFullRadius}" 
         fill="${conduitBgColor}" fill-opacity="${conduitBgOpacity}" stroke="#333" stroke-width="2" />
       
-      <!-- 유효면적 경계선 (점선으로 표시) -->
-      <circle cx="${centerX}" cy="${centerY}" r="${effectiveRadius}" 
-        fill="none" stroke="#1a73e8" stroke-width="1.5" stroke-dasharray="5,3" />`;
+      <!-- 유효면적 경계선 (점선으로 표시) 
+  <circle cx="${centerX}" cy="${centerY}" r="${effectiveRadius}" 
+        fill="none" stroke="#1a73e8" stroke-width="1.5" stroke-dasharray="5,3" />
+-->
+
+`;
     
     // 케이블 계산 준비
     const cableDetails = [];
@@ -1770,11 +1773,14 @@ const containerFullRadius = (svgSize - (padding * 2)) / 2 * 0.8;
       <text x="${centerX}" y="${centerY + containerFullRadius + 30}" 
         text-anchor="middle" font-size="12">내경 ${innerDia}mm</text>
       
-      <!-- 유효면적 레이블 -->
-      <text x="${centerX}" y="${centerY - effectiveRadius - 8}" 
+      <!-- 유효면적 레이블 
+<text x="${centerX}" y="${centerY - effectiveRadius - 8}" 
         text-anchor="middle" font-size="10" fill="#1a73e8">
         유효면적 (${Math.round(correction * 100)}%)
       </text>
+
+-->
+      
         
       <!-- 채움률 정보 -->
       <text x="${centerX}" y="${padding / 2 + 5}" 
