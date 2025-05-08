@@ -2,8 +2,8 @@ const CACHE_NAME = 'electric-calculator-v1';
 const urlsToCache = [
   '/',
   '/index.html',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png',
+  '/icons/IMG_1900.png',
+  '/icons/IMG_1901.png',
   '/manifest.json',
   // 계산기 페이지들
   '/cable2.html',
