@@ -6,7 +6,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="전기 계산기">
-  <link rel="apple-touch-icon" href="icons/IMG_1900.png">
+  <link rel="apple-touch-icon" href="icons/icon-192x192.png">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#2b5596">
   <title>전기 계산기 메인 페이지</title>
@@ -243,6 +243,164 @@
     .social-link:hover {
       color: var(--primary-color);
     }
+    
+    /* 설치 프롬프트 스타일 */
+    #installPrompt {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      padding: 16px;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+      display: none;
+      z-index: 1000;
+      border-top: 4px solid var(--primary-color);
+      animation: slideUp 0.3s ease-out;
+    }
+    
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    
+    .prompt-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .prompt-icon {
+      margin-right: 15px;
+      color: var(--primary-color);
+      font-size: 28px;
+    }
+    
+    .prompt-content {
+      flex: 1;
+    }
+    
+    .prompt-title {
+      font-weight: bold;
+      font-size: 16px;
+      margin-bottom: 5px;
+      color: #333;
+    }
+    
+    .prompt-description {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 0;
+    }
+    
+    .prompt-buttons {
+      display: flex;
+      gap: 10px;
+      margin-left: 10px;
+    }
+    
+    #installButton {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    #installButton:hover {
+      background: var(--hover-color);
+    }
+    
+    #closePrompt {
+      background: transparent;
+      border: 1px solid #ddd;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    #closePrompt:hover {
+      background: #f5f5f5;
+    }
+    
+    /* iOS 설치 안내 모달 */
+    #iosInstallModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal-content {
+      background: white;
+      padding: 24px;
+      border-radius: 10px;
+      max-width: 90%;
+      width: 360px;
+      text-align: center;
+    }
+    
+    .modal-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    
+    .install-steps {
+      text-align: left;
+      margin: 20px 0;
+    }
+    
+    .install-steps li {
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .step-number {
+      background: var(--primary-color);
+      color: white;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      margin-right: 10px;
+      flex-shrink: 0;
+    }
+    
+    .ios-instruction-image {
+      max-width: 100%;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    
+    #closeModalButton {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -403,13 +561,54 @@
           © 2025 Electric Calculator ｜ Developed by Park Pyung Hwan
         </div>
         <div class="social-links">
-          
           <a href="mailto:jisa861@naver.com" class="social-link"><i class="fas fa-envelope"></i></a>
           <a href="https://blog.naver.com/jisa861" target="_blank" class="social-link"><i class="fas fa-blog"></i></a>
         </div>
       </div>
     </div>
   </footer>
+
+  <!-- 앱 설치 프롬프트 -->
+  <div id="installPrompt">
+    <div class="prompt-container">
+      <div class="prompt-icon">
+        <i class="fas fa-download"></i>
+      </div>
+      <div class="prompt-content">
+        <div class="prompt-title">전기 계산기 앱 설치하기</div>
+        <div class="prompt-description">앱을 설치하면 오프라인에서도 사용할 수 있습니다</div>
+      </div>
+      <div class="prompt-buttons">
+        <button id="installButton">설치하기</button>
+        <button id="closePrompt">나중에</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- iOS 설치 안내 모달 -->
+  <div id="iosInstallModal">
+    <div class="modal-content">
+      <div class="modal-title">iOS에서 앱 설치하기</div>
+      <div class="install-steps">
+        <ul style="list-style: none; padding-left: 0;">
+          <li>
+            <span class="step-number">1</span>
+            <span>Safari 하단의 <strong>공유 버튼</strong>을 탭하세요</span>
+          </li>
+          <li>
+            <span class="step-number">2</span>
+            <span><strong>'홈 화면에 추가'</strong> 옵션을 선택하세요</span>
+          </li>
+          <li>
+            <span class="step-number">3</span>
+            <span><strong>'추가'</strong> 버튼을 탭하세요</span>
+          </li>
+        </ul>
+      </div>
+      <img src="ios-install-guide.png" alt="iOS 설치 안내" class="ios-instruction-image" onerror="this.style.display='none'">
+      <button id="closeModalButton">확인</button>
+    </div>
+  </div>
 
   <script>
     // PWA 서비스 워커 등록
@@ -423,23 +622,186 @@
       });
     }
     
-    // 앱 설치 프롬프트 처리
-    let deferredPrompt;
-    const installButton = document.createElement('button');
-    installButton.style.display = 'none';
+    // 기기 감지
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isAndroid = /Android/.test(navigator.userAgent);
+    const isSafari = isIOS && /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+    const isChrome = /Chrome/.test(navigator.userAgent);
     
+    // 요소 참조
+    const installPrompt = document.getElementById('installPrompt');
+    const installButton = document.getElementById('installButton');
+    const closePrompt = document.getElementById('closePrompt');
+    const iosInstallModal = document.getElementById('iosInstallModal');
+    const closeModalButton = document.getElementById('closeModalButton');
+    
+    // PWA 설치 프롬프트 이벤트
+    let deferredPrompt;
+    
+    // 이미 설치된 앱인지 확인
+    function isAppInstalled() {
+      // PWA 모드에서 실행 중인지 확인
+      return window.matchMedia('(display-mode: standalone)').matches || 
+             (window.navigator.standalone === true) || 
+             document.referrer.includes('android-app://');
+    }
+    
+    // 설치 프롬프트 이력 확인
+    function checkPromptHistory() {
+      const promptDismissed = localStorage.getItem('installPromptDismissed');
+      const lastPromptTime = localStorage.getItem('lastPromptTime');
+      const now = Date.now();
+      
+      // 3일(259,200,000밀리초) 내에 거부한 경우 표시 안 함
+      if (promptDismissed && lastPromptTime && 
+          now - parseInt(lastPromptTime) < 259200000) {
+        return false;
+      }
+      
+      return true;
+    }
+    
+    // URL 매개변수 확인
+    function getURLParams() {
+      const params = new URLSearchParams(window.location.search);
+      return {
+        force: params.get('force') === 'true'
+      };
+    }
+    
+    // beforeinstallprompt 이벤트 처리
     window.addEventListener('beforeinstallprompt', (e) => {
-      // 프롬프트 바로 표시 방지
+      // 기본 브라우저 프롬프트 방지
       e.preventDefault();
       // 이벤트 저장
       deferredPrompt = e;
-      // 설치 버튼 표시
-      installButton.style.display = 'block';
+      
+      // URL 매개변수 확인
+      const params = getURLParams();
+      
+      // 이미 설치된 앱이 아니고, 설치 이력 체크를 통과하거나 강제 표시 매개변수가 있는 경우
+      if (!isAppInstalled() && (checkPromptHistory() || params.force)) {
+        setTimeout(() => {
+          showInstallPrompt();
+        }, 1500); // 페이지 로드 1.5초 후 표시
+      }
+    });
+    
+    // 설치 프롬프트 표시
+    function showInstallPrompt() {
+      if (isIOS && isSafari) {
+        // iOS Safari의 경우 설치 안내 모달 표시
+        iosInstallModal.style.display = 'flex';
+      } else if (deferredPrompt) {
+        // Android Chrome 등 beforeinstallprompt를 지원하는 경우
+        installPrompt.style.display = 'block';
+      }
+    }
+    
+    // 페이지 로드 시 자동 처리
+    window.addEventListener('load', () => {
+      // 이미 설치된 앱이면 프롬프트 표시 안 함
+      if (isAppInstalled()) {
+        return;
+      }
+      
+      // iOS Safari의 경우 네이티브 설치 프롬프트 없음
+      if (isIOS && isSafari && checkPromptHistory()) {
+        setTimeout(() => {
+          showInstallPrompt();
+        }, 1500); // 페이지 로드 1.5초 후 표시
+      }
+      
+      // URL 매개변수 확인
+      const params = getURLParams();
+      if (params.force) {
+        // 강제 표시 매개변수가 있으면 로컬 스토리지 초기화
+        localStorage.removeItem('installPromptDismissed');
+        localStorage.removeItem('lastPromptTime');
+      }
+    });
+    
+// 설치 버튼 클릭 이벤트
+    installButton.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      
+      // 설치 프롬프트 표시
+      deferredPrompt.prompt();
+      
+      // 사용자 선택 결과 확인
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log(`설치 결과: ${outcome}`);
+      
+      // 설치 프롬프트 숨기기
+      installPrompt.style.display = 'none';
+      
+      // 저장된 프롬프트 이벤트 초기화
+      deferredPrompt = null;
+      
+      // 결과 추적 (선택사항)
+      if (outcome === 'accepted') {
+        // 설치 성공 추적
+        console.log('앱 설치 성공');
+      } else {
+        // 설치 거부 추적
+        console.log('앱 설치 거부');
+        // 설치 거부 정보 저장
+        localStorage.setItem('installPromptDismissed', 'true');
+        localStorage.setItem('lastPromptTime', Date.now().toString());
+      }
+    });
+    
+    // 닫기 버튼 클릭 이벤트
+    closePrompt.addEventListener('click', () => {
+      // 프롬프트 숨기기
+      installPrompt.style.display = 'none';
+      
+      // 거부 정보 저장
+      localStorage.setItem('installPromptDismissed', 'true');
+      localStorage.setItem('lastPromptTime', Date.now().toString());
+    });
+    
+    // iOS 모달 닫기 버튼 이벤트
+    closeModalButton.addEventListener('click', () => {
+      // iOS 모달 숨기기
+      iosInstallModal.style.display = 'none';
+      
+      // 거부 정보 저장
+      localStorage.setItem('installPromptDismissed', 'true');
+      localStorage.setItem('lastPromptTime', Date.now().toString());
+    });
+    
+    // 앱 설치 완료 감지
+    window.addEventListener('appinstalled', (e) => {
+      console.log('앱이 설치되었습니다!');
+      // 설치 프롬프트 숨기기
+      installPrompt.style.display = 'none';
+      
+      // 설치 완료 추적 (선택사항)
+      try {
+        // 웹 분석 도구가 있는 경우 이벤트 기록
+        if (typeof gtag === 'function') {
+          gtag('event', 'app_installed', {
+            'event_category': 'pwa',
+            'event_label': 'install_success'
+          });
+        }
+      } catch (err) {
+        console.error('설치 추적 오류:', err);
+      }
     });
     
     // 계산기 카드 클릭 이벤트 추적
     document.addEventListener('DOMContentLoaded', function() {
       console.log('전기 계산기 페이지가 로드되었습니다.');
+      
+      // 계산기 카드 요소들에 이벤트 리스너 추가
+      const calculatorCards = document.querySelectorAll('.calculator-card');
+      calculatorCards.forEach((card, index) => {
+        card.addEventListener('click', function() {
+          console.log(`계산기 ${index + 1} 클릭됨: ${this.querySelector('.calculator-title').textContent}`);
+        });
+      });
     });
   </script>
 </body>
