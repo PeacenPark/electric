@@ -1,0 +1,297 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>앱 설치하기</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#4285f4">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+            color: #333;
+        }
+        .logo {
+            width: 100px;
+            height: 100px;
+            margin: 20px auto;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h1 {
+            font-size: 24px;
+            margin: 16px 0;
+        }
+        .install-btn {
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 24px 0;
+            cursor: pointer;
+            display: none; /* 초기에는 숨김 */
+            box-shadow: 0 4px 8px rgba(66,133,244,0.3);
+        }
+        .instructions {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 24px 0;
+            text-align: left;
+            display: none;
+        }
+        .instructions li {
+            margin: 12px 0;
+            line-height: 1.5;
+        }
+        .instructions img {
+            max-width: 200px;
+            display: block;
+            margin: 16px auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .hidden {
+            display: none;
+        }
+        .step-highlight {
+            background: #fffde7;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        .footer {
+            margin-top: 40px;
+            font-size: 14px;
+            color: #666;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(66,133,244,0.3);
+            border-radius: 50%;
+            border-top-color: #4285f4;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 8px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="logo">
+        <!-- 앱 로고 이미지 -->
+        <img src="/images/icon-192.png" alt="앱 아이콘" width="100" height="100">
+    </div>
+    
+    <h1>앱 설치하기</h1>
+    <p>더 빠르고 안전한 경험을 위해 앱을 설치하세요.</p>
+    
+    <button id="installButton" class="install-btn">앱 설치하기</button>
+    
+    <!-- Android 설치 안내 -->
+    <div id="androidInstructions" class="instructions">
+        <h2>Android 설치 방법</h2>
+        <ol>
+            <li>위의 <span class="step-highlight">앱 설치하기</span> 버튼을 클릭하세요.</li>
+            <li>설치 확인 메시지가 나타나면 <span class="step-highlight">설치</span>를 탭하세요.</li>
+            <li>설치가 완료되면 앱 아이콘이 홈 화면에 나타납니다.</li>
+        </ol>
+        <img src="/images/android-install.png" alt="Android 설치 방법">
+    </div>
+    
+    <!-- iOS 설치 안내 -->
+    <div id="iosInstructions" class="instructions">
+        <h2>iOS 설치 방법</h2>
+        <ol>
+            <li>Safari 브라우저의 <span class="step-highlight">공유 버튼</span>을 탭하세요 <span style="font-size:20px">⬆️</span></li>
+            <li><span class="step-highlight">홈 화면에 추가</span> 옵션을 선택하세요.</li>
+            <li><span class="step-highlight">추가</span> 버튼을 탭하세요.</li>
+            <li>설치가 완료되면 앱 아이콘이 홈 화면에 나타납니다.</li>
+        </ol>
+        <img src="/images/ios-install.png" alt="iOS 설치 방법">
+    </div>
+    
+    <!-- 지원되지 않는 브라우저 메시지 -->
+    <div id="notSupportedMessage" class="hidden">
+        <p>죄송합니다. 현재 사용 중인 브라우저에서는 앱 설치가 지원되지 않습니다.</p>
+        <p>Chrome(Android) 또는 Safari(iOS)에서 다시 시도해주세요.</p>
+    </div>
+    
+    <div id="installingMessage" class="hidden">
+        <p>앱을 설치하는 중입니다<span class="loading"></span></p>
+    </div>
+    
+    <div class="footer">
+        <p>문제가 있으신가요? <a href="mailto:support@example.com">지원팀에 문의하세요</a></p>
+    </div>
+    
+    <script>
+        // 기기 및 브라우저 감지
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        const isAndroid = /Android/.test(navigator.userAgent);
+        const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+        const isChrome = /Chrome/.test(navigator.userAgent);
+        
+        // 설치 가능 여부 확인
+        const canInstall = (isAndroid && isChrome) || (isIOS && isSafari);
+        
+        const installButton = document.getElementById('installButton');
+        const androidInstructions = document.getElementById('androidInstructions');
+        const iosInstructions = document.getElementById('iosInstructions');
+        const notSupportedMessage = document.getElementById('notSupportedMessage');
+        const installingMessage = document.getElementById('installingMessage');
+        
+        let deferredPrompt;
+        
+        // URL 파라미터 감지
+        const urlParams = new URLSearchParams(window.location.search);
+        const autoInstall = urlParams.get('auto') === 'true';
+        const source = urlParams.get('source') || 'direct';
+        
+        // 설치 추적을 위한 함수
+        function trackInstallAttempt(status, details = {}) {
+            try {
+                const data = {
+                    status,
+                    source,
+                    timestamp: new Date().toISOString(),
+                    userAgent: navigator.userAgent,
+                    ...details
+                };
+                
+                // 서버에 설치 시도 기록 (선택사항)
+                fetch('/api/track-install', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                }).catch(err => console.error('추적 오류:', err));
+                
+                // 또는 로컬 스토리지에 저장
+                localStorage.setItem('installAttempt', JSON.stringify(data));
+            } catch (err) {
+                console.error('설치 추적 오류:', err);
+            }
+        }
+        
+        // 설치 가능 여부에 따른 UI 업데이트
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // 설치 버튼 표시
+            installButton.style.display = 'inline-block';
+            
+            if (isAndroid) {
+                androidInstructions.style.display = 'block';
+            }
+            
+            trackInstallAttempt('prompt-ready');
+            
+            // 자동 설치 파라미터가 있으면 자동으로 설치 프롬프트 표시
+            if (autoInstall) {
+                setTimeout(() => {
+                    installButton.click();
+                }, 1000);
+            }
+        });
+        
+        // iOS용 설치 안내
+        if (isIOS) {
+            if (navigator.standalone) {
+                // 이미 설치된 경우
+                document.body.innerHTML = '<div class="logo"><img src="/images/icon-192.png" alt="앱 아이콘" width="100"></div><h1>이미 설치된 앱입니다!</h1><p>앱 아이콘을 통해 접속해 주세요.</p>';
+                trackInstallAttempt('already-installed', { platform: 'ios' });
+            } else {
+                iosInstructions.style.display = 'block';
+                trackInstallAttempt('instructions-shown', { platform: 'ios' });
+            }
+        }
+        
+        // 설치 지원 안됨
+        if (!canInstall) {
+            notSupportedMessage.classList.remove('hidden');
+            trackInstallAttempt('not-supported', { browser: navigator.userAgent });
+        }
+        
+        // 설치 버튼 이벤트
+        installButton.addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            
+            installButton.disabled = true;
+            installButton.textContent = '설치 준비 중...';
+            installingMessage.classList.remove('hidden');
+            
+            trackInstallAttempt('button-clicked');
+            
+            try {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                
+                if (outcome === 'accepted') {
+                    installButton.textContent = '설치 완료!';
+                    trackInstallAttempt('installation-accepted');
+                    
+                    // 성공 페이지로 리디렉션 (선택사항)
+                    setTimeout(() => {
+                        window.location.href = '/install-success.html';
+                    }, 2000);
+                } else {
+                    installButton.textContent = '설치 취소됨';
+                    installButton.disabled = false;
+                    installingMessage.classList.add('hidden');
+                    trackInstallAttempt('installation-dismissed');
+                    
+                    // 3초 후 버튼 복원
+                    setTimeout(() => {
+                        installButton.textContent = '앱 설치하기';
+                        installButton.disabled = false;
+                    }, 3000);
+                }
+            } catch (err) {
+                console.error('설치 오류:', err);
+                installButton.textContent = '설치 오류';
+                installButton.disabled = false;
+                installingMessage.classList.add('hidden');
+                trackInstallAttempt('installation-error', { error: err.message });
+                
+                // 3초 후 버튼 복원
+                setTimeout(() => {
+                    installButton.textContent = '다시 시도하기';
+                    installButton.disabled = false;
+                }, 3000);
+            }
+            
+            deferredPrompt = null;
+        });
+        
+        // 앱이 이미 설치되었는지 확인
+        window.addEventListener('appinstalled', (e) => {
+            installButton.textContent = '설치 완료!';
+            installButton.disabled = true;
+            installingMessage.classList.add('hidden');
+            
+            trackInstallAttempt('installation-completed');
+            
+            // 설치 완료 페이지로 리디렉션 (선택사항)
+            setTimeout(() => {
+                window.location.href = '/install-success.html';
+            }, 2000);
+        });
+        
+        // 페이지 로드 완료 추적
+        window.addEventListener('load', () => {
+            trackInstallAttempt('page-loaded');
+        });
+    </script>
+</body>
+</html>
