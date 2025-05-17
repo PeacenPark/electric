@@ -5,7 +5,7 @@
       "namespace": "android_app",
       "package_name": "com.peacenpark.electric",
       "sha256_cert_fingerprints": [
-        "D5:5A:C1:D3:07:F4:2F:39:07:D2:36:E8:B1:B1:EF:27:64:48:27:C0:16:85:5F:00:13:8D:99:6D:95:89:B5:04"  ← 여기에 서명 키의 SHA-256 지문 입력
+        "D5:5A:C1:D3:07:F4:2F:39:07:D2:36:E8:B1:B1:EF:27:64:48:27:C0:16:85:5F:00:13:8D:99:6D:95:89:B5:04"
       ]
     }
   }
