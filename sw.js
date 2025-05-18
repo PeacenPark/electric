@@ -9,7 +9,8 @@ const urlsToCache = [
   '/cable2.html',
   '/conduit-size.html',
   '/voltage-drop.html',
-  '/moltal.html'
+  '/moltal.html',
+  '/earth.html'
 ];
 
 // 서비스 워커 설치 및 캐시 파일 선정
