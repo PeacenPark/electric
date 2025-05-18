@@ -1,4 +1,4 @@
-const CACHE_NAME = 'electric-calculator-v1';
+const CACHE_NAME = 'electric-calculator-v2';
 const urlsToCache = [
   '/',
   '/index.html',
