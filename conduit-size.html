@@ -570,7 +570,7 @@
             <select id="type" onchange="updateSizeOptions(); updateExternalDiameter();">
               <option value="F-CV">F-CV</option>
               <option value="HFIX">HFIX</option>
-              <option value="GV">GV</option>
+              <option value="F-GV">F-GV</option>
               <option value="TFR-CV">TFR-CV (고압용)</option>
               <option value="CN/CV(CO)">CN/CV(CO) (고압용)</option>
             </select>
@@ -761,7 +761,7 @@ const cableDiameters = {
     '150': { '1': 43.0 }, '200': { '1': 45.0 }, '250': { '1': 48.0 },
     '325': { '1': 51.0 }, '400': { '1': 55.0 }, '500': { '1': 57.0 }, '600': { '1': 61.0 }
   },
-  'GV': {
+  'F-GV': {
     '2.5': { '1': 9.0 }, '4': { '1': 10.0 }, '6': { '1': 11.0 },
     '10': { '1': 13.0 }, '16': { '1': 15.0 }, '25': { '1': 17.0 },
     '35': { '1': 18.5 }, '50': { '1': 20.5 }, '70': { '1': 24.0 },
@@ -1079,8 +1079,8 @@ function updateSizeOptions() {
     coreSelect.innerHTML = `<option value="1">1C</option><option value="3">3C</option>`;
     coreSelect.disabled = false;
   }
-  // HFIX, CN/CV(CO), GV는 Core가 항상 1C로 고정됨
-  else if (type === "HFIX" || type === "CN/CV(CO)" || type === "GV") {
+  // HFIX, CN/CV(CO), F-GV는 Core가 항상 1C로 고정됨
+  else if (type === "HFIX" || type === "CN/CV(CO)" || type === "F-GV") {
     coreSelect.innerHTML = `<option value="1">1C</option>`;
     coreSelect.disabled = true;
   } else {
