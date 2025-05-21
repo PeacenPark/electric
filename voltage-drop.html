@@ -312,11 +312,13 @@
     }
 
     .collapsible {
-  display: none;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.6s ease-out; /* 전환 시간을 약간 늘림 */
 }
 
 .expanded {
-  display: block;
+  max-height: 5000px; /* 더 큰 값으로 설정 */
 }
 
     .toggle-btn {
